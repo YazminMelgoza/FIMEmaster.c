@@ -1,0 +1,7 @@
+{
+  "name": "Master_C",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
