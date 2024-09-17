@@ -1,3 +1,4 @@
+
 import { Redirect, Route } from 'react-router-dom';
 import {
   IonApp,
@@ -11,6 +12,7 @@ import {
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import { ellipse, square, triangle } from 'ionicons/icons';
+
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
 import Tab3 from './pages/Tab3';
@@ -46,6 +48,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 import './theme/variables.css';
 import Login from './pages/login';
 import Register from './pages/Register';
+import SplashScreen from './pages/splashscreen';
 
 setupIonicReact();
 
@@ -53,10 +56,11 @@ const App: React.FC = () => (
   <IonApp>
   <IonReactRouter>
     <IonRouterOutlet>
-      <Route exact path="/login" component={Login} />
-      <Route exact path="/">
-        <Redirect to="/login" />
-      </Route>
+      {/* Ruta para la pantalla de splash */}
+      <Route exact path="/" component={SplashScreen} />
+      {/* Ruta para la pantalla de login */}
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
     </IonRouterOutlet>
   </IonReactRouter>
 </IonApp>

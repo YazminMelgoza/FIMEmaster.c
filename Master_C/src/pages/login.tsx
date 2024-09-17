@@ -1,8 +1,7 @@
 import React from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonButton, IonText, IonItem, IonLabel, IonIcon } from '@ionic/react';
-import { logoFacebook, logoGoogle,  } from 'ionicons/icons';
-import { useForm, Controller } from 'react-hook-form';
-import './login.css'; // Puedes agregar un archivo CSS para personalización
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonButton, IonRouterLink, IonText, IonItem, IonLabel, IonIcon } from '@ionic/react';
+
+import './login.css'; 
 import { useState } from 'react';
 
 const Login: React.FC = () => {
@@ -16,8 +15,10 @@ const Login: React.FC = () => {
       <IonPage>
         <IonContent className="ion-padding login-content">
           <div className="login-container">
-            <img src="/public/Wave.png" alt="hand-icon" className="icon" />
+            <img src="./public/Wave.png" alt="hand-icon" className="icon" />
+
             <h2 className="title">Inicia Sesión</h2>
+
             <p className="subtitle">Ingresa tus datos para comenzar a utilizar la <br></br> aplicación.</p>
   
             <div className="social-buttons">
@@ -32,22 +33,50 @@ const Login: React.FC = () => {
             </div>
   
             <div className="or-divider">Or</div>
-  
-            <IonInput type="email" placeholder="Email" className="input-field">
-            
-            </IonInput>
-            <div className="password-field">
-              <IonInput type={showPassword ? 'text' : 'password'} placeholder="Contraseña" className="input-field">
-              <img src="/public/Vector.png" alt="hand-icon" className="iconeye" />
-              </IonInput>
-              
 
-            </div>
-                <a href="#" className="forgot-password">Olvidé mi contraseña</a>
-                     <IonButton expand="block" color="#008000;" className="login-button">Log In</IonButton>
-                <a href="#" className="register-link">¿No tienes una cuenta? <span>Regístrate</span></a>
-          </div>
-          <div>
+               
+  return (
+    <div className="container-inputs">
+      <div className="email-field">
+        <IonInput 
+          type="email" 
+          placeholder="Email" 
+          className="input-field" 
+          clearInput={true} // Permite borrar el input
+        />
+      </div>
+
+      <div className="password-field">
+        <IonInput 
+          type={showPassword ? 'text' : 'password'} 
+          placeholder="Contraseña" 
+          className="input-field"
+        >
+          {/* Icono de mostrar/ocultar contraseña */}
+          <img 
+            src="/public/Vector.png" 
+            alt="hand-icon" 
+            className="" 
+            onClick={() => setShowPassword(!showPassword)}
+          />
+        </IonInput>
+        <a href="#" className="forgot-password">Olvidé mi contraseña</a>
+      </div>
+    </div>
+  );
+
+             
+                    <div className="login-container">
+                    <IonButton expand="block" color="#008000;" className="login-button">Log in</IonButton>
+                    
+                    <IonRouterLink href="/register" className="register-link">
+  ¿No tienes una cuenta? <span>Regístrate</span>
+</IonRouterLink>
+                    </div>
+                    
+
+          
+          
           
           </div>
         </IonContent>

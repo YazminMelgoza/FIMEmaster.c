@@ -1,7 +1,4 @@
-
-
-  
-  .login-container {
+.login-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -10,11 +7,11 @@
   }
   
   .icon {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     margin-bottom: 20px;
   }
-  .iconeye{ /*logos facebook y google*/
+  .iconeye{
     align-items: right;
     justify-content: right;
     padding-right: 1rem;
@@ -55,7 +52,7 @@
     border-radius: 10px;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 27rem;
     height: 2.5rem; /* Ajusté la altura para ser más coherente */
     padding: 0.5rem; /* Añadí padding para el espaciado interno */
     border: 2px solid #ccc; /* Borde inicial gris claro */
@@ -65,26 +62,18 @@
   .input-field:focus {
     border: 2px solid green; /* Cambia el borde a verde al hacer foco */
     outline: none; /* Elimina el borde predeterminado */
-   
   }
   
-  .container-inputs{
-    width: 95%;
-    
-  }
   .email-field {
     color: black;
     text-align: left;
-    align-items: center;
     margin-bottom: 1rem;
-    width: 100%;
   }
   
   .password-field {
     color: black;
     text-align: left;
     position: relative; /* Para posicionar el icono del ojo */
-    width: 100%;
   }
   
   

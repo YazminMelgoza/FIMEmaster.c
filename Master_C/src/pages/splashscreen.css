@@ -1,0 +1,27 @@
+.splash-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    background-color: white; /* Color de fondo blanco */
+  }
+  
+  .splash-logo {
+    width: 250px;
+    height: 250px;
+    margin-top: 250px;
+    
+   
+  }
+  
+  .splash-title {
+    font-size: 30px;
+    font-weight: bold;
+    color: #00953b; /* Verde representativo */
+    margin-top: 0px;
+  }
+  
+  .vivalafime{
+    margin-top: 300px;
+  }
