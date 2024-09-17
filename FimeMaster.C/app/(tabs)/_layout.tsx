@@ -24,6 +24,24 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="firstscreen"
+        options={{
+          title: 'firstscreen',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'key' : 'key-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="register"
+        options={{
+          title: 'register',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'options' : 'options-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
