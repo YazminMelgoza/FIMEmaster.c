@@ -1,0 +1,11 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "Master_C",
+	"webDir": "dist",
+	"packageClassList": [
+		"AppPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"StatusBarPlugin"
+	]
+}
