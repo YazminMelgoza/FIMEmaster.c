@@ -1,7 +1,6 @@
 import React from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonInput, IonButton, IonText, IonItem, IonLabel, IonIcon } from '@ionic/react';
-import { logoFacebook, logoGoogle,  } from 'ionicons/icons';
-import { useForm, Controller } from 'react-hook-form';
+
 import './register.css'; // Puedes agregar un archivo CSS para personalización
 import { useState } from 'react';
 
