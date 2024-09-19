@@ -8,7 +8,7 @@ const SplashScreen = () => {
   useEffect(() => {
     // Después de 4 segundos, redirigir a la pantalla de login
     const timer = setTimeout(() => {
-      navigation.navigate('Login'); // Redirige a la pantalla de login
+        // Redirige a la pantalla de login
     }, 4000);
 
     return () => clearTimeout(timer); // Limpiar el temporizador al desmontar el componente
@@ -16,9 +16,9 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.splashContainer}>
-      <Image source={require('./assets/oso.jpg')} style={styles.splashLogo} />
+      <Image source={require('@/assets/images/oso.jpg')} style={styles.splashLogo} />
       <Text style={styles.splashTitle}>master.c</Text>
-      <Image source={require('./assets/vivalafime.jpg')} style={styles.vivalafime} />
+      <Image source={require('@/assets/images/vivalafime.jpg')} style={styles.vivalafime} />
     </View>
   );
 };
@@ -35,15 +35,15 @@ const styles = StyleSheet.create({
   splashLogo: {
     width: 250,
     height: 250,
-    marginTop: 250,
+    
   },
   splashTitle: {
     fontSize: 30,
     fontWeight: 'bold',
     color: '#00953b', // Verde representativo
-    marginTop: 0,
+    marginBottom:200
   },
   vivalafime: {
-    marginTop: 300,
+    marginTop: 50
   },
 });
