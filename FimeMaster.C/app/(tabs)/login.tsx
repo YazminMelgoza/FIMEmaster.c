@@ -17,7 +17,7 @@ const Login: React.FC = () => {
     <View style={styles.loginContainer}>
       <Image source={require('@/assets/images/Wave.png')} style={styles.icon} />
 
-      <Text style={styles.title}>Inicia Sesiónes</Text>
+      <Text style={styles.title}>Inicia Sesión</Text>
 
       <Text style={styles.subtitle}>
         Ingresa tus datos para comenzar a utilizar la aplicación.
