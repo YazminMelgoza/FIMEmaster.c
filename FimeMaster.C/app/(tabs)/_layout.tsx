@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -41,6 +41,15 @@ export default function TabLayout() {
           ),
         }}
       />
+       <Tabs.Screen
+        name="registro"
+        options={{
+          title: 'registro',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'options' : 'options-outline'} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="register"
         options={{
@@ -50,6 +59,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      
       <Tabs.Screen
         name="explore"
         options={{
