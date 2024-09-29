@@ -51,6 +51,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="crearQuiz"
+        options={{
+          title: 'crearQuiz',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'options' : 'options-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="register"
         options={{
           title: 'register',
