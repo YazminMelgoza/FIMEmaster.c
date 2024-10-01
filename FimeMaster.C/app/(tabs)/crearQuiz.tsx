@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import { useRouter } from 'expo-router'; // Importa useRouter para la navegación
 const QuizScreen = () => {
+    const router = useRouter(); 
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -33,7 +34,7 @@ const QuizScreen = () => {
           {/* Profile */}
           <View style={styles.profileContainer}>
             <Image
-              source={{ uri: 'https://randomuser.me/api/portraits/women/1.jpg' }}
+              source={require('@/assets/images/usuario.png')}
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
@@ -43,7 +44,10 @@ const QuizScreen = () => {
 
           {/* Start Quiz Button */}
          <View style={styles.startButtons}>
-            <TouchableOpacity style={styles.startButton}>
+            <TouchableOpacity 
+            style={styles.startButton}
+            onPress={() => router.push('/quiz')} // Navega a la pantalla de detalles del quiz
+            >
                 <Icon name="play-circle" size={100} color="#0A8754" />
                 <Text style={styles.startText}>Empezar + 10pts</Text>
                
@@ -114,7 +118,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
     left: 65,
     top:40,
@@ -241,11 +245,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    position: 'relative', // Esto permite posicionar hijos de forma absoluta
+    position: 'relative', 
   },
   qrCodeText: {
     textAlign: 'center',
-      // Posicionar justo por encima de la parte inferior del código QR
+      // Posicionar  por encima de la parte inferior del código QR
      fontSize: 20,
      color: '#00622A',
      fontWeight: 'bold',
