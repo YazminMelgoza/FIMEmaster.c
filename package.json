@@ -1,5 +1,5 @@
 {
-  "dependencies": {
-    "react-native-elements": "^3.4.3"
+  "devDependencies": {
+    "react-scripts": "5.0.1"
   }
 }
