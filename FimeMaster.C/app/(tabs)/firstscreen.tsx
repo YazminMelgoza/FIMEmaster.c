@@ -1,70 +1,49 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Hook de React Navigation
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const SplashScreen = () => {
+  const navigation = useNavigation(); // Para la navegación en React Native
 
-export default function HomeScreen() {
+  useEffect(() => {
+    // Después de 4 segundos, redirigir a la pantalla de login
+    const timer = setTimeout(() => {
+        // Redirige a la pantalla de login
+    }, 4000);
+
+    return () => clearTimeout(timer); // Limpiar el temporizador al desmontar el componente
+  }, [navigation]);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Release it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.splashContainer}>
+      <Image source={require('@/assets/images/oso.jpg')} style={styles.splashLogo} />
+      <Text style={styles.splashTitle}>master.c</Text>
+      <Image source={require('@/assets/images/vivalafime.jpg')} style={styles.vivalafime} />
+    </View>
   );
-}
+};
+
+export default SplashScreen;
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  splashContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: 'white', // Color de fondo blanco
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  splashLogo: {
+    width: 250,
+    height: 250,
+    
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  splashTitle: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#00953b', // Verde representativo
+    marginBottom:200
+  },
+  vivalafime: {
+    marginTop: 50
   },
 });
