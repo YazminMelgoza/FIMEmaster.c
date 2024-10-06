@@ -89,7 +89,15 @@ export default function TabLayout() {
           ),
         }}
       />
-      
+      <Tabs.Screen
+        name="TerminarQuiz"
+        options={{
+          title: 'TerminarQuiz',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'qr-code' : 'qr-code-outline'} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }
