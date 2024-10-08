@@ -39,13 +39,13 @@ const App = () => {
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.replace('/inicio/quiz/crearQuiz'); // Cambia a la pantalla de tabs
+    router.replace('/(inicio)/quiz/crearQuiz'); // Cambia a la pantalla de tabs
 
   };
 
   const handleScanCode = () => {
     console.log('Escanear código');
-    router.replace('/inicio/qr/scan'); // Cambia a la pantalla de tabs
+    router.replace('/(inicio)/qr/scan'); // Cambia a la pantalla de tabs
 
   };
 
