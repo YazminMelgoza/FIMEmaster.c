@@ -1,18 +1,28 @@
 // login.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { useRouter } from 'expo-router';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const router = useRouter();
+  const navigation = useNavigation();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  // Esquema de validación con Yup
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email('Correo electrónico no válido')
+      .required('El correo es obligatorio'),
+    password: Yup.string()
+      .min(6, 'La contraseña debe tener al menos 6 caracteres')
+      .required('La contraseña es obligatoria'),
+  });
 
   const handleLogin = () => {
     // Aquí puedes añadir la lógica de autenticación
@@ -26,58 +36,89 @@ const Login: React.FC = () => {
   };
 
   return (
-    <View style={styles.loginContainer}>
-      <Image source={require('@/assets/images/Wave.png')} style={styles.icon} />
-      <Text style={styles.title}>Inicia Sesión</Text>
-      <Text style={styles.subtitle}>Ingresa tus datos para comenzar a utilizar la aplicación.</Text>
-      <View style={styles.socialButtons}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image source={require('@/assets/images/_Facebook.png')} style={styles.iconEye} />
-          <Text style={styles.buttonText}>Facebook</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image source={require('@/assets/images/_Google.png')} style={styles.iconEye} />
-          <Text style={styles.buttonText}>Google</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.orDivider}>Or</Text>
-      <View style={styles.containerInputs}>
-        <View style={styles.emailField}>
-          <TextInput
-            style={styles.inputField}
-            placeholder="Correouniversitario@unal.edu.mx"
-            placeholderTextColor="#000000"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            clearButtonMode="while-editing"
-          />
+    <Formik
+      initialValues={{ email: '', password: '' }}
+      validationSchema={validationSchema}
+      onSubmit={(values) => {
+        console.log(values);
+        // Aquí puedes manejar la lógica de inicio de sesión
+      }}
+    >
+      {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+        <View style={styles.loginContainer}>
+          <Image source={require('@/assets/images/Wave.png')} style={styles.icon} />
+
+          <Text style={styles.title}>Inicia Sesión</Text>
+
+          <Text style={styles.subtitle}>
+            Ingresa tus datos para comenzar a utilizar la aplicación.
+          </Text>
+
+          <View style={styles.socialButtons}>
+            <TouchableOpacity style={styles.socialButton}>
+              <Image source={require('@/assets/images/_Facebook.png')} style={styles.iconEye} />
+              <Text style={styles.buttonText}>Facebook</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.socialButton}>
+              <Image source={require('@/assets/images/_Google.png')} style={styles.iconEye} />
+              <Text style={styles.buttonText}>Google</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.orDivider}>Or</Text>
+
+          <View style={styles.containerInputs}>
+            <View style={styles.emailField}>
+              <TextInput
+                style={styles.inputField}
+                placeholder="Correouniversitario@unal.edu.mx"
+                placeholderTextColor="#000000"
+                value={values.email}
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                clearButtonMode="while-editing"
+              />
+              {touched.email && errors.email && (
+                <Text style={styles.errorText}>{errors.email}</Text>
+              )}
+            </View>
+
+            <View style={styles.passwordField}>
+              <TextInput
+                style={styles.inputField}
+                placeholder=""
+                placeholderTextColor="#000000"
+                value={values.password}
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                secureTextEntry={!showPassword}
+              />
+              <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
+                <Image source={require('@/assets/images/Vector.png')} style={styles.iconEye} />
+              </TouchableOpacity>
+              {touched.password && errors.password && (
+                <Text style={styles.errorText}>{errors.password}</Text>
+              )}
+            </View>
+
+            <TouchableOpacity>
+              <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.loginButton} onPress={() => handleSubmit()}>
+  <Text style={styles.buttonText}>Log in</Text>
+</TouchableOpacity>
+
+          <Text style={styles.registerLink}>
+            ¿No tienes una cuenta? <Text style={styles.registerText}>Regístrate</Text>
+          </Text>
+          
         </View>
-        <View style={styles.passwordField}>
-          <TextInput
-            style={styles.inputField}
-            placeholder=""
-            placeholderTextColor="#000000"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-          />
-          <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
-            <Image source={require('@/assets/images/Vector.png')} style={styles.iconEye} />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity>
-          <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
-        </TouchableOpacity>
-      </View>
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Log in</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.registerLink} onPress={handleregister}>
-      <Text style={styles.registerText}> ¿No tienes una cuenta?  Regístrate</Text>
-      </TouchableOpacity>
-    </View>
+      )}
+    </Formik>
   );
 };
 
@@ -137,11 +178,9 @@ const styles = StyleSheet.create({
   },
   containerInputs: {
     width: '100%',
-    
   },
   emailField: {
     marginBottom: 15,
-    
   },
   passwordField: {
     position: 'relative',
@@ -154,7 +193,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderWidth: 2,
     width: '100%',
-    height:45,
+    height: 45,
   },
   forgotPassword: {
     color: '#777777',
@@ -172,15 +211,21 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
-    
   },
   registerLink: {
     color: '#000',
-    textAlign: 'center',
+    alignSelf: 'flex-start',
     marginTop: 20,
   },
   registerText: {
     color: '#28a745',
     fontWeight: 'bold',
+    textAlign:'left',
+    
+  },
+  
+  errorText: {
+    color: 'red',
+    marginTop: 5,
   },
 });

@@ -1,111 +1,142 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Para navegación si la usas en Expo
+import { useNavigation } from '@react-navigation/native';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+
+// Esquema de validación Yup
+const validationSchema = Yup.object().shape({
+  firstName: Yup.string().required('El nombre es obligatorio'),
+  lastName: Yup.string().required('El apellido paterno es obligatorio'),
+  middleName: Yup.string().required('El apellido materno es obligatorio'),
+  email: Yup.string().email('Correo inválido').required('El correo es obligatorio'),
+  password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria'),
+});
+
 import { router } from 'expo-router';
 const Register = () => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-  
-    const navigation = useNavigation(); // Para navegación en Expo
-    const routelogin = () => {
-      // Aquí puedes añadir la lógica de autenticación
-      // Si la autenticación es exitosa, redirige al usuario a las tabs principales
-      router.replace('/login'); // Cambia a la pantalla de tabs
-    };
-    const togglePasswordVisibility = () => {
-      setShowPassword(!showPassword);
-  }
+  const [showPassword, setShowPassword] = useState(false);
+  const navigation = useNavigation();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
-    <View style={styles.container}>
-      <Image source={require('@/assets/images/oso.jpg')} style={styles.icon} />
+    <Formik
+      initialValues={{ firstName: '', lastName: '', middleName: '', email: '', password: '' }}
+      validationSchema={validationSchema}
+      onSubmit={(values) => {
+        console.log(values);
+        // Lógica para manejar el envío de datos
+      }}
+    >
+      {({ handleChange, handleSubmit, values, errors, touched }) => (
+        <View style={styles.container}>
+          <Image source={require('@/assets/images/oso.jpg')} style={styles.icon} />
+          
+          <Text style={styles.title}>Regístrate</Text>
+          <Text style={styles.subtitle}>Crea una nueva cuenta para comenzar a aprender</Text>
 
-      <Text style={styles.title}>Regístrate</Text>
-      
-      <Text style={styles.subtitle}>Crea una nueva cuenta  para comenzar a aprender</Text>
+          <View style={styles.socialButtons}>
+            <TouchableOpacity style={styles.socialButton}>
+              <Image source={require('@/assets/images/_Facebook.png')} style={styles.iconeye} />
+              <Text>Facebook</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.socialButton}>
+              <Image source={require('@/assets/images/_Google.png')} style={styles.iconeye} />
+              <Text>Google</Text>
+            </TouchableOpacity>
+          </View>
 
-      <View style={styles.socialButtons}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image source={require('@/assets/images/_Facebook.png')} style={styles.iconeye} />
-          <Text>Facebook</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image source={require('@/assets/images/_Google.png')} style={styles.iconeye} />
-          <Text>Google</Text>
-        </TouchableOpacity>
-      </View>
+          <Text style={styles.orDivider}>Or</Text>
 
-      <Text style={styles.orDivider}>Or</Text>
+          {/* Campo de Nombres */}
+          <View style={styles.inputField}>
+            <TextInput
+              placeholder="Nombres"
+              placeholderTextColor="#000000"
+              style={styles.textInput}
+              onChangeText={handleChange('firstName')}
+              value={values.firstName}
+            />
+            {touched.firstName && errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
+          </View>
 
-      <View style={styles.inputField}>
-        <TextInput 
-        placeholder="Nombres" 
-        placeholderTextColor= "#000000"
-        style={styles.textInput} 
-        />
-      </View>
+          {/* Campo de Apellido Paterno */}
+          <View style={styles.inputField}>
+            <TextInput
+              placeholder="Apellido paterno"
+              placeholderTextColor="#000000"
+              style={styles.textInput}
+              onChangeText={handleChange('lastName')}
+              value={values.lastName}
+            />
+            {touched.lastName && errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
+          </View>
 
-      <View style={styles.inputField}>
-        <TextInput 
-        placeholder="Apellido paterno" 
-           placeholderTextColor= "#000000"
-        style={styles.textInput} 
-        />
-      </View>
-      <View style={styles.inputField}>
-        <TextInput 
-        placeholder="Apellido materno" 
-           placeholderTextColor= "#000000"
-        style={styles.textInput} 
-        />
-      </View>
+          {/* Campo de Apellido Materno */}
+          <View style={styles.inputField}>
+            <TextInput
+              placeholder="Apellido materno"
+              placeholderTextColor="#000000"
+              style={styles.textInput}
+              onChangeText={handleChange('middleName')}
+              value={values.middleName}
+            />
+            {touched.middleName && errors.middleName && <Text style={styles.errorText}>{errors.middleName}</Text>}
+          </View>
 
-      <View style={styles.inputField}>
-        <TextInput 
-        placeholder="Correouniversitario@unal.edu.mx" 
-           placeholderTextColor= "#000000"
-        style={styles.textInput} 
-        keyboardType="email-address" 
-        />
-      </View>
+          {/* Campo de Correo */}
+          <View style={styles.inputField}>
+            <TextInput
+              placeholder="Correouniversitario@unal.edu.mx"
+              placeholderTextColor="#000000"
+              style={styles.textInput}
+              onChangeText={handleChange('email')}
+              value={values.email}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            {touched.email && errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+          </View>
 
-      <View style={styles.passwordField}>
-          <TextInput
-            style={styles.inputField}
-            placeholder=""
-               placeholderTextColor= "#000000"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry={!showPassword}
-          />
-          <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
-            <Image source={require('@/assets/images/Vector.png')} style={styles.iconEye} />
+          {/* Campo de Contraseña */}
+          <View style={styles.passwordField}>
+            <TextInput
+              style={styles.inputField}
+              placeholder="Contraseña"
+              placeholderTextColor="#000000"
+              onChangeText={handleChange('password')}
+              value={values.password}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
+              <Image source={require('@/assets/images/Vector.png')} style={styles.iconEye} />
+            </TouchableOpacity>
+            {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+          </View>
+
+          <TouchableOpacity style={styles.loginButton} onPress={() => handleSubmit()}>
+  <Text style={styles.loginButtonText}>Crear una cuenta</Text>
+</TouchableOpacity>
+
+
+          <TouchableOpacity>
+            <Text style={styles.registerLink}>
+              ¿Ya tienes una cuenta? <Text style={styles.registerLinkSpan}>Iniciar sesión</Text>
+            </Text>
           </TouchableOpacity>
         </View>
-
-      <TouchableOpacity>
-        <Text style={styles.forgotPassword}>I'm agree to the <Text style={styles.registerLinkSpan}>Terms of service</Text>  and </Text>
-        
-        <Text style={styles.registerLinkSpan}> Privacy  Policy </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Crear cuenta</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={routelogin}>
-        <Text style={styles.registerLink}>
-          ¿Ya tienes una cuenta? <Text style={styles.registerLinkSpan}>Iniciar sesion</Text>
-        </Text>
-      </TouchableOpacity>
-    </View>
+      )}
+    </Formik>
   );
 };
-
 
 export default Register;
 
 const styles = StyleSheet.create({
+  // Tus estilos aquí
   container: {
     flex: 1,
     alignItems: 'center',
@@ -163,7 +194,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F9FE',
     borderRadius: 10,
     width: '100%',
-    height: 40,
+    height: 45,
     marginBottom: 15,
     borderWidth: 2,
     borderColor: '#ccc',
@@ -214,5 +245,11 @@ const styles = StyleSheet.create({
     color: '#28a745',
     fontWeight: 'bold',
     marginBottom:15,
+  },
+
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
   },
 });
