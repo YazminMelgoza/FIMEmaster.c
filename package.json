@@ -1,5 +1,9 @@
 {
   "devDependencies": {
     "react-scripts": "5.0.1"
+  },
+  "dependencies": {
+    "formik": "^2.4.6",
+    "yup": "^1.4.0"
   }
 }

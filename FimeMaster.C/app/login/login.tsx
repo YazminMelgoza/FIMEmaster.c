@@ -4,7 +4,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { useRouter } from 'expo-router';
+import router from 'expo-router';
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,12 +27,12 @@ const Login: React.FC = () => {
   const handleLogin = () => {
     // Aquí puedes añadir la lógica de autenticación
     // Si la autenticación es exitosa, redirige al usuario a las tabs principales
-    router.replace('/home'); // Cambia a la pantalla de tabs
+    router.router.replace('/home'); // Cambia a la pantalla de tabs
   };
   const handleregister = () => {
     // registro
     // Si la autenticación es exitosa, redirige al usuario a las tabs principales
-    router.replace('/registro'); // Cambia a la pantalla de tabs
+    router.router.replace('/register/registro'); // Cambia a la pantalla de tabs
   };
 
   return (
