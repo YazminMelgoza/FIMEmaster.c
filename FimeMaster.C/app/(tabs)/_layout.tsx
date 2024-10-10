@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -32,6 +32,35 @@ export default function TabLayout() {
           ),
         }}
       />
+       <Tabs.Screen
+        name="login"
+        options={{
+          title: 'login',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'key' : 'key-outline'} color={color} />
+          ),
+        }}
+      />
+       <Tabs.Screen
+        name="registro"
+        options={{
+          title: 'registro',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'options' : 'options-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="crearQuiz"
+        options={{
+          
+          
+          title: 'crearQuiz',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'options' : 'options-outline'} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="register"
         options={{
@@ -42,6 +71,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="resolverBien"
+        options={{
+          title: 'resolverBien',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
+          ),
+        }}
+      />
+      
+      <Tabs.Screen
         name="explore"
         options={{
           title: 'Explore',
@@ -50,6 +89,7 @@ export default function TabLayout() {
           ),
         }}
       />
+      
     </Tabs>
   );
 }
