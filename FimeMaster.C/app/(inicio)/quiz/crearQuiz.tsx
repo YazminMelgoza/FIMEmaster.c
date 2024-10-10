@@ -46,7 +46,7 @@ const QuizScreen = () => {
          <View style={styles.startButtons}>
             <TouchableOpacity 
             style={styles.startButton}
-            onPress={() => router.push('/inicio/quiz/quiz')} // Navega a la pantalla de detalles del quiz
+            onPress={() => router.push('/(inicio)/quiz/quiz')} // Navega a la pantalla de detalles del quiz
             >
                 <Icon name="play-circle" size={100} color="#0A8754" />
                 <Text style={styles.startText}>Empezar + 10pts</Text>
