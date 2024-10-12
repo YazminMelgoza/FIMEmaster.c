@@ -83,11 +83,7 @@ export default function SignUp() {
                 <Text>Iniciar Sesión</Text>
                 </Pressable>
             </Link>
-            <Link asChild href="/home" >
-                <Pressable>
-                <Text>Ingresar a los Tabs</Text>
-                </Pressable>
-            </Link>
+            
             
         </View>
         
