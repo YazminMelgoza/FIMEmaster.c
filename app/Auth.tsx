@@ -121,13 +121,13 @@ export default function Auth() {
           </View>
 
           <TouchableOpacity style={styles.loginButton} onPress={() => handleSubmit()}>
-            <Text style={styles.buttonText}>Log in</Text>
+            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
           </TouchableOpacity>
-
+          
           <Text style={styles.registerLink}>
             ¿No tienes una cuenta? 
             <Link href="/signUp/signUp" >
-            <Text style={styles.registerText}>Regístrate</Text>
+            <Text style={styles.registerText}> Regístrate</Text>
             </Link>
           </Text>
           
@@ -135,135 +135,8 @@ export default function Auth() {
       )}
     </Formik>
   );
-  /*
-  return (
-    <View style={styles.container}>
-      <Stack.Screen 
-              options={{
-                headerStyle: {
-                  backgroundColor: 'black', 
-                },
-                title: '',
-                headerShown: false, 
-                
-              }}
-          />
-      <ScrollView>
-        <View style={styles.imageContainer}>
-          <Image 
-                  source={require('../assets/rectanguloGris.png')} // Imagen local en los assets
-                  style={styles.imageRectangulo} 
-          />
-        </View>
-        <View style={styles.imageContainer}>
-          <Image 
-                  source={require('../assets/loginOso.png')} // Imagen local en los assets
-                  style={styles.imageOso} 
-          />
-        </View>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-          <Input
-            label="Correo electrónico"
-            leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            placeholder="email@address.com"
-            autoCapitalize={'none'}
-          />
-        </View>
-        <View style={styles.verticallySpaced}>
-          <Input
-            label="Contraseña"
-            leftIcon={{ type: 'font-awesome', name: 'lock' }}
-            onChangeText={(text) => setPassword(text)}
-            value={password}
-            secureTextEntry={true}
-            placeholder="*******"
-            autoCapitalize={'none'}
-          />
-        </View>
-        <View style={[styles.verticallySpaced, styles.mt20]}>
-            <TouchableOpacity 
-                style={styles.botonVerde} 
-                onPress={() => signInWithEmail()} 
-                disabled={loading}
-            >
-                <Text style={styles.buttonText}>Iniciar Sesión</Text>
-            </TouchableOpacity>
-        </View>
-        
-        <View style={[styles.row, styles.marginY10]}>
-          <Text>¿No tienes una cuenta? </Text>
-          <Link href="/signUp" >
-            <Text style={styles.cVerdeClaro}>Registrate aquí</Text>
-          </Link>
-        </View>
-      </ScrollView>
-    </View>
-  );*/
 }
-/*
-const styles = StyleSheet.create({
-  container: 
-  {
-    marginTop: 50,
-    padding: 12,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40, 
-    backgroundColor: 'white',
-    height: screenHeight ,
-  },
-  row:
-  {
-    flexDirection: 'row',
-  },
-  imageContainer: 
-  {
-    flex: 1,
-    justifyContent: 'center', // Centrar verticalmente
-    alignItems: 'center', 
 
-  },
-  cVerdeClaro:
-  {
-    color: '#1C731A',
-  },
-  imageRectangulo: {
-    width: 200,  // Ancho de la imagen
-    height: 7, // Alto de la imagen
-    resizeMode: 'contain', 
-    
-  },
-  imageOso: {
-    width: 200,  // Ancho de la imagen
-    height: 200, // Alto de la imagen
-    resizeMode: 'contain', 
-    
-  },
-  verticallySpaced: 
-  {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: 
-  {
-    marginTop: 20,
-  },
-  marginY10: {
-    marginVertical: 10, 
-  },
-  botonVerde: {
-    backgroundColor: '#1C731A', // Color verde para el botón
-    padding: 12,
-    borderRadius: 5, // Bordes redondeados
-    alignItems: 'center', // Centrar el texto
-  },
-  buttonText: {
-      color: 'white', // Color del texto del botón
-      fontSize: 16, // Tamaño de la fuente
-  },
-})*/
 const styles = StyleSheet.create({
   loginContainer: {
     flex: 1,
@@ -297,6 +170,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 15,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   socialButton: {
     width: '48%',
