@@ -5,6 +5,7 @@ import { Button, Input } from '@rneui/themed';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import Avatar from '../../components/Avatar';
 import { RootStackParamList } from '../types/RootStackParam';
+import { Session } from '@supabase/supabase-js'; 
 // Define el tipo de los parámetros de la ruta 'account'
 type AccountScreenRouteProp = RouteProp<RootStackParamList, 'account'>;
 
@@ -17,7 +18,7 @@ export default function Account() {
 
   // Obtenemos la sesión de los parámetros de la ruta
   const route = useRoute<AccountScreenRouteProp>();
-  const session = route.params?.session;
+  const [session, setSession] = useState<Session | null>(route.params?.session || null);
 
   useEffect(() => {
     if (session) getProfile();
@@ -126,7 +127,12 @@ export default function Account() {
       </View>
 
       <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+        <Button title="Sign Out" onPress={() =>{
+          supabase.auth.signOut().then(() => {
+            setSession(null);
+            console.log("Signed out");
+          }).catch(console.error);
+        }} />
       </View>
     </View>
   );
