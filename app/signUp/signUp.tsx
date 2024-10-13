@@ -161,62 +161,17 @@ export default function SignUp() {
           <Text style={styles.registerLink}>
             ¿Ya tienes una cuenta?
             <Link href="/" >
-            <Text style={styles.registerLinkSpan}> Inicar Sesión</Text>
+            <Text style={styles.registerLinkSpan}> Inicia Sesión</Text>
             </Link>
           </Text>
         </View>
       )}
     </Formik>
   );
-  /*
-  return (
-    <Screen>
-        <Stack.Screen 
-            options={{
-                headerShown: false, // Oculta el encabezado
-            }}
-        />
-        <View style={styles.container}>
-            <View style={[styles.verticallySpaced, styles.mt20]}>
-                <Input
-                label="Email"
-                leftIcon={{ type: 'font-awesome', name: 'envelope' }}
-                onChangeText={(text) => setEmail(text)}
-                value={email}
-                placeholder="email@address.com"
-                autoCapitalize={'none'}
-                />
-            </View>
-            <View style={styles.verticallySpaced}>
-                <Input
-                label="Password"
-                leftIcon={{ type: 'font-awesome', name: 'lock' }}
-                onChangeText={(text) => setPassword(text)}
-                value={password}
-                secureTextEntry={true}
-                placeholder="Password"
-                autoCapitalize={'none'}
-                />
-            </View>
-            
-            <View style={styles.verticallySpaced}>
-                <Button title="Sign up" disabled={loading} onPress={() => signUpWithEmail()} />
-            </View>
-            <Link asChild href="/" >
-                <Pressable>
-                <Text>Iniciar Sesión</Text>
-                </Pressable>
-            </Link>
-            
-            
-        </View>
-        
-    </Screen>
-  )*/
+  
 }
 
 const styles = StyleSheet.create({
-  // Tus estilos aquí
   container: {
     flex: 1,
     alignItems: 'center',
@@ -333,21 +288,3 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 });
-/*
-const styles = StyleSheet.create({
-  container: 
-  {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: 
-  {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: 
-  {
-    marginTop: 20,
-  },
-})*/
