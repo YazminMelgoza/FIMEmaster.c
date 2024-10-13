@@ -20,12 +20,16 @@ export default function TabsLayout(){
         {
         try 
         {
+            
             supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session)
+                setSession(session)
             })
+                
             supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session)
+                setSession(session)
             })
+                
+                
             await Font.loadAsync(Entypo.font);
             //await new Promise(resolve => setTimeout(resolve, 2000)); //Artificial Delay to see splashScreen
         } catch (e) {
@@ -37,6 +41,8 @@ export default function TabsLayout(){
         }
         }
         prepare();
+        // Limpiar el listener de auth cuando el componente se desmonte
+        
     }, [])
 
     if (!appIsReady) 
@@ -68,7 +74,7 @@ export default function TabsLayout(){
                 initialParams={{ session }} // Se pasa la sesión
             />
             <Tabs.Screen
-                name="Stadistics"
+                name="Storage"
                 options={{
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => <HomeIcon name="home" color={color} />,

@@ -121,13 +121,13 @@ export default function Auth() {
           </View>
 
           <TouchableOpacity style={styles.loginButton} onPress={() => handleSubmit()}>
-            <Text style={styles.buttonText}>Log in</Text>
+            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
           </TouchableOpacity>
-
+          
           <Text style={styles.registerLink}>
             ¿No tienes una cuenta? 
             <Link href="/signUp/signUp" >
-            <Text style={styles.registerText}>Regístrate</Text>
+            <Text style={styles.registerText}> Regístrate</Text>
             </Link>
           </Text>
           
@@ -297,6 +297,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 15,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   socialButton: {
     width: '48%',
