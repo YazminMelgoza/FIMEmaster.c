@@ -128,11 +128,10 @@ export default function Account() {
 
       <View style={styles.verticallySpaced}>
         <Button title="Sign Out" onPress={() =>{
-          console.log("Signing out...");
-          supabase.auth.signOut().then(() => console.log("Signed out")).catch(console.error);
-          setSession(null);
-          console.log(session);
-          
+          supabase.auth.signOut().then(() => {
+            setSession(null);
+            console.log("Signed out");
+          }).catch(console.error);
         }} />
       </View>
     </View>
