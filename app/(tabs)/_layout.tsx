@@ -89,6 +89,14 @@ export default function TabsLayout(){
                 }}
                 initialParams={{ session }} // Se pasa la sesión
             />
+            <Tabs.Screen
+                name="TerminarQuiz"
+                options={{
+                    headerShown: false,
+                    tabBarIcon: ({ color, size }) => <HomeIcon name="qrcode" color={color} />,
+                }}
+                initialParams={{ session }} // Se pasa la sesión
+            />
         </Tabs>
         );
     }else
