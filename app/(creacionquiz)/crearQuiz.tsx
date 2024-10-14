@@ -4,11 +4,6 @@ import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useRouter } from 'expo-router'; // Importa useRouter para la navegación
 const QuizScreen = () => {
-  const backindex = () => {
-    console.log('Crear test');
-    router.replace('/(tabs)/index'); // Cambia a la pantalla de tabs
-
-  };
     const router = useRouter(); 
   return (
     <View style={styles.container}>
@@ -21,7 +16,9 @@ const QuizScreen = () => {
         />
 
         {/* Contenido encima de la imagen: flecha y título */}
-        <TouchableOpacity style={styles.backButton} onPress={backindex}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => router.back()} >
           <Image source={require('../../assets/images/flechaAtras.png')} />
         </TouchableOpacity>
 

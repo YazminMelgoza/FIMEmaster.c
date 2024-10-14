@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 
 
 const QuizScreen = () => {
+  const router = useRouter();
   
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: boolean | null }>({
     1: true,
@@ -32,7 +34,10 @@ const QuizScreen = () => {
           source={require('../../assets/images/imagetextura2.png')}
           style={styles.backgroundImage}
         />
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity 
+        style={styles.backButton}
+        onPress={() => router.back()} // Utiliza router.back() para regresar
+        >
           <Image source={require('../../assets/images/flechaAtras.png')} />
         </TouchableOpacity>
         <Text style={styles.title}>Resolver Quiz</Text>
