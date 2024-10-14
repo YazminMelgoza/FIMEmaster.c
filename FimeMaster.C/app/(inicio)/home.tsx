@@ -53,21 +53,21 @@ const App = () => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
-          source={require('../../assets/images/imagetextura2.png')}
+          source={require('/assets/images/imagetextura2.png')} 
           style={styles.headerBackgroundImage}
         />
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
             <View style={styles.sunContainer}>
               <Image
-                source={require('../../assets/images/sun.png')}
+                source={require('@/assets/images/sun.png')}
                 style={styles.sunImage}
               />
               <Text style={styles.headerText}>BUENOS DÍAS</Text>
             </View>
             <Text style={styles.headerName}>Yazmin Melgoza</Text>
           </View>
-          <Image source={require('../../assets/images/user.png')} style={styles.profileImage} />
+          <Image source={require('@/assets/images/user.png')} style={styles.profileImage} />
         </View>
       </View>
 
@@ -118,7 +118,7 @@ const App = () => {
         </View>
       </ScrollView>
 
-      {/*<View style={styles.footer}>
+      <View style={styles.footer}>
         <TouchableOpacity onPress={() => setSelectedTab('home')}>
           <Icon
             name="home"
@@ -148,7 +148,6 @@ const App = () => {
           />
         </TouchableOpacity>
       </View>
-      */}
     </View>
   );
 };
