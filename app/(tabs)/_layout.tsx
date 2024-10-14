@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router'
-import { HomeIcon, InfoIcon } from '../../components/Icons';
+import { HomeIcon, SearchIcon, StorageIcon, AccountIcon } from '../../components/Icons';
 import { useCallback, useState, useEffect } from 'react'
 import { supabase } from '../../lib/supabase'
 import Auth from '../Auth'
@@ -62,14 +62,17 @@ export default function TabsLayout(){
                 options={{
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => <HomeIcon name="home" color={color} />,
+                    tabBarLabel: () => null,
                 }}
+                
                 initialParams={{ session }} // Se pasa la sesión
             />
             <Tabs.Screen
                 name="Search"
                 options={{
                     headerShown: false,
-                    tabBarIcon: ({ color, size }) => <HomeIcon name="home" color={color} />,
+                    tabBarIcon: ({ color, size }) => <SearchIcon name="search" color={color} />,
+                    tabBarLabel: () => null,
                 }}
                 initialParams={{ session }} // Se pasa la sesión
             />
@@ -77,7 +80,8 @@ export default function TabsLayout(){
                 name="Storage"
                 options={{
                     headerShown: false,
-                    tabBarIcon: ({ color, size }) => <HomeIcon name="home" color={color} />,
+                    tabBarIcon: ({ color, size }) => <StorageIcon name="database" color={color} />,
+                    tabBarLabel: () => null,
                 }}
                 initialParams={{ session }} // Se pasa la sesión
             />
@@ -85,7 +89,8 @@ export default function TabsLayout(){
                 name="Account"
                 options={{
                     headerShown: false,
-                    tabBarIcon: ({ color, size }) => <HomeIcon name="home" color={color} />,
+                    tabBarIcon: ({ color, size }) => <AccountIcon name="user" color={color} />,
+                    tabBarLabel: () => null,
                 }}
                 initialParams={{ session }} // Se pasa la sesión
             />
