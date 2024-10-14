@@ -1,5 +1,6 @@
-import { router } from 'expo-router';
+import { router, Link  } from 'expo-router';
 import React, { useState } from 'react';
+
 import {
   View,
   Text,
@@ -10,7 +11,8 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const App = () => {
+export default function Index() 
+{
   const [quizzes, setQuizzes] = useState([
     {
       title: 'Programa Arrays',
@@ -39,13 +41,11 @@ const App = () => {
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.replace('/(creacionquiz)/crearQuiz'); // Cambia a la pantalla de tabs
-
+    router.navigate('quiz');
   };
-
   const handleScanCode = () => {
     console.log('Escanear código');
-    router.replace('/(inicio)/qr/scan'); // Cambia a la pantalla de tabs
+    router.replace('/(creacionquiz)/qr/scan'); 
 
   };
 
@@ -73,18 +73,23 @@ const App = () => {
 
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleScanCode}>
-            <View style={styles.buttonIcon}>
-              <Icon name="qr-code" size={50} color="#3BA76B" />
-            </View>
-            <Text style={styles.buttonText}>Escanear Código</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleCreateQuiz}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Icon name="code" size={50} color="#3BA76B" />
-              <Text style={styles.buttonText}> Crear test</Text>
-            </View>
-          </TouchableOpacity>
+            <Link asChild href="quiz" >
+                <TouchableOpacity>
+                    <View style={styles.buttonIcon}>
+                    <Icon name="qr-code" size={50} color="#3BA76B" />
+                    </View>
+                    <Text style={styles.buttonText}>Escanear Código</Text>
+                </TouchableOpacity>
+            </Link>
+            <Link asChild href="crearQuiz" >
+                <TouchableOpacity style={styles.button} >
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Icon name="code" size={50} color="#3BA76B" />
+                    <Text style={styles.buttonText}> Crear test</Text>
+                    </View>
+                </TouchableOpacity>
+            </Link>
+          
         </View>
 
         <View style={styles.quizListContainer}>
@@ -315,4 +320,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+
