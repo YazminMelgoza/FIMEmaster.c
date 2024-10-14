@@ -33,6 +33,6 @@ yarn-error.*
 
 # Ignorar el archivo .env
 .env
-
+.env
 # typescript
 *.tsbuildinfo

@@ -1,24 +1,23 @@
 import { Stack } from 'expo-router';
-import {View, Text, StyleSheet} from "react-native";
+import { StyleSheet } from "react-native";
 
-
-export default function Layout(){
-    return(
-        <View style={styles.container}>
-            <Stack 
-                screenOptions={{
-                    headerStyle: {backgroundColor: "black"},
-                    headerTintColor: "white",
-                    headerShown: false,
-                }}
-            />
-        </View>
-    )
+export default function Layout() {
+    return (
+        <Stack 
+            screenOptions={{
+                headerStyle: { backgroundColor: "black" },
+                headerTintColor: "white",
+                headerShown: false,
+            }}>
+            {/* Asegúrate de que estas rutas correspondan a las pantallas que deseas mostrar */}
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(creacionquiz)" />
+        </Stack>
+    );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        //backgroundColor: '#000000',
     },
 });
