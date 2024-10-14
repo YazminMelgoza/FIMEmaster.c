@@ -39,7 +39,7 @@ const App = () => {
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.replace('/(inicio)/quiz/crearQuiz'); // Cambia a la pantalla de tabs
+    router.replace('/(creacionquiz)/crearQuiz'); // Cambia a la pantalla de tabs
 
   };
 
