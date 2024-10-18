@@ -43,11 +43,12 @@ export default function Index()
     console.log('Crear test');
     router.navigate('quiz');
   };
+  /*
   const handleScanCode = () => {
     console.log('Escanear código');
     router.replace('/(creacionquiz)/qr/scan'); 
 
-  };
+  };*/
 
   return (
     <View style={styles.container}>
