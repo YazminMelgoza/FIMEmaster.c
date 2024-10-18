@@ -16,7 +16,7 @@ const EscanearCodigo = () => {
         source={require("../../assets/images/relieve.png")}
       />
       <View style={styles.escanearCodigoChild} />
-      <Pressable style={styles.vector} onPress={() => router.replace("/home")}>
+      <Pressable style={styles.vector} onPress={() => router.replace("/index")}>
         <Image
           style={styles.icon}
           resizeMode="cover"
