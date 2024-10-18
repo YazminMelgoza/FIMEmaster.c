@@ -102,6 +102,14 @@ export default function TabsLayout(){
                 }}
                 initialParams={{ session }} // Se pasa la sesión
             />
+            <Tabs.Screen
+                name="SignIn"
+                options={{
+                    headerShown: false,
+                    tabBarIcon: ({ color, size }) => <HomeIcon name="user" color={color} />,
+                }}
+                initialParams={{ session }} // Se pasa la sesión
+            />
         </Tabs>
         );
     }else
