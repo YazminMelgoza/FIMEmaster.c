@@ -58,15 +58,44 @@ return 0;
         <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 pb-6 '>
         <Text className='text-green-800 text-xl font-bold  '>Output Esperado:</Text>
         </View>
-        <View className="flex flex-column px-1 h-52 gap-3 px-1 rounded-lg">
+        <View className="flex flex-column px-1 h-auto gap-3 px-1 rounded-lg">
           <View className="flex flex-column px-1 h-auto  px-1 bg-green-50 rounded-xl">
             <Text className='text-black-800 text-base font-normal tracking-wide px-2  '>El resultado es: 15</Text>
 
           </View>
-          <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 pb-6 '>
+          
+        </View>
+        <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 '>
         <Text className='text-green-800 text-xl font-bold  '>Resuelve:</Text>
         </View>
-        </View>
+        <View style={styles.answersContainer}>
+            {[1, 4, 6, 8].map((lineNumber) => (
+              <TouchableOpacity
+                key={lineNumber}
+                style={styles.answerOption}
+              >
+                <View style={styles.answerBox}>
+                  <Image
+                    source={require('../../assets/images/fime-logo2.png')} 
+                    style={styles.answerImage}
+                  />
+                  <Text style={styles.answerText}>Línea #{lineNumber}</Text>
+              
+  
+                  
+
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View className='h-auto w-auto flex flex-row gap-4 pb-16'>
+            <TouchableOpacity className='flex justify-center w-[45%] h-16 rounded-xl align-middle items-center bg-green-100 '> 
+            <Text className='text-green-900 text-base font-normal tracking-wide   '>Regresar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity className='flex justify-center w-[45%] h-16 rounded-xl align-middle items-center bg-green-900 '> 
+            <Text className='text-white text-base font-normal tracking-wide   '>Finalizar</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
     </View>
   );
@@ -107,6 +136,36 @@ const styles = StyleSheet.create({
     left: 20,
     top: 40,  // Ajustar para estar más alineado con el encabezado
     zIndex: 2,
+  },
+  answersContainer: {
+    margin: 20,
+  },
+  answersHeader: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    color: '#00622A',
+  },
+  answerOption: {
+    marginBottom: 10, 
+  },
+  answerBox: {
+    backgroundColor: '#f9fff9',
+    padding: 15,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  answerImage: {
+    width: 40, 
+    height: 40,
+    resizeMode: 'contain', // Cambia a 'cover' o 'stretch' si es necesario
+    marginRight: 10,
+  },
+  answerText: {
+    fontSize: 16,
+    color: '#333',
+    flex: 1, // Permite que el texto ocupe el espacio disponible
   },
   backIcon: {
     width: 24,  // Ajustar tamaño del icono
