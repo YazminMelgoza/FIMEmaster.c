@@ -13,12 +13,12 @@ const App: React.FC = () => {
         <TouchableOpacity style={styles.backButton}>
           <Image source={require('../../assets/images/flechaAtras.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Crear un nuevo quiz</Text>
+        <Text style={styles.headerText}>Generando Quiz...</Text>
       </View>
 
-      {/* Fondo blanco */}
+      {/* Fondo blanco  */}
       <View style={styles.quizListContainer}>
-        <Text style={styles.loadingText}>Previsualización del código</Text>
+        <Text style={styles.loadingText}>Generando preguntas...</Text>
       </View>
     </View>
   );
@@ -30,43 +30,42 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F9',
   },
   header: {
-    height: 200,  // Ajustar la altura del encabezado
+    padding: 30,
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    overflow: 'hidden', // Para asegurarse de que la imagen no se salga del contenedor
+    flexDirection: 'row',
     marginBottom: 20,
     position: 'relative',
   },
   backgroundImage: {
-    width: '100%',  // Hacer que la imagen de fondo se ajuste a todo el ancho
-    height: '100%',  // Ajustar la imagen a la altura del contenedor
+    width: 1000,
+    height: 250,
     position: 'absolute',
-    resizeMode: 'cover',  // Asegura que la imagen se ajuste sin deformarse
   },
   headerText: {
     color: '#fff',
-    fontSize: 24,  // Tamaño del texto un poco más grande para mejor legibilidad
+    fontSize: 20,
     fontWeight: 'bold',
+    left: 30,
+    top: 40,
     zIndex: 1,
-    position: 'absolute',
-    top: '50%',  // Centrar el texto verticalmente
-    textAlign: 'center',
   },
   backButton: {
     position: 'absolute',
-    left: 20,
-    top: 40,  // Ajustar para estar más alineado con el encabezado
-    zIndex: 2,
+    left: 10,
+    top: 65,
   },
   backIcon: {
-    width: 24,  // Ajustar tamaño del icono
-    height: 24,
+    position: 'absolute',
+    left: 20,
+    paddingTop: 30,
   },
   quizListContainer: {
     flex: 1,
     marginTop: 20,
+    width: '100%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
@@ -79,9 +78,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   loadingText: {
-    fontSize: 18,  // Hacer el texto un poco más grande
+    fontSize: 16,
     color: '#00622A',
-    textAlign: 'center',  // Centrar el texto
+    textAlign: 'left', 
+    marginLeft: 20,  
   },
 });
 

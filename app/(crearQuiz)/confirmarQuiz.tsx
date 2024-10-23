@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 
-const App: React.FC = () => {
+export default function confirmacioncreacion (){
   return (
     <View style={styles.container}>
       {/* Encabezado con imagen de fondo */}
@@ -13,7 +13,7 @@ const App: React.FC = () => {
         <TouchableOpacity style={styles.backButton}>
           <Image source={require('../../assets/images/flechaAtras.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Crear un nuevo quiz</Text>
+        <Text style={styles.headerText}>Confirmar Quiz</Text>
       </View>
 
       {/* Fondo blanco */}
@@ -199,4 +199,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+
