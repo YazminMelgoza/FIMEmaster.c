@@ -3,18 +3,19 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from 'reac
 import { useNavigation } from '@react-navigation/native';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import signUpWithEmail from './services';
 
-// Esquema de validación Yup
+
+// Yup validation schema
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required('El nombre es obligatorio'),
   lastName: Yup.string().required('El apellido paterno es obligatorio'),
-  middleName: Yup.string().required('El apellido materno es obligatorio'),
   email: Yup.string().email('Correo inválido').required('El correo es obligatorio'),
   password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria'),
 });
 
-import { router } from 'expo-router';
-const Register = () => {
+export default function SignUp() {
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
@@ -22,13 +23,14 @@ const Register = () => {
     setShowPassword(!showPassword);
   };
 
+
   return (
     <Formik
-      initialValues={{ firstName: '', lastName: '', middleName: '', email: '', password: '' }}
+      initialValues={{ firstName: '', lastName: '', email: '', password: '' }}
       validationSchema={validationSchema}
-      onSubmit={(values) => {
-        console.log(values);
-        // Lógica para manejar el envío de datos
+      onSubmit={async (values) => {
+        const { firstName, lastName, email, password } = values;
+        await signUpWithEmail(email, password, firstName, lastName);
       }}
     >
       {({ handleChange, handleSubmit, values, errors, touched }) => (
@@ -38,20 +40,9 @@ const Register = () => {
           <Text style={styles.title}>Regístrate</Text>
           <Text style={styles.subtitle}>Crea una nueva cuenta para comenzar a aprender</Text>
 
-          <View style={styles.socialButtons}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image source={require('../../assets/images/_Facebook.png')} style={styles.iconeye} />
-              <Text>Facebook</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image source={require('../../assets/images/_Google.png')} style={styles.iconeye} />
-              <Text>Google</Text>
-            </TouchableOpacity>
-          </View>
-
           <Text style={styles.orDivider}>Or</Text>
 
-          {/* Campo de Nombres */}
+          {/* First Name Input */}
           <View style={styles.inputField}>
             <TextInput
               placeholder="Nombres"
@@ -63,7 +54,7 @@ const Register = () => {
             {touched.firstName && errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
           </View>
 
-          {/* Campo de Apellido Paterno */}
+          {/* Last Name Input */}
           <View style={styles.inputField}>
             <TextInput
               placeholder="Apellido paterno"
@@ -75,19 +66,7 @@ const Register = () => {
             {touched.lastName && errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
           </View>
 
-          {/* Campo de Apellido Materno */}
-          <View style={styles.inputField}>
-            <TextInput
-              placeholder="Apellido materno"
-              placeholderTextColor="#000000"
-              style={styles.textInput}
-              onChangeText={handleChange('middleName')}
-              value={values.middleName}
-            />
-            {touched.middleName && errors.middleName && <Text style={styles.errorText}>{errors.middleName}</Text>}
-          </View>
-
-          {/* Campo de Correo */}
+          {/* Email Input */}
           <View style={styles.inputField}>
             <TextInput
               placeholder="Correouniversitario@unal.edu.mx"
@@ -101,7 +80,7 @@ const Register = () => {
             {touched.email && errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
           </View>
 
-          {/* Campo de Contraseña */}
+          {/* Password Input */}
           <View style={styles.passwordField}>
             <TextInput
               style={styles.inputField}
@@ -118,22 +97,20 @@ const Register = () => {
           </View>
 
           <TouchableOpacity style={styles.loginButton} onPress={() => handleSubmit()}>
-  <Text style={styles.loginButtonText}>Crear una cuenta</Text>
-</TouchableOpacity>
-
-
-          <TouchableOpacity>
-            <Text style={styles.registerLink}>
-              ¿Ya tienes una cuenta? <Text style={styles.registerLinkSpan}>Iniciar sesión</Text>
-            </Text>
+            <Text style={styles.loginButtonText}>Crear una cuenta</Text>
           </TouchableOpacity>
+
+          <Text style={styles.registerLink}>
+            ¿Ya tienes una cuenta?
+            <TouchableOpacity onPress={() => SignUp}>
+              <Text style={styles.registerLinkSpan}> Inicia Sesión</Text>
+            </TouchableOpacity>
+          </Text>
         </View>
       )}
     </Formik>
   );
-};
-
-export default Register;
+}
 
 const styles = StyleSheet.create({
   // Tus estilos aquí
@@ -253,3 +230,4 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 });
+

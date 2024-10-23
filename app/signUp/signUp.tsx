@@ -7,6 +7,8 @@ import { Screen } from '../../components/ScreenLayout'
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
+import signUpWithEmail from './services';
+import createUser from './services'
 // Esquema de validación Yup
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required('El nombre es obligatorio'),
@@ -66,6 +68,8 @@ export default function SignUp() {
   
         // Llamar a signInWithEmail con los valores del formulario
         await signUpWithEmail(email, password);
+        
+        await createUser(email, password, firstName, lastName);
       }}
     >
       {({ handleChange, handleSubmit, values, errors, touched }) => (
