@@ -66,8 +66,7 @@ export default function SignUp() {
       onSubmit={async (values) => {
         const { firstName, lastName, middleName, email, password } = values;
   
-        // Llamar a signInWithEmail con los valores del formulario
-        await signUpWithEmail(email, password);
+        
         
         await createUser(email, password, firstName, lastName);
       }}
