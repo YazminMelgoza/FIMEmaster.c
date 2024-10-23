@@ -7,18 +7,18 @@ const App: React.FC = () => {
       {/* Encabezado con imagen de fondo */}
       <View style={styles.header}>
         <Image
-          source={require('@/assets/images/imagetextura2.png')}
+          source={require('../../assets/images/imagetextura2.png')}
           style={styles.backgroundImage}
         />
         <TouchableOpacity style={styles.backButton}>
-          <Image source={require('@/assets/images/flechaAtras.png')} style={styles.backIcon} />
+          <Image source={require('../../assets/images/flechaAtras.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Generando Quiz...</Text>
+        <Text style={styles.headerText}>Crear un nuevo quiz</Text>
       </View>
 
       {/* Fondo blanco  */}
       <View style={styles.quizListContainer}>
-        <Text style={styles.loadingText}>Generando preguntas...</Text>
+        <Text style={styles.loadingText}>Previsualizacion del codigo</Text>
       </View>
     </View>
   );
