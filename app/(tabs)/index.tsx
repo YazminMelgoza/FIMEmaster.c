@@ -41,7 +41,7 @@ export default function Index()
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.navigate('quiz');
+    router.navigate('iniciarQuiz');
   };
   /*
   const handleScanCode = () => {
@@ -74,15 +74,15 @@ export default function Index()
 
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>
-            <Link asChild href="quiz" >
-                <TouchableOpacity>
-                    <View style={styles.buttonIcon}>
+            <Link asChild href="scan" >
+                <TouchableOpacity style={styles.button}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Icon name="qr-code" size={50} color="#3BA76B" />
-                    </View>
                     <Text style={styles.buttonText}>Escanear Código</Text>
+                    </View>
                 </TouchableOpacity>
             </Link>
-            <Link asChild href="crearQuiz" >
+            <Link asChild href="confirmacioncreacion" >
                 <TouchableOpacity style={styles.button} >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Icon name="code" size={50} color="#3BA76B" />
@@ -96,9 +96,11 @@ export default function Index()
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
             <Text style={styles.quizListTitle}>Quiz Recientes</Text>
-            <TouchableOpacity style={styles.quizListSeeAll}>
-              <Text style={styles.quizListSeeAllText}>ver todos</Text>
-            </TouchableOpacity>
+            <Link asChild href="historialQuiz" >
+              <TouchableOpacity style={styles.quizListSeeAll}>
+                <Text style={styles.quizListSeeAllText}>ver todos</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
 
           {quizzes.map((quiz, index) => (
