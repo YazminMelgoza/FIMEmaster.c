@@ -1,4 +1,4 @@
-export interface Score {
+export type Score = {
     scoreid: number;  // Identificador único del score
     score: number;    // Valor del score
     userid: string;   // ID del usuario (uuid)

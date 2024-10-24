@@ -1,5 +1,5 @@
 // attemptModel.ts
-export interface Attempt {
+export type Attempt = {
     attemptid: number;    // ID del intento
     exerciseid: number;   // ID del ejercicio al que se intentó
     score: number;        // Puntuación obtenida en el intento

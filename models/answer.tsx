@@ -1,5 +1,5 @@
 // answerModel.ts
-export interface Answer {
+export type Answer = {
     answerid: number;       // ID de la respuesta
     questionid: number;     // ID de la pregunta asociada
     answer: string;         // Texto de la respuesta

@@ -1,5 +1,5 @@
 // userModel.tsx
-export interface User {
+export type User = {
     id: string;             // UUID
     updated_at: string;     // Timestamp with time zone (usualmente se maneja como string)
     username: string;       // Texto

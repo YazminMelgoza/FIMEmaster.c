@@ -1,5 +1,5 @@
 // questionModel.ts
-export interface Question {
+export type Question = {
     questionid: number;         // ID de la pregunta
     exerciseid: number;        // ID del ejercicio asociado
     question: string;          // Texto de la pregunta

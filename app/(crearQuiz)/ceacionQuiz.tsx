@@ -4,11 +4,8 @@ import { View, Text, StyleSheet, TextInput, Button, Alert, ScrollView } from 're
 import { Formik } from 'formik';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-import { Quiz } from '../../models/quizModel'; // Ajusta la ruta
-import { createQuiz } from '../../services/quizService'; 
-
-// Obtenemos la sesión de los parámetros de la ruta
-
+import { Quiz } from '../../models/quiz'; // Ajusta la ruta
+import { QuizService } from '../../services/quiz'; 
 
 export default function CrearQuiz() {
     const [loading, setLoading] = useState(true);
@@ -19,6 +16,8 @@ export default function CrearQuiz() {
     const [wrongCodeText, setWrongCodeText] = useState('');
     const [solutionCodeText, setSolutionCodeText] = useState('');
     const [authorId, setAuthorId] = useState('');
+    //Servicio de Quiz
+    const quizService = new QuizService();
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -87,12 +86,14 @@ export default function CrearQuiz() {
                         solutioncode: values.solutioncode,
                     };
                     console.log(objQuiz);
-                    const { error } = await createQuiz(objQuiz);
-                    if (error) {
-                        Alert.alert('Error', 'Hubo un problema al crear el quiz. Intenta nuevamente.');
-                    } else {
-                        Alert.alert('Éxito', 'El quiz se creó correctamente.');
-                    }
+                    quizService.createQuiz(objQuiz).then(response => {
+                        if (response.error) {
+                            Alert.alert('Error', 'Hubo un problema al crear el quiz. Intenta nuevamente.');
+                        } else {
+                            Alert.alert('Éxito', 'El quiz se creó correctamente.');
+                        }
+                    });
+                    
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, setFieldValue, values }) => (
