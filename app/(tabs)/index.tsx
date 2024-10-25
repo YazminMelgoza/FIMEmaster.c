@@ -82,7 +82,7 @@ export default function Index()
                     </View>
                 </TouchableOpacity>
             </Link>
-            <Link asChild href="confirmacioncreacion" >
+            <Link asChild href="ceacionQuiz" >
                 <TouchableOpacity style={styles.button} >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Icon name="code" size={50} color="#3BA76B" />
