@@ -1,19 +1,45 @@
-import { router, Link  } from 'expo-router';
-import React, { useState } from 'react';
-
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from 'react-native';
+import { router } from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { QuizService } from '../../services/quiz';
+import { Quiz } from '../../models/quiz';
+import { supabase } from '../../lib/supabase'; // Asegúrate de que esta ruta es correcta
 
-export default function About() 
-{
-  const [quizzes, setQuizzes] = useState([
+export default function About() {
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [authorId, setAuthorId] = useState<string>('');
+  const quizService = new QuizService();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data?.user) {
+        setAuthorId(data.user.id);
+        fetchQuizzes(data.user.id);
+      } else {
+        console.error('Error al obtener el usuario:', error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const fetchQuizzes = async (userId: string) => {
+    const { quizzes, error } = await quizService.getQuizzesByAuthorId(userId);
+    if (error) {
+      console.error('Error al obtener los quizzes:', error);
+    } else {
+      
+      setQuizzes(quizzes);
+    }
+  };
+
+  const handleCreateQuiz = () => {
+    console.log('Crear test');
+    router.navigate('iniciarQuiz');
+  };
+
+  const mockQuizzes = [
     {
       title: 'Programa Arrays',
       description: 'Estructura de Datos',
@@ -36,33 +62,20 @@ export default function About()
       textColor: '#2D2D2D',
     },
     {
-        title: 'Programa calculadora',
-        description: 'Lógica matemática',
-        icon: 'bar-chart',
-        color: '#9C27B0',
-        textColor: '#2D2D2D',
-      },
-      {
-        title: 'Programa calculadora',
-        description: 'Lógica matemática',
-        icon: 'bar-chart',
-        color: '#9C27B0',
-        textColor: '#2D2D2D',
-      },
-  ]);
-
-  const [selectedTab, setSelectedTab] = useState('home');
-
-  const handleCreateQuiz = () => {
-    console.log('Crear test');
-    router.navigate('quiz');
-  };
-  /*
-  const handleScanCode = () => {
-    console.log('Escanear código');
-    router.replace('/(creacionquiz)/qr/scan'); 
-
-  };*/
+      title: 'Programa calculadora',
+      description: 'Lógica matemática',
+      icon: 'bar-chart',
+      color: '#9C27B0',
+      textColor: '#2D2D2D',
+    },
+    {
+      title: 'Programa calculadora',
+      description: 'Lógica matemática',
+      icon: 'bar-chart',
+      color: '#9C27B0',
+      textColor: '#2D2D2D',
+    },
+  ];
 
   return (
     <View style={styles.container}>
@@ -73,21 +86,16 @@ export default function About()
         />
         <View style={styles.headerContent}>
           <View style={styles.headerTextContainer}>
-           
             <Text style={styles.headerName}>Mis ejercicios</Text>
           </View>
-         
         </View>
       </View>
-
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
-            <Text style={styles.quizListTitle}>Quiz </Text>
-            
+            <Text style={styles.quizListTitle}>Quiz</Text>
           </View>
-
-          {quizzes.map((quiz, index) => (
+          {mockQuizzes.map((quiz, index) => (
             <TouchableOpacity
               key={index}
               style={[styles.quizItem, { backgroundColor: '#fff', borderColor: quiz.color }]}
@@ -100,50 +108,32 @@ export default function About()
                 <Text style={[styles.quizItemTitle, { color: quiz.textColor }]}>
                   {quiz.title}
                 </Text>
-                <Text style={styles.quizItemDescription}>
-                  {quiz.description}
-                </Text>
+                <Text style={styles.quizItemDescription}>{quiz.description}</Text>
               </View>
               <Icon name="arrow-forward-ios" size={20} color={quiz.color} />
             </TouchableOpacity>
           ))}
+          {quizzes.map((quiz) => (
+            <TouchableOpacity
+              key={quiz.exerciseid}
+              style={[styles.quizItem, { backgroundColor: '#fff' }]}
+              onPress={handleCreateQuiz}
+            >
+              <View style={styles.quizItemIcon}>
+                <Icon name="bar-chart" size={30} color="#4CAF50" />
+              </View>
+              <View style={styles.quizItemDetails}>
+                <Text style={styles.quizItemTitle}>{quiz.instructions}</Text>
+                <Text style={styles.quizItemDescription}>Categoría ID: {quiz.categoryid}</Text>
+              </View>
+              <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
+            </TouchableOpacity>
+          ))}
         </View>
       </ScrollView>
-
-      {/*<View style={styles.footer}>
-        <TouchableOpacity onPress={() => setSelectedTab('home')}>
-          <Icon
-            name="home"
-            size={30}
-            color={selectedTab === 'home' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('search')}>
-          <Icon
-            name="search"
-            size={30}
-            color={selectedTab === 'search' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('stats')}>
-          <Icon
-            name="bar-chart"
-            size={30}
-            color={selectedTab === 'stats' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('account')}>
-          <Icon
-            name="account-circle"
-            size={30}
-            color={selectedTab === 'account' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-      </View>
-      */}
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -151,13 +141,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F7F7F7',
   },
   header: {
-    flexDirection: 'column', 
+    flexDirection: 'column',
     padding: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     paddingBottom: 40,
     marginBottom: 0,
-    position: 'relative', 
+    position: 'relative',
   },
   headerBackgroundImage: {
     width: 1000,
@@ -173,15 +163,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 40, 
+    marginTop: 40,
   },
   headerTextContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
-    marginLeft: 10, 
+    marginLeft: 10,
   },
- 
- 
   headerName: {
     color: '#fff',
     fontSize: 24,
@@ -189,8 +177,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 10,
   },
-  
- 
   whiteBackgroundContainer: {
     flexGrow: 1,
     backgroundColor: '#fff',
@@ -203,31 +189,6 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
     zIndex: 1,
-  },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 10,
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#fff',
-    paddingVertical: 25,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    flex: 1,
-    marginHorizontal: 10,
-    alignItems: 'center',
-    borderColor: '#E0E0E0',
-    borderWidth: 1,
-  },
-  buttonIcon: {
-    marginBottom: 5,
-  },
-  buttonText: {
-    color: '#3BA76B',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
   quizListContainer: {
     paddingHorizontal: 20,
@@ -243,11 +204,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
-  quizListSeeAll: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-  },
-  
   quizItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -280,13 +236,4 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 14,
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderColor: '#E0E0E0',
-  },
 });
-
-
