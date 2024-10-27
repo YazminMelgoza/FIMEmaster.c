@@ -95,6 +95,11 @@ export default function SignUp() {
             style={styles.icon}
           />
 
+          <Image
+            source={require("../../assets/images/texture.png")}
+            style={styles.backgroundImage}
+          />
+
           <Text style={styles.title}>Regístrate</Text>
           <Text style={styles.subtitle}>
             Crea una nueva cuenta para comenzar a aprender
@@ -117,7 +122,7 @@ export default function SignUp() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.orDivider}>Or</Text>
+          <Text style={styles.orDivider}>O</Text>
 
           {/* Campo de Nombres */}
           <View style={styles.passwordField}>
@@ -334,5 +339,11 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: 12,
+  },
+  backgroundImage: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    zIndex: -1,
   },
 });

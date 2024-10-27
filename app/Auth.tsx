@@ -81,6 +81,10 @@ export default function Auth() {
             source={require("../assets/images/Wave.png")}
             style={styles.icon}
           />
+          <Image
+            source={require("../assets/images/texture.png")}
+            style={styles.backgroundImage}
+          />
 
           <Text style={styles.title}>Inicia Sesión</Text>
 
@@ -105,7 +109,7 @@ export default function Auth() {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.orDivider}>Or</Text>
+          <Text style={styles.orDivider}>O</Text>
 
           <View style={styles.containerInputs}>
             <View style={styles.emailField}>
@@ -282,5 +286,12 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginTop: 5,
+  },
+  backgroundImage: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    zIndex: -1,
+    transform: [{ rotate: "180deg" }],
   },
 });
