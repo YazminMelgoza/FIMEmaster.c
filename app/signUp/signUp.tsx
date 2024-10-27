@@ -10,8 +10,9 @@ import {
   Image,
   Dimensions,
 } from "react-native";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { supabase } from "../../lib/supabase";
-import { Link, Stack } from "expo-router";
+import { Link } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
@@ -119,11 +120,11 @@ export default function SignUp() {
           <Text style={styles.orDivider}>Or</Text>
 
           {/* Campo de Nombres */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
-              placeholder="Nombres"
+              placeholder="Nombre(s)"
               placeholderTextColor="#999"
-              style={styles.textInput}
+              style={styles.inputField}
               onChangeText={handleChange("firstName")}
               value={values.firstName}
             />
@@ -133,11 +134,11 @@ export default function SignUp() {
           </View>
 
           {/* Campo de Apellido Paterno */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
               placeholder="Apellido paterno"
               placeholderTextColor="#999"
-              style={styles.textInput}
+              style={styles.inputField}
               onChangeText={handleChange("lastName")}
               value={values.lastName}
             />
@@ -147,11 +148,11 @@ export default function SignUp() {
           </View>
 
           {/* Campo de Apellido Materno */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
               placeholder="Apellido materno"
               placeholderTextColor="#999"
-              style={styles.textInput}
+              style={styles.inputField}
               onChangeText={handleChange("middleName")}
               value={values.middleName}
             />
@@ -161,11 +162,11 @@ export default function SignUp() {
           </View>
 
           {/* Campo de Correo */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
               placeholder="correouniversitario@uanl.edu.mx"
               placeholderTextColor="#999"
-              style={styles.textInput}
+              style={styles.inputField}
               onChangeText={handleChange("email")}
               value={values.email}
               keyboardType="email-address"
@@ -180,7 +181,7 @@ export default function SignUp() {
           <View style={styles.passwordField}>
             <TextInput
               style={styles.inputField}
-              placeholder="Contraseña"
+              placeholder="********"
               placeholderTextColor="#999"
               onChangeText={handleChange("password")}
               value={values.password}
@@ -190,11 +191,10 @@ export default function SignUp() {
               style={styles.eyeIcon}
               onPress={togglePasswordVisibility}
             >
-              <Image
-                source={require("../../assets/images/Vector.png")}
-                style={styles.iconEye}
-              />
+              {/* font awesome icon  */}
+              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
             </TouchableOpacity>
+
             {touched.password && errors.password && (
               <Text style={styles.errorText}>{errors.password}</Text>
             )}
@@ -228,12 +228,10 @@ const styles = StyleSheet.create({
     maxWidth: 500,
     width: "100%",
     marginHorizontal: "auto",
-    backgroundColor: "#fff",
   },
   icon: {
     width: 100,
     height: 100,
-
     marginTop: 10,
   },
   iconEye: {
@@ -281,7 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: "100%",
     height: 45,
-    marginBottom: 15,
+    marginTop: 10,
     borderWidth: 2,
     borderColor: "#ccc",
     paddingHorizontal: 10,
@@ -293,14 +291,14 @@ const styles = StyleSheet.create({
   passwordField: {
     position: "relative",
     width: "100%",
-    marginBottom: 20,
   },
   eyeIcon: {
     position: "absolute",
+    top: 23,
     right: 10,
-    top: 10,
-    width: 20,
-    height: 20,
+    fontSize: 20,
+    color: "#888",
+    marginVertical: "auto",
   },
   forgotPassword: {
     color: "#000000",
@@ -313,6 +311,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#28a745",
     width: "100%",
     borderRadius: 10,
+    marginTop: 15,
     paddingVertical: 10,
     alignItems: "center",
   },
@@ -335,6 +334,5 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     fontSize: 12,
-    marginTop: 5,
   },
 });

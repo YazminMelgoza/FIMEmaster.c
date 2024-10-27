@@ -17,6 +17,7 @@ import { Link, Stack } from "expo-router";
 import { Formik } from "formik";
 import { useNavigation } from "@react-navigation/native";
 import * as Yup from "yup";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
 const screenHeight = Dimensions.get("window").height;
 AppState.addEventListener("change", (state) => {
@@ -127,7 +128,7 @@ export default function Auth() {
             <View style={styles.passwordField}>
               <TextInput
                 style={styles.inputField}
-                placeholder=""
+                placeholder="********"
                 placeholderTextColor="#999"
                 value={values.password}
                 onChangeText={handleChange("password")}
@@ -138,10 +139,7 @@ export default function Auth() {
                 style={styles.eyeIcon}
                 onPress={togglePasswordVisibility}
               >
-                <Image
-                  source={require("../assets/images/Vector.png")}
-                  style={styles.iconEye}
-                />
+                {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
               </TouchableOpacity>
               {touched.password && errors.password && (
                 <Text style={styles.errorText}>{errors.password}</Text>
@@ -258,7 +256,9 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     position: "absolute",
-    top: 15,
+    fontSize: 20,
+    color: "#888",
+    top: 12,
     right: 10,
   },
   loginButton: {
