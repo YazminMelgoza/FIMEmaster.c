@@ -12,8 +12,8 @@ export default function About() {
   const quizService = new QuizService();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
+    const fetchUser  = async () => {
+      const { data, error } = await supabase.auth.getUser ();
       if (data?.user) {
         setAuthorId(data.user.id);
         fetchQuizzes(data.user.id);
@@ -21,7 +21,7 @@ export default function About() {
         console.error('Error al obtener el usuario:', error);
       }
     };
-    fetchUser();
+    fetchUser ();
   }, []);
 
   const fetchQuizzes = async (userId: string) => {
@@ -29,53 +29,14 @@ export default function About() {
     if (error) {
       console.error('Error al obtener los quizzes:', error);
     } else {
-      
       setQuizzes(quizzes);
     }
   };
 
-  const handleCreateQuiz = () => {
-    console.log('Crear test');
-    router.navigate('iniciarQuiz');
+  const handleCreateQuiz = (quizId: number) => {
+    console.log('Crear test con ID:', quizId);
+    router.push(`infoQuiz?id=${quizId}`); // Navega a la pantalla del quiz pasando el ID
   };
-
-  const mockQuizzes = [
-    {
-      title: 'Programa Arrays',
-      description: 'Estructura de Datos',
-      icon: 'bar-chart',
-      color: '#4CAF50',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa Arrays',
-      description: 'Estructura de Datos',
-      icon: 'reorder',
-      color: '#2196F3',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa calculadora',
-      description: 'Lógica matemática',
-      icon: 'bar-chart',
-      color: '#9C27B0',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa calculadora',
-      description: 'Lógica matemática',
-      icon: 'bar-chart',
-      color: '#9C27B0',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa calculadora',
-      description: 'Lógica matemática',
-      icon: 'bar-chart',
-      color: '#9C27B0',
-      textColor: '#2D2D2D',
-    },
-  ];
 
   return (
     <View style={styles.container}>
@@ -95,29 +56,11 @@ export default function About() {
           <View style={styles.quizListHeader}>
             <Text style={styles.quizListTitle}>Quiz</Text>
           </View>
-          {mockQuizzes.map((quiz, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[styles.quizItem, { backgroundColor: '#fff', borderColor: quiz.color }]}
-              onPress={handleCreateQuiz}
-            >
-              <View style={styles.quizItemIcon}>
-                <Icon name={quiz.icon} size={30} color={quiz.color} />
-              </View>
-              <View style={styles.quizItemDetails}>
-                <Text style={[styles.quizItemTitle, { color: quiz.textColor }]}>
-                  {quiz.title}
-                </Text>
-                <Text style={styles.quizItemDescription}>{quiz.description}</Text>
-              </View>
-              <Icon name="arrow-forward-ios" size={20} color={quiz.color} />
-            </TouchableOpacity>
-          ))}
           {quizzes.map((quiz) => (
             <TouchableOpacity
               key={quiz.exerciseid}
               style={[styles.quizItem, { backgroundColor: '#fff' }]}
-              onPress={handleCreateQuiz}
+              onPress={() => handleCreateQuiz(quiz.exerciseid)} // Pasa el ID del quiz
             >
               <View style={styles.quizItemIcon}>
                 <Icon name="bar-chart" size={30} color="#4CAF50" />
@@ -134,7 +77,6 @@ export default function About() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

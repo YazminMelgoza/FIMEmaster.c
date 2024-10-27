@@ -16,9 +16,10 @@
     "@supabase/supabase-js": "^2.45.4",
     "expo": "~51.0.28",
     "expo-constants": "~16.0.2",
+    "expo-document-picker": "~12.0.2",
     "expo-image-picker": "~15.0.7",
     "expo-linking": "~6.3.1",
-    "expo-router": "~3.5.23",
+    "expo-router": "^3.5.23",
     "expo-splash-screen": "~0.27.6",
     "expo-status-bar": "~1.12.1",
     "formik": "^2.4.6",
@@ -30,9 +31,9 @@
     "react-native-screens": "3.31.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.10",
+    "react-router-dom": "^6.27.0",
     "tailwind": "4.0.0",
-    "yup": "^1.4.0",
-    "expo-document-picker": "~12.0.2"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
