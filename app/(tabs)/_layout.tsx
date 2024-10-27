@@ -8,6 +8,7 @@ import { Session } from '@supabase/supabase-js'
 import Entypo from '@expo/vector-icons/Entypo';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+import { router  } from 'expo-router';
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
@@ -18,27 +19,26 @@ export default function TabsLayout(){
     {
         async function prepare() 
         {
-        try 
-        {
-            
-            supabase.auth.getSession().then(({ data: { session } }) => {
-                setSession(session)
-            })
-                
-            supabase.auth.onAuthStateChange((_event, session) => {
-                setSession(session)
-            })
-                
-                
-            await Font.loadAsync(Entypo.font);
-            //await new Promise(resolve => setTimeout(resolve, 2000)); //Artificial Delay to see splashScreen
-        } catch (e) {
-            console.warn(e);
-        } finally {
-            // Tell the application to render
-            setAppIsReady(true);
-            await SplashScreen.hideAsync();
-        }
+            try 
+            {
+                supabase.auth.getSession().then(({ data: { session } }) => {
+                    setSession(session)
+                })       
+                supabase.auth.onAuthStateChange((_event, session) => {
+                    setSession(session);
+                    if (session) {
+                        router.navigate('/'); 
+                    }
+                })
+                await Font.loadAsync(Entypo.font);
+                //await new Promise(resolve => setTimeout(resolve, 2000)); //Artificial Delay to see splashScreen
+            } catch (e) {
+                console.warn(e);
+            } finally {
+                // Tell the application to render
+                setAppIsReady(true);
+                await SplashScreen.hideAsync();
+            }
         }
         prepare();
         // Limpiar el listener de auth cuando el componente se desmonte

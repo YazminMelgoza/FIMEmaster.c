@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase'
 import { Button, Input } from '@rneui/themed'
 import { Link, Stack } from "expo-router"
 import { Formik } from 'formik';
-import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
 
 const screenHeight = Dimensions.get('window').height;
@@ -19,7 +18,7 @@ AppState.addEventListener('change', (state) => {
 export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false);
-  const navigation = useNavigation();
+ 
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -127,7 +126,7 @@ export default function Auth() {
           <Text style={styles.registerLink}>
             ¿No tienes una cuenta? 
             <Link href="/signUp/signUp" >
-            <Text style={styles.registerText}> Regístrate</Text>
+              <Text style={styles.registerText}> Regístrate</Text>
             </Link>
           </Text>
           

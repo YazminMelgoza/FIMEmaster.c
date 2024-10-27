@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { StyleSheet, View, Alert, Text } from 'react-native';
+import { StyleSheet, View, Alert } from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import Avatar from '../../components/Avatar';
@@ -14,9 +14,6 @@ export default function Account() {
   const [username, setUsername] = useState('');
   const [website, setWebsite] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
-  const [firstname, setFirstname] = useState('');
-  const [lastname, setLastName] = useState('');
-
 
 
   // Obtenemos la sesión de los parámetros de la ruta
@@ -34,7 +31,7 @@ export default function Account() {
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url, firstname, lastname`)
+        .select(`username, website, avatar_url`)
         .eq('id', session?.user.id)
         .single();
 
@@ -46,8 +43,6 @@ export default function Account() {
         setUsername(data.username);
         setWebsite(data.website);
         setAvatarUrl(data.avatar_url);
-        setFirstname(data.firstname);
-        setLastName(data.lastname);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -105,10 +100,6 @@ export default function Account() {
           }}
         />
       </View>
-      <View style={styles.verticallySpaced}>
-        <Text>{firstname} {lastname}</Text>
-      </View>
-      
       <View style={[styles.verticallySpaced, styles.mt20]}>
         <Input label="Email" value={session?.user?.email} disabled />
       </View>
@@ -119,7 +110,6 @@ export default function Account() {
           onChangeText={(text) => setUsername(text)}
         />
       </View>
-      
       <View style={styles.verticallySpaced}>
         <Input
           label="Website"

@@ -2,16 +2,16 @@ import React, { useState } from 'react'
 import { Alert, StyleSheet, View, AppState, Pressable, Text, TextInput, TouchableOpacity, Image } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { Button, Input } from '@rneui/themed'
-import { Link, Stack } from "expo-router"
+import { Link, Stack, router } from "expo-router"
 import { Screen } from '../../components/ScreenLayout'
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
+import { Snackbar } from 'react-native-paper';
 // Esquema de validación Yup
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required('El nombre es obligatorio'),
-  lastName: Yup.string().required('El apellido paterno es obligatorio'),
-  middleName: Yup.string().required('El apellido materno es obligatorio'),
+  lastName: Yup.string().required('El apellido es obligatorio'),
   email: Yup.string().email('Correo inválido').required('El correo es obligatorio'),
   password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria'),
 });
@@ -31,50 +31,70 @@ export default function SignUp() {
 
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
+  //SnackBar
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  async function signUpWithEmail(email: string, password: string) {
+  /*
+  const irConfirmacion = () => {
+    router.replace('/signUp/confirmation'); // Reemplaza la ruta actual
+  };
+  */
+  async function signUpWithEmail(email: string, password: string, first_Name: string ,last_Name: string) {
     setLoading(true)
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
+  
+    
+    const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
+      options: {
+        data: {
+          firstName: 'Luis Mario',
+          lastName: 'Medellin',
+        },
+      },
     })
-
-    if (error)
+    
+    if(error)
     {
-      Alert.alert(error.message);
-      console.log(error.message);
+      console.error('Error en la creación del usuario:', error.message);
+      setSnackbarVisible(true);
+      setSnackbarMessage("Ups, no se ha podido crear el usuario, consulte a soporte técnico");
     }else
     {
-      if (!session) Alert.alert('Se ha enviado un enlace de confirmación al correo electrónico ingresado');
+      router.replace('/signUp/confirmation');
     }
     
     setLoading(false)
   }
   return (
     <Formik
-      initialValues={{ firstName: '', lastName: '', middleName: '', email: '', password: '' }}
+      initialValues={{ firstName: '', lastName: '', email: '', password: '' }}
       validationSchema={validationSchema}
       onSubmit={async (values) => {
-        const { firstName, lastName, middleName, email, password } = values;
+        const { firstName, lastName, email, password } = values;
   
         // Llamar a signInWithEmail con los valores del formulario
-        await signUpWithEmail(email, password);
+        
+        await signUpWithEmail(email, password, firstName, lastName);
       }}
     >
       {({ handleChange, handleSubmit, values, errors, touched }) => (
         <View style={styles.container}>
           <Image source={require('../../assets/images/oso.jpg')} style={styles.icon} />
           
+          {/*
+          <TouchableOpacity onPress={irConfirmacion}>
+            <Text style={{ color: 'blue' }}>Ir a Confirmación</Text>
+          </TouchableOpacity>
+          */}
+
           <Text style={styles.title}>Regístrate</Text>
           <Text style={styles.subtitle}>Crea una nueva cuenta para comenzar a aprender</Text>
-
+          
           <View style={styles.socialButtons}>
             <TouchableOpacity style={styles.socialButton}>
               <Image source={require('../../assets/images/_Facebook.png')} style={styles.iconeye} />
@@ -103,7 +123,7 @@ export default function SignUp() {
           {/* Campo de Apellido Paterno */}
           <View style={styles.inputField}>
             <TextInput
-              placeholder="Apellido paterno"
+              placeholder="Apellido"
               placeholderTextColor="#000000"
               style={styles.textInput}
               onChangeText={handleChange('lastName')}
@@ -111,19 +131,6 @@ export default function SignUp() {
             />
             {touched.lastName && errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
           </View>
-
-          {/* Campo de Apellido Materno */}
-          <View style={styles.inputField}>
-            <TextInput
-              placeholder="Apellido materno"
-              placeholderTextColor="#000000"
-              style={styles.textInput}
-              onChangeText={handleChange('middleName')}
-              value={values.middleName}
-            />
-            {touched.middleName && errors.middleName && <Text style={styles.errorText}>{errors.middleName}</Text>}
-          </View>
-
           {/* Campo de Correo */}
           <View style={styles.inputField}>
             <TextInput
