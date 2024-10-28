@@ -1,10 +1,17 @@
 import { router, Link } from 'expo-router';
 import React, { useState } from 'react';
-
+import { useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import { StyleSheet, View, Alert } from 'react-native';
+import { Button, Input } from '@rneui/themed';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import Avatar from '../../components/Avatar';
+import { RootStackParamList } from '../types/RootStackParam';
+import { Session } from '@supabase/supabase-js'; 
+// Define el tipo de los parámetros de la ruta 'account'
+type AccountScreenRouteProp = RouteProp<RootStackParamList, 'account'>;
 import {
-  View,
   Text,
-  StyleSheet,
   TouchableOpacity,
   Image,
   ScrollView,
@@ -54,6 +61,83 @@ export default function Index() {
 
   };
   const [selectedTab, setSelectedTab] = useState('home');
+  const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState('');
+  const [website, setWebsite] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+
+
+  // Obtenemos la sesión de los parámetros de la ruta
+  const route = useRoute<AccountScreenRouteProp>();
+  const [session, setSession] = useState<Session | null>(route.params?.session || null);
+
+  useEffect(() => {
+    if (session) getProfile();
+  }, [session]);
+
+  async function getProfile() {
+    try {
+      setLoading(true);
+      if (!session?.user) throw new Error('No user on the session!');
+
+      const { data, error, status } = await supabase
+        .from('profiles')
+        .select(`username, website, avatar_url`)
+        .eq('id', session?.user.id)
+        .single();
+
+      if (error && status !== 406) {
+        throw error;
+      }
+
+      if (data) {
+        setUsername(data.username);
+        setWebsite(data.website);
+        setAvatarUrl(data.avatar_url);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function updateProfile({
+    username,
+    website,
+    avatar_url,
+  }: {
+    username: string;
+    website: string;
+    avatar_url: string;
+  }) {
+    try {
+      setLoading(true);
+      if (!session?.user) throw new Error('No user on the session!');
+
+      const updates = {
+        id: session?.user.id,
+        username,
+        website,
+        avatar_url,
+        updated_at: new Date(),
+      };
+
+      const { error } = await supabase.from('profiles').upsert(updates);
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
@@ -81,9 +165,18 @@ export default function Index() {
         </View>
 
         <View className='flex relative w-full bg-white h-auto flex-col  items-center'>
-          <Image source={require('../../assets/images/user.png')} className='w-20 absolute  self-center h-20 -top-16 ' />
+          <View className=' absolute  self-center h-20 -top-20 '>
+          <Avatar
+          size={100}
+          url={avatarUrl}
+          onUpload={(url: string) => {
+            setAvatarUrl(url);
+            updateProfile({ username, website, avatar_url: url });
+          }}
+        />
+          </View>
 
-          <Text className="pt-5 pb-5 text-center text-[#0b082a] text-2xl font-medium font-['Rubik'] leading-9">Estudiante ITS</Text>
+          <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['Rubik'] leading-9">Estudiante ITS</Text>
           <View className="w-[90%] h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
             <View className='w-1/6 flex justify-center items-center h-auto pl-2'>
               <Icon name='star' style={styles.backIcon} className='text-white relative'></Icon>
