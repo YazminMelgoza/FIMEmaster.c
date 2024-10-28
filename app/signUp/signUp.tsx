@@ -1,33 +1,46 @@
-import React, { useState } from 'react'
-import { Alert, StyleSheet, View, AppState, Pressable, Text, TextInput, TouchableOpacity, Image } from 'react-native'
-import { supabase } from '../../lib/supabase'
-import { Button, Input } from '@rneui/themed'
-import { Link, Stack } from "expo-router"
-import { Screen } from '../../components/ScreenLayout'
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import {
+  Alert,
+  StyleSheet,
+  View,
+  AppState,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from "react-native";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { supabase } from "../../lib/supabase";
+import { Link } from "expo-router";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { useNavigation } from "@react-navigation/native";
 // Esquema de validación Yup
 const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required('El nombre es obligatorio'),
-  lastName: Yup.string().required('El apellido paterno es obligatorio'),
-  middleName: Yup.string().required('El apellido materno es obligatorio'),
-  email: Yup.string().email('Correo inválido').required('El correo es obligatorio'),
-  password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('La contraseña es obligatoria'),
+  firstName: Yup.string().required("El nombre es obligatorio"),
+  lastName: Yup.string().required("El apellido paterno es obligatorio"),
+  middleName: Yup.string().required("El apellido materno es obligatorio"),
+  email: Yup.string()
+    .email("Correo inválido")
+    .required("El correo es obligatorio"),
+  password: Yup.string()
+    .min(6, "La contraseña debe tener al menos 6 caracteres")
+    .required("La contraseña es obligatoria"),
 });
 
-AppState.addEventListener('change', (state) => {
-  if (state === 'active') {
-    supabase.auth.startAutoRefresh()
+AppState.addEventListener("change", (state) => {
+  if (state === "active") {
+    supabase.auth.startAutoRefresh();
   } else {
-    supabase.auth.stopAutoRefresh()
+    supabase.auth.stopAutoRefresh();
   }
-})
+});
 
 export default function SignUp() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
@@ -37,152 +50,193 @@ export default function SignUp() {
   };
 
   async function signUpWithEmail(email: string, password: string) {
-    setLoading(true)
+    setLoading(true);
     const {
       data: { session },
       error,
     } = await supabase.auth.signUp({
       email: email,
       password: password,
-    })
+    });
 
-    if (error)
-    {
+    if (error) {
       Alert.alert(error.message);
       console.log(error.message);
-    }else
-    {
-      if (!session) Alert.alert('Se ha enviado un enlace de confirmación al correo electrónico ingresado');
+    } else {
+      if (!session)
+        Alert.alert(
+          "Se ha enviado un enlace de confirmación al correo electrónico ingresado"
+        );
     }
-    
-    setLoading(false)
+
+    setLoading(false);
   }
   return (
     <Formik
-      initialValues={{ firstName: '', lastName: '', middleName: '', email: '', password: '' }}
+      initialValues={{
+        firstName: "",
+        lastName: "",
+        middleName: "",
+        email: "",
+        password: "",
+      }}
       validationSchema={validationSchema}
       onSubmit={async (values) => {
         const { firstName, lastName, middleName, email, password } = values;
-  
+
         // Llamar a signInWithEmail con los valores del formulario
         await signUpWithEmail(email, password);
       }}
     >
       {({ handleChange, handleSubmit, values, errors, touched }) => (
         <View style={styles.container}>
-          <Image source={require('../../assets/images/oso.jpg')} style={styles.icon} />
-          
+          <Image
+            source={require("../../assets/images/oso.jpg")}
+            style={styles.icon}
+          />
+
+          <Image
+            source={require("../../assets/images/texture.png")}
+            style={styles.backgroundImage}
+          />
+
           <Text style={styles.title}>Regístrate</Text>
-          <Text style={styles.subtitle}>Crea una nueva cuenta para comenzar a aprender</Text>
+          <Text style={styles.subtitle}>
+            Crea una nueva cuenta para comenzar a aprender
+          </Text>
 
           <View style={styles.socialButtons}>
             <TouchableOpacity style={styles.socialButton}>
-              <Image source={require('../../assets/images/_Facebook.png')} style={styles.iconeye} />
+              <Image
+                source={require("../../assets/images/_Facebook.png")}
+                style={styles.iconeye}
+              />
               <Text>Facebook</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.socialButton}>
-              <Image source={require('../../assets/images/_Google.png')} style={styles.iconeye} />
+              <Image
+                source={require("../../assets/images/_Google.png")}
+                style={styles.iconeye}
+              />
               <Text>Google</Text>
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.orDivider}>Or</Text>
+          <Text style={styles.orDivider}>O</Text>
 
           {/* Campo de Nombres */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
-              placeholder="Nombres"
-              placeholderTextColor="#000000"
-              style={styles.textInput}
-              onChangeText={handleChange('firstName')}
+              placeholder="Nombre(s)"
+              placeholderTextColor="#999"
+              style={styles.inputField}
+              onChangeText={handleChange("firstName")}
               value={values.firstName}
             />
-            {touched.firstName && errors.firstName && <Text style={styles.errorText}>{errors.firstName}</Text>}
+            {touched.firstName && errors.firstName && (
+              <Text style={styles.errorText}>{errors.firstName}</Text>
+            )}
           </View>
 
           {/* Campo de Apellido Paterno */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
               placeholder="Apellido paterno"
-              placeholderTextColor="#000000"
-              style={styles.textInput}
-              onChangeText={handleChange('lastName')}
+              placeholderTextColor="#999"
+              style={styles.inputField}
+              onChangeText={handleChange("lastName")}
               value={values.lastName}
             />
-            {touched.lastName && errors.lastName && <Text style={styles.errorText}>{errors.lastName}</Text>}
+            {touched.lastName && errors.lastName && (
+              <Text style={styles.errorText}>{errors.lastName}</Text>
+            )}
           </View>
 
           {/* Campo de Apellido Materno */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
               placeholder="Apellido materno"
-              placeholderTextColor="#000000"
-              style={styles.textInput}
-              onChangeText={handleChange('middleName')}
+              placeholderTextColor="#999"
+              style={styles.inputField}
+              onChangeText={handleChange("middleName")}
               value={values.middleName}
             />
-            {touched.middleName && errors.middleName && <Text style={styles.errorText}>{errors.middleName}</Text>}
+            {touched.middleName && errors.middleName && (
+              <Text style={styles.errorText}>{errors.middleName}</Text>
+            )}
           </View>
 
           {/* Campo de Correo */}
-          <View style={styles.inputField}>
+          <View style={styles.passwordField}>
             <TextInput
-              placeholder="Correouniversitario@unal.edu.mx"
-              placeholderTextColor="#000000"
-              style={styles.textInput}
-              onChangeText={handleChange('email')}
+              placeholder="correouniversitario@uanl.edu.mx"
+              placeholderTextColor="#999"
+              style={styles.inputField}
+              onChangeText={handleChange("email")}
               value={values.email}
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            {touched.email && errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            {touched.email && errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
           </View>
 
           {/* Campo de Contraseña */}
           <View style={styles.passwordField}>
             <TextInput
               style={styles.inputField}
-              placeholder="Contraseña"
-              placeholderTextColor="#000000"
-              onChangeText={handleChange('password')}
+              placeholder="********"
+              placeholderTextColor="#999"
+              onChangeText={handleChange("password")}
               value={values.password}
               secureTextEntry={!showPassword}
             />
-            <TouchableOpacity style={styles.eyeIcon} onPress={togglePasswordVisibility}>
-              <Image source={require('../../assets/images/Vector.png')} style={styles.iconEye} />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={togglePasswordVisibility}
+            >
+              {/* font awesome icon  */}
+              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
             </TouchableOpacity>
-            {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+
+            {touched.password && errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
           </View>
 
-          <TouchableOpacity style={styles.loginButton} onPress={() => handleSubmit()}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => handleSubmit()}
+          >
             <Text style={styles.loginButtonText}>Crear una cuenta</Text>
           </TouchableOpacity>
 
           <Text style={styles.registerLink}>
             ¿Ya tienes una cuenta?
-            <Link href="/" >
-            <Text style={styles.registerLinkSpan}> Inicia Sesión</Text>
+            <Link href="/">
+              <Text style={styles.registerLinkSpan}> Inicia Sesión</Text>
             </Link>
           </Text>
         </View>
       )}
     </Formik>
   );
-  
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 10,
-    backgroundColor: '#fff',
+    maxWidth: 500,
+    width: "100%",
+    marginHorizontal: "auto",
   },
   icon: {
     width: 100,
     height: 100,
-    
     marginTop: 10,
   },
   iconEye: {
@@ -190,30 +244,30 @@ const styles = StyleSheet.create({
     height: 20,
   },
   title: {
-    color: '#008000',
+    color: "#008000",
     fontSize: 30,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    marginTop:0,
+    marginTop: 0,
   },
   subtitle: {
-    color: '#777777',
-    textAlign: 'center',
+    color: "#777777",
+    textAlign: "center",
     marginBottom: 20,
   },
   socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
     marginBottom: 15,
   },
   socialButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '48%',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    width: "48%",
+    justifyContent: "center",
     padding: 10,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     borderRadius: 5,
   },
   iconeye: {
@@ -222,69 +276,74 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   orDivider: {
-    color: 'black',
+    color: "black",
     margin: 10,
   },
   inputField: {
-    backgroundColor: '#F5F9FE',
+    backgroundColor: "#F5F9FE",
     borderRadius: 10,
-    width: '100%',
+    width: "100%",
     height: 45,
-    marginBottom: 15,
+    marginTop: 10,
     borderWidth: 2,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     paddingHorizontal: 10,
   },
   textInput: {
     flex: 1,
-    color: '#000',
+    color: "#000",
   },
   passwordField: {
-    position: 'relative',
-    width: '100%',
-    marginBottom: 20,
+    position: "relative",
+    width: "100%",
   },
   eyeIcon: {
-    position: 'absolute',
+    position: "absolute",
+    top: 23,
     right: 10,
-    top: 10,
-    width: 20,
-    height: 20,
+    fontSize: 20,
+    color: "#888",
+    marginVertical: "auto",
   },
   forgotPassword: {
-    color: '#000000',
+    color: "#000000",
     fontSize: 14,
-    
-    textAlign: 'right',
-    width: '100%',
+
+    textAlign: "right",
+    width: "100%",
   },
   loginButton: {
-    backgroundColor: '#28a745',
-    width: '100%',
+    backgroundColor: "#28a745",
+    width: "100%",
     borderRadius: 10,
+    marginTop: 15,
     paddingVertical: 10,
-    alignItems: 'center',
-    
+    alignItems: "center",
   },
   loginButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerLink: {
-    color: 'black',
+    color: "black",
     marginTop: 20,
-    textAlign: 'center',
+    textAlign: "center",
   },
   registerLinkSpan: {
-    color: '#28a745',
-    fontWeight: 'bold',
-    marginBottom:15,
+    color: "#28a745",
+    fontWeight: "bold",
+    marginBottom: 15,
   },
 
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 12,
-    marginTop: 5,
+  },
+  backgroundImage: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    zIndex: -1,
   },
 });
