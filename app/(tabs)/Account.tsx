@@ -1,9 +1,14 @@
 import { router, Link } from 'expo-router';
 import React, { useState } from 'react';
 import { useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 import { StyleSheet, View, Alert } from 'react-native';
 import { Button, Input } from '@rneui/themed';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import Feather from '@expo/vector-icons/Feather';
+
+
 import { useRoute, RouteProp } from '@react-navigation/native';
 import Avatar from '../../components/Avatar';
 import { RootStackParamList } from '../types/RootStackParam';
@@ -176,13 +181,12 @@ export default function Index() {
         />
           </View>
 
-          <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['Rubik'] leading-9">Estudiante ITS</Text>
-          <View className="w-[90%] h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
-            <View className='w-1/6 flex justify-center items-center h-auto pl-2'>
-              <Icon name='star' style={styles.backIcon} className='text-white relative'></Icon>
-
+          <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['Rubik'] leading-9">{username || 'Estudiante ITS'}</Text>
+          <View className="w-[90%] pl-3 h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
+            <View className='w-1/6 flex justify-center items-center h-auto pl-4'>
+            <AntDesign name="staro" size={32} color="white"/>
             </View>
-            <View className='w-1/6 flex h-full flex-col items-center'>
+            <View className='w-1/5 flex h-full flex-col items-center'>
 
               <View className='flex flex-col h-1/2 justify-end items-end'>
                 <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['Rubik'] uppercase leading-[18px] tracking-wide">Puntos</Text>
@@ -191,18 +195,19 @@ export default function Index() {
                 <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">590</Text>
               </View>
             </View>
-            <View className="w-1/5 h-[69px] bg-gradient-to-b from-white via-white to-white" />
+            <View className="w-[15%] h-full bg-gradient-to-b flex items-end pr-2 justify-center from-white via-white to-white" >
+            <View className="w-[2px] h-[80%] bg-gradient-to-b from-white  via-white to-slate-200 justify-end align-bottom shadow-white fill-slate-300 bg-slate-200" />
+            </View>
             <View className='w-1/6 flex justify-center items-center h-auto pl-2'>
-              <Icon name='star' style={styles.backIcon} className='text-white relative'></Icon>
-
+            <Feather name="codesandbox" size={32} color="white" />
             </View>
             <View className='w-1/6 flex h-full flex-col items-center'>
 
               <View className='flex flex-col h-1/2 justify-end items-end'>
-                <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['Rubik'] uppercase leading-[18px] tracking-wide">Puntos</Text>
+                <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['Rubik'] uppercase leading-[18px] tracking-wide">Puesto</Text>
               </View>
               <View className='flex flex-col h-1/2 justify-start items-end'>
-                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">590</Text>
+                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">#32</Text>
               </View>
             </View>
 
@@ -275,7 +280,7 @@ export default function Index() {
               <View className=' flex align-middle items-center border-2 rounded-3xl border-green-300'>
                 <StackedBarChart
                   data={barData}
-                  width={340}
+                  width={300}
                   height={220}
                   yAxisLabel=""
                   yAxisSuffix="%"
