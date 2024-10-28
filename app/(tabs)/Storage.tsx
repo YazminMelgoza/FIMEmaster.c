@@ -5,41 +5,47 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { QuizService } from '../../services/quiz';
 import { Quiz } from '../../models/quiz';
 import { supabase } from '../../lib/supabase'; // Asegúrate de que esta ruta es correcta
+import ToastManager, { Toast } from 'toastify-react-native';
 
 export default function About() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [authorId, setAuthorId] = useState<string>('');
-  const quizService = new QuizService();
 
   useEffect(() => {
-    const fetchUser  = async () => {
-      const { data, error } = await supabase.auth.getUser ();
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
       if (data?.user) {
         setAuthorId(data.user.id);
         fetchQuizzes(data.user.id);
       } else {
         console.error('Error al obtener el usuario:', error);
+        Toast.error('Error al obtener el usuario.');
       }
     };
-    fetchUser ();
+    fetchUser();
   }, []);
 
   const fetchQuizzes = async (userId: string) => {
-    const { quizzes, error } = await quizService.getQuizzesByAuthorId(userId);
+    const { quizzes, error } = await QuizService.getQuizzesByAuthorId(userId);
     if (error) {
       console.error('Error al obtener los quizzes:', error);
+      Toast.error('Error al obtener los quizzes.');
+    } else if (!quizzes || quizzes.length === 0) {
+      Toast.warn('No existen quizzes.');
     } else {
       setQuizzes(quizzes);
+      Toast.success("Quizzes cargados.");
     }
   };
 
   const handleCreateQuiz = (quizId: number) => {
     console.log('Crear test con ID:', quizId);
-    router.push(`infoQuiz?id=${quizId}`); // Navega a la pantalla del quiz pasando el ID
+    router.push(`infoQuiz?id=${quizId}`);
   };
 
   return (
     <View style={styles.container}>
+      <ToastManager />
       <View style={styles.header}>
         <Image
           source={require('../../assets/images/imagetextura2.png')}
@@ -60,7 +66,7 @@ export default function About() {
             <TouchableOpacity
               key={quiz.exerciseid}
               style={[styles.quizItem, { backgroundColor: '#fff' }]}
-              onPress={() => handleCreateQuiz(quiz.exerciseid)} // Pasa el ID del quiz
+              onPress={() => handleCreateQuiz(quiz.exerciseid)}
             >
               <View style={styles.quizItemIcon}>
                 <Icon name="bar-chart" size={30} color="#4CAF50" />
@@ -77,6 +83,7 @@ export default function About() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
