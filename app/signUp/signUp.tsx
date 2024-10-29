@@ -7,7 +7,7 @@ import { Screen } from '../../components/ScreenLayout'
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { useNavigation } from '@react-navigation/native';
-import { Snackbar } from 'react-native-paper';
+
 // Esquema de validación Yup
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required('El nombre es obligatorio'),
@@ -31,9 +31,7 @@ export default function SignUp() {
 
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
-  //SnackBar
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -52,8 +50,8 @@ export default function SignUp() {
       password: password,
       options: {
         data: {
-          firstName: 'Luis Mario',
-          lastName: 'Medellin',
+          firstName: first_Name,
+          lastName: last_Name,
         },
       },
     })
@@ -61,8 +59,7 @@ export default function SignUp() {
     if(error)
     {
       console.error('Error en la creación del usuario:', error.message);
-      setSnackbarVisible(true);
-      setSnackbarMessage("Ups, no se ha podido crear el usuario, consulte a soporte técnico");
+
     }else
     {
       router.replace('/signUp/confirmation');
