@@ -1,33 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
-
+import { useRouter, useLocalSearchParams } from 'expo-router'; 
+import { QuizService } from '../../services/quiz';
+import { Quiz } from '../../models/quiz';
+import ToastManager, { Toast } from 'toastify-react-native';  // Importa ToastManager y Toast
 
 const QuizScreen = () => {
   const router = useRouter();
-  
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: boolean | null }>({
-    1: true,
-    4: false,
-    6: null,
-    8: null,
-  });
+  const { id } = useLocalSearchParams();
+  const quizService = new QuizService();
+
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: boolean }>({});
+
+  useEffect(() => {
+    if (id) {
+      fetchQuiz(Number(id));
+    }
+  }, [id]);
+
+  const fetchQuiz = async (quizId: number) => {
+    const { quiz, error } = await quizService.getQuizById(quizId);
+    
+    if (error) {
+      Toast.error('Error al obtener el quiz.');
+      console.error('Error al obtener el quiz:', error);
+    } else if (!quiz) {
+      Toast.warn('El quiz no existe');
+    } else {
+      setQuiz(quiz);
+      Toast.success("Quiz cargado");
+      console.log(quiz);
+    }
+  };
 
   const handleAnswerSelect = (lineNumber: number) => {
     setSelectedAnswers((prevState) => ({
       ...prevState,
-      [lineNumber]: prevState[lineNumber] === null ? true : null, 
+      [lineNumber]: prevState[lineNumber] !== true,
     }));
   };
 
   const calculateCompletion = () => {
-    const totalAnswers = Object.keys(selectedAnswers).length;
-    const answeredCount = Object.values(selectedAnswers).filter((answer) => answer !== null).length;
-    return Math.round((answeredCount / totalAnswers) * 100);
+    const answeredCount = Object.values(selectedAnswers).filter(Boolean).length;
+    const totalLines = 4;
+    return Math.round((answeredCount / totalLines) * 100);
   };
 
   return (
     <View style={styles.container}>
+      {/* Agrega el ToastManager para mostrar las notificaciones */}
+      <ToastManager />
+
       {/* Header */}
       <View style={styles.header}>
         <Image
@@ -35,12 +59,17 @@ const QuizScreen = () => {
           style={styles.backgroundImage}
         />
         <TouchableOpacity 
-        style={styles.backButton}
-        onPress={() => router.back()} // Utiliza router.back() para regresar
+          style={styles.backButton}
+          onPress={() => router.back()} 
         >
           <Image source={require('../../assets/images/flechaAtras.png')} />
         </TouchableOpacity>
         <Text style={styles.title}>Resolver Quiz</Text>
+      </View>
+
+      {/* Mostrar el ID del Quiz */}
+      <View style={styles.quizIdContainer}>
+        <Text style={styles.quizIdText}>ID del Quiz: {id}</Text>
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -50,75 +79,79 @@ const QuizScreen = () => {
             source={require('../../assets/images/fondoBlanco.jpg')}
             style={styles.whiteBackgroundImage}
           />
-
-          {/* Code Container */}
-          <View style={styles.codeContainer}>
-            <Text style={styles.codeHeader}>Código a resolver:</Text>
-            <View style={styles.codeBox}>
-              <Text style={styles.code}>#include {'<'}stdio.h{'>'}</Text>
-              <Text style={styles.code}>int main()</Text>
-              <Text style={styles.code}>{'}'}</Text>
-              <Text style={styles.code}> int a, d, c;</Text>
-              <Text style={styles.code}> a = 5;</Text>
-              <Text style={styles.code}> b = 10</Text>
-              <Text style={styles.code}> c = a + b;</Text>
-              <Text style={styles.code}> printf("El resultado es: %d", c);</Text>
-              <Text style={styles.code}> return 0;</Text>
-              <Text style={styles.code}>{'}'}</Text>
-            </View>
-          </View>
-
-          {/* Output Container */}
-          <View style={styles.outputContainer}>
-            <Text style={styles.outputHeader}>Output Esperado:</Text>
-            <View style={styles.outputBox}>
-              <Text style={styles.output}>El resultado es 15</Text>
-            </View>
-          </View>
-
-          {/* Answers Container */}
-          <View style={styles.answersContainer}>
-            <Text style={styles.answersHeader}>Resuelve:</Text>
-            {[1, 4, 6, 8].map((lineNumber) => (
-              <TouchableOpacity
-                key={lineNumber}
-                style={styles.answerOption}
-                onPress={() => handleAnswerSelect(lineNumber)}
-              >
-                <View style={styles.answerBox}>
-                  <Image
-                    source={require('../../assets/images/fime-logo2.png')} 
-                    style={styles.answerImage}
-                  />
-                  <Text style={styles.answerText}>Línea #{lineNumber}</Text>
-                  {selectedAnswers[lineNumber] === true && (
-                     <Image
-                     source={require('../../assets/images/cancelar.png')} 
-                      style={styles.answerImage}
-                   />
-                  )}
-                  {selectedAnswers[lineNumber] === false && (
-                     <Image
-                     source={require('../../assets/images/comprobado.png')} 
-                     style={styles.answerImage}
-                   />
-                  )}
+          
+          {quiz ? (
+            <>
+              {/* Code Container */}
+              <View style={styles.codeContainer}>
+                <Text style={styles.codeHeader}>Código a resolver:</Text>
+                <View style={styles.codeBox}>
+                  {quiz.wrongcode.split('\n').map((line, index) => (
+                    <Text key={index} style={styles.code}>{line}</Text>
+                  ))}
                 </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Completion Container */}
-          <View style={styles.completionContainer}>
-            <Text style={styles.completionText}>
-              Completado: {calculateCompletion()}%
-            </Text>
-          </View>
+              </View>
+              {/* Output Container */}
+              <View style={styles.outputContainer}>
+                <Text style={styles.outputHeader}>Output Esperado:</Text>
+                <View style={styles.outputBox}>
+                  <Text style={styles.output}>{quiz.solutioncode}</Text>
+                </View>
+              </View>
+              {/* Answers Container */}
+              <View style={styles.answersContainer}>
+                <Text style={styles.answersHeader}>Resuelve:</Text>
+                {[1, 4, 6, 8].map((lineNumber) => (
+                  <TouchableOpacity
+                    key={lineNumber}
+                    style={styles.answerOption}
+                    onPress={() => handleAnswerSelect(lineNumber)}
+                  >
+                    <View style={styles.answerBox}>
+                      <Image
+                        source={require('../../assets/images/fime-logo2.png')}
+                        style={styles.answerImage}
+                      />
+                      <Text style={styles.answerText}>Línea #{lineNumber}</Text>
+                      {selectedAnswers[lineNumber] && (
+                        <Image
+                          source={require('../../assets/images/cancelar.png')}
+                          style={styles.answerImage}
+                        />
+                      )}
+                      {!selectedAnswers[lineNumber] && (
+                        <Image
+                          source={require('../../assets/images/comprobado.png')}
+                          style={styles.answerImage}
+                        />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {/* Completion Container */}
+              <View style={styles.completionContainer}>
+                <Text style={styles.completionText}>
+                  Completado: {calculateCompletion()}%
+                </Text>
+              </View>
+            </>
+          ) : (
+            // Mostrar mensaje de error cuando no se encuentre el quiz
+            <View style={styles.noQuizContainer}>
+              <Image
+                source={require('../../assets/images/cancelar.png')}
+                style={styles.errorIcon}
+              />
+              <Text style={styles.errorMessage}>No se encontró el quiz solicitado.</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -134,6 +167,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
+  },
+  quizIdContainer: {
+    padding: 10,
+    alignItems: 'center',
+  },
+  quizIdText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
   },
   backButton: {
     position: 'absolute',
@@ -216,7 +258,7 @@ const styles = StyleSheet.create({
     color: '#00622A',
   },
   answerOption: {
-    marginBottom: 10, 
+    marginBottom: 10,
   },
   answerBox: {
     backgroundColor: '#f9fff9',
@@ -226,21 +268,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   answerImage: {
-    width: 40, 
+    width: 40,
     height: 40,
-    resizeMode: 'contain', // Cambia a 'cover' o 'stretch' si es necesario
+    resizeMode: 'contain',
     marginRight: 10,
   },
   answerText: {
     fontSize: 16,
     color: '#333',
-    flex: 1, // Permite que el texto ocupe el espacio disponible
-  },
-  correctIcon: {
-    color: 'green',
-  },
-  incorrectIcon: {
-    color: 'red',
+    flex: 1,
   },
   completionContainer: {
     margin: 20,
@@ -249,6 +285,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#00622A',
+  },
+  
+  noQuizContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  errorIcon: {
+    width: 50,
+    height: 50,
+    marginBottom: 10,
+  },
+  errorMessage: {
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
   },
 });
 

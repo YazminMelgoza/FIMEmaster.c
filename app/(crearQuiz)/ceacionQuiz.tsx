@@ -86,7 +86,7 @@ export default function CrearQuiz() {
                         solutioncode: values.solutioncode,
                     };
                     console.log(objQuiz);
-                    quizService.createQuiz(objQuiz).then(response => {
+                    QuizService.createQuiz(objQuiz).then(response => {
                         if (response.error) {
                             Alert.alert('Error', 'Hubo un problema al crear el quiz. Intenta nuevamente.');
                         } else {

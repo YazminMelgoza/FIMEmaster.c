@@ -63,7 +63,7 @@ export default function About() {
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.navigate('quiz');
+    router.navigate('infoQuiz');
   };
 
   const filteredQuizzes = quizzes.filter((quiz) =>
