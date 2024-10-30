@@ -79,6 +79,19 @@ export class QuizService {
 
         return { quiz: data as Quiz, error: null };
     }
+    static async getAllQuiz(): Promise<{ quiz: Quiz[] | null; error: PostgrestError | null }> {
+        const { data, error } = await supabase
+          .from('exercises')
+          .select('*');
+      
+        if (error) {
+          console.error('Error al obtener ejercicios:', error);
+          return { quiz: null, error };
+        }
+      
+        console.log('Ejercicios obtenidos:', data);
+        return { quiz: data as Quiz[], error: null };
+      }
 
     // Método para obtener quizzes por authorId
     async getQuizzesByAuthorId(authorId: string): Promise<{ quizzes: Quiz[]; error: PostgrestError | null }> {

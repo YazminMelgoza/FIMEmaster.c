@@ -301,18 +301,6 @@ export default function Index() {
 
         </View>
 
-        <View style={styles.quizListContainer}>
-          <View style={styles.quizListHeader}>
-            <Text style={styles.quizListTitle}>Quiz Recientes</Text>
-            <Link asChild href="historialQuiz" >
-              <TouchableOpacity style={styles.quizListSeeAll}>
-                <Text style={styles.quizListSeeAllText}>ver todos</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-
-
-        </View>
       </ScrollView>
 
       {/*<View style={styles.footer}>
