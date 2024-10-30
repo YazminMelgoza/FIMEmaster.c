@@ -97,11 +97,16 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
           style={[avatarSize, styles.avatar, styles.image]}
         />
       ) : (
-        <View style={[avatarSize, styles.avatar, styles.noImage]} />
+        <Image
+          source={require('../assets/images/user.png')}
+          style={[avatarSize, styles.placeholderImage]}
+          accessibilityLabel="Default Avatar"
+        />
+
       )}
-      <View>
-        <Button
-          title={uploading ? 'Uploading ...' : 'Upload'}
+      <View >
+        <Button 
+          title={uploading ? 'Uploading ...' : ''}
           onPress={uploadAvatar}
           disabled={uploading}
         />
@@ -119,6 +124,9 @@ const styles = StyleSheet.create({
   image: {
     objectFit: 'cover',
     paddingTop: 0,
+  },
+  placeholderImage: {
+    resizeMode: 'contain', // or 'cover' based on your preference
   },
   noImage: {
     backgroundColor: '#333',

@@ -1,8 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, Dimensions } from 'react-native';
-import { ProgressChart, BarChart } from 'react-native-chart-kit';
+import React from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Dimensions,
+} from "react-native";
+import { ProgressChart, BarChart } from "react-native-chart-kit";
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get("window").width;
 
 const DashboardScreen = () => {
   const progressData = {
@@ -24,7 +31,12 @@ const DashboardScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.profileContainer}>
-          <Image source={{ uri: 'https://i.pinimg.com/474x/9b/67/88/9b6788434b3ea5d2c1ade31388def253.jpg' }} style={styles.avatar} />
+          <Image
+            source={{
+              uri: "https://i.pinimg.com/474x/9b/67/88/9b6788434b3ea5d2c1ade31388def253.jpg",
+            }}
+            style={styles.avatar}
+          />
           <Text style={styles.name}>Estudiante ITS</Text>
         </View>
         <View style={styles.statsRow}>
@@ -45,7 +57,9 @@ const DashboardScreen = () => {
 
       {/* Stats Section */}
       <View style={styles.statsSection}>
-        <Text style={styles.sectionTitle}>Haz programado 24 códigos este mes!</Text>
+        <Text style={styles.sectionTitle}>
+          Haz programado 24 códigos este mes!
+        </Text>
         <View style={styles.progressContainer}>
           {/* Gráfico circular */}
           <ProgressChart
@@ -55,7 +69,7 @@ const DashboardScreen = () => {
             strokeWidth={12}
             radius={40}
             chartConfig={chartConfig}
-            hideLegend={true}  // Ocultar la leyenda predeterminada
+            hideLegend={true} // Ocultar la leyenda predeterminada
           />
           {/* Texto superpuesto dentro del gráfico */}
           <View style={styles.textInCircle}>
@@ -82,10 +96,10 @@ const DashboardScreen = () => {
           data={barData}
           width={screenWidth * 0.8}
           height={220}
-          yAxisLabel=""  // Prefijo vacío
+          yAxisLabel="" // Prefijo vacío
           yAxisSuffix="%"
           yAxisInterval={1} // Para mostrar cada valor, 0, 25, 50, 75, 100
-          fromZero={true}  // Asegura que el eje Y comience desde 0
+          fromZero={true} // Asegura que el eje Y comience desde 0
           chartConfig={chartConfig}
           verticalLabelRotation={0}
         />
@@ -96,8 +110,8 @@ const DashboardScreen = () => {
 
 // Configuración de los gráficos
 const chartConfig = {
-  backgroundGradientFrom: '#e6e6fa',
-  backgroundGradientTo: '#e6e6fa',
+  backgroundGradientFrom: "#e6e6fa",
+  backgroundGradientTo: "#e6e6fa",
   color: (opacity = 1) => `rgba(63, 191, 127, ${opacity})`,
   labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
   strokeWidth: 2, // opcional
@@ -106,18 +120,18 @@ const chartConfig = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
-    backgroundColor: '#28a745',
+    backgroundColor: "#28a745",
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
   profileContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatar: {
     width: 60,
@@ -127,76 +141,76 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 15,
   },
   statBox: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statText: {
     fontSize: 12,
-    color: '#fff',
+    color: "#fff",
   },
   statNumber: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   statsSection: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   progressContainer: {
-    position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
   },
   textInCircle: {
-    position: 'absolute',
-    justifyContent: 'center',
-    alignItems: 'center',
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
   },
   programsText: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   programsSubText: {
     fontSize: 10,
-    color: '#555',
+    color: "#555",
   },
   statBoxGreen: {
-    backgroundColor: '#28a745',
+    backgroundColor: "#28a745",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginVertical: 10,
   },
   statBoxWhite: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 10,
     marginVertical: 10,
     borderWidth: 1,
-    borderColor: '#28a745',
+    borderColor: "#28a745",
   },
   statBoxText: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#000000', 
+    fontWeight: "bold",
+    color: "#000000",
   },
   categoriesSection: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 20,
   },
 });
