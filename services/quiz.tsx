@@ -6,16 +6,19 @@ import { PostgrestError } from '@supabase/supabase-js';
 export class QuizService {
     
     // Método para insertar un nuevo quiz
-    async createQuiz(quiz: Quiz): Promise<{ error: PostgrestError | null }> {
+    public static async createQuiz(quiz: Quiz): Promise<{ error: PostgrestError | null }> {
         const { data, error } = await supabase
             .from('exercises') 
             .insert([
                 {
                     authorId: quiz.authorId,
+                    title: quiz.title,
                     instructions: quiz.instructions,
                     categoryid: quiz.categoryid,
+                    questionsnumber: quiz.questionsnumber,
                     wrongcode: quiz.wrongcode,
                     solutioncode: quiz.solutioncode,
+                    createdat: quiz.createdat,
                 },
             ]);
 
@@ -94,7 +97,7 @@ export class QuizService {
       }
 
     // Método para obtener quizzes por authorId
-    async getQuizzesByAuthorId(authorId: string): Promise<{ quizzes: Quiz[]; error: PostgrestError | null }> {
+    public static async getQuizzesByAuthorId(authorId: string): Promise<{ quizzes: Quiz[]; error: PostgrestError | null }> {
         const { data, error } = await supabase
             .from('exercises') 
             .select('*')

@@ -51,6 +51,7 @@ export default function Index()
   };*/
 
   return (
+    
     <View style={styles.container}>
       <View style={styles.header}>
         <Image
@@ -82,7 +83,7 @@ export default function Index()
                     </View>
                 </TouchableOpacity>
             </Link>
-            <Link asChild href="ceacionQuiz" >
+            <Link asChild href="creacionQuiz" >
                 <TouchableOpacity style={styles.button} >
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Icon name="code" size={50} color="#3BA76B" />

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
-import { StyleSheet, View, Alert } from 'react-native';
+import { StyleSheet, View, Alert} from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
@@ -70,6 +70,9 @@ export default function Index() {
   const [username, setUsername] = useState('');
   const [website, setWebsite] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastName] = useState('');
+
 
 
   // Obtenemos la sesión de los parámetros de la ruta
@@ -87,7 +90,7 @@ export default function Index() {
 
       const { data, error, status } = await supabase
         .from('profiles')
-        .select(`username, website, avatar_url`)
+        .select(`username, website, avatar_url, firstname, lastname`)
         .eq('id', session?.user.id)
         .single();
 
@@ -99,6 +102,8 @@ export default function Index() {
         setUsername(data.username);
         setWebsite(data.website);
         setAvatarUrl(data.avatar_url);
+        setFirstname(data.firstname);
+        setLastName(data.lastname);
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -157,8 +162,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-
-
+      
       <ScrollView className=' h-full flex flex-col' contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>
           <View className='h-32 w-full'>
@@ -182,6 +186,11 @@ export default function Index() {
           </View>
 
           <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['Rubik'] leading-9">{username || 'Estudiante ITS'}</Text>
+          <Link asChild href={"modificarUsuario"}>
+            <Text>
+              Clic here to go to Settings
+            </Text>
+          </Link>
           <View className="w-[90%] pl-3 h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
             <View className='w-1/6 flex justify-center items-center h-auto pl-4'>
             <AntDesign name="staro" size={32} color="white"/>
