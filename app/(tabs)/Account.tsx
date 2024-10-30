@@ -162,8 +162,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-
-
+      
       <ScrollView className=' h-full flex flex-col' contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>
           <View className='h-32 w-full'>
@@ -187,6 +186,11 @@ export default function Index() {
           </View>
 
           <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['Rubik'] leading-9">{username || 'Estudiante ITS'}</Text>
+          <Link asChild href={"modificarUsuario"}>
+            <Text>
+              Clic here to go to Settings
+            </Text>
+          </Link>
           <View className="w-[90%] pl-3 h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
             <View className='w-1/6 flex justify-center items-center h-auto pl-4'>
             <AntDesign name="staro" size={32} color="white"/>

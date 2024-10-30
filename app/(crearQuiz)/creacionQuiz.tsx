@@ -6,6 +6,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { Quiz } from '../../models/quiz'; // Ajusta la ruta
 import { QuizService } from '../../services/quiz'; 
+import { router } from "expo-router";
 
 export default function CrearQuiz() {
     const [loading, setLoading] = useState(true);
@@ -75,6 +76,8 @@ export default function CrearQuiz() {
                     categoryid: 0,
                     wrongcode: '',
                     solutioncode: '',
+                    title: '',
+                    questionsnumber: 0,
                 }}
                 onSubmit={async (values) => {
                     const objQuiz: Quiz = {
@@ -84,13 +87,17 @@ export default function CrearQuiz() {
                         categoryid: values.categoryid,
                         wrongcode: values.wrongcode,
                         solutioncode: values.solutioncode,
+                        title: values.title,
+                        questionsnumber: values.questionsnumber,
+                        createdat: new Date().toISOString(),
                     };
                     console.log(objQuiz);
                     QuizService.createQuiz(objQuiz).then(response => {
                         if (response.error) {
                             Alert.alert('Error', 'Hubo un problema al crear el quiz. Intenta nuevamente.');
                         } else {
-                            Alert.alert('Éxito', 'El quiz se creó correctamente.');
+                              router.replace("finalizarQuiz");
+                           
                         }
                     });
                     
@@ -100,6 +107,13 @@ export default function CrearQuiz() {
                     <View>
                         
                         <Text>Author ID: {authorId}</Text>
+                        <Text>Title:</Text>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={handleChange('title')}
+                            onBlur={handleBlur('title')}
+                            value={values.title}
+                        />
                         <Text>Instructions:</Text>
                         <TextInput
                             style={styles.input}
@@ -115,6 +129,14 @@ export default function CrearQuiz() {
                             onChangeText={handleChange('categoryid')} 
                             onBlur={handleBlur('categoryid')}
                             value={values.categoryid ? values.categoryid.toString() : ''} 
+                        />
+                        <Text>Cantidad de preguntas:</Text>
+                        <TextInput
+                            style={styles.input}
+                            keyboardType="numeric"
+                            onChangeText={handleChange('questionsnumber')} 
+                            onBlur={handleBlur('questionsnumber')}
+                            value={values.questionsnumber ? values.questionsnumber.toString() : ''} 
                         />
                         
                         

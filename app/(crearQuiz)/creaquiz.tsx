@@ -1,78 +1,76 @@
 import * as React from "react";
 import {Image, StyleSheet, Text, View, Pressable} from "react-native";
-import { StackNavigationProp } from '@react-navigation/stack';
-import {useNavigation, ParamListBase} from "@react-navigation/native";
 
-const CrearQuizDeCdigo = () => {
-  	const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
-    		
-    		return (
-      			<View style={styles.crearQuizDeCdigo}>
-        				<Image style={[styles.statusBarLight, styles.statusBarLightPosition]} resizeMode="cover" source={require('@/assets/images/status-bar-light2.png')} />
-        				<Image style={styles.imageIcon} resizeMode="cover" source={require('@/assets/images/relieve.png')} />
-        				<View style={[styles.crearQuizDeCdigoChild, styles.statusBarLightPosition]} />
-        				<Pressable style={styles.vector} onPress={() => navigation.goBack()}>
-          					<Image style={[styles.icon, styles.iconLayout]} resizeMode="cover" source={require('@/assets/images/vector-flecha.png')} />
-        				</Pressable>
-        				<Text style={styles.creaUnNuevo}>Crea un nuevo quiz</Text>
-        				<View style={styles.headline}>
-          					<View style={styles.frameParent}>
-            						<View style={styles.loginInput1Layout}>
-              							<Text style={[styles.headline1, styles.headlineTypo]}>Nombre del ejercicio</Text>
-              							<View style={[styles.loginInput, styles.loginBorder]}>
-                								<View style={styles.regularInputDoubleRow}>
-                  									<View style={styles.placeholderValue}>
-                    										<View style={styles.parentFlexBox}>
-                      											<Text style={styles.ingresaTypo}>Ingresa el nombre del ejercicio</Text>
-                      											<View style={styles.printLine}>
-                        												<View style={[styles.rectangle, styles.iconLayout]} />
-                      											</View>
-                    										</View>
-                  									</View>
-                								</View>
-              							</View>
-            						</View>
-            						<View style={styles.headlineGroupSpaceBlock}>
-              							<Text style={styles.headlineTypo}>Instrucciones</Text>
-              							<View style={[styles.loginInput1, styles.loginBorder]}>
-                								<View style={styles.regularInputDoubleRow}>
-                  									<View style={styles.placeholderValue}>
-                    										<View style={[styles.ingresaLasInstruccionesParent, styles.parentFlexBox]}>
-                      											<Text style={[styles.ingresaLasInstrucciones, styles.ingresaTypo]}>Ingresa las instrucciones</Text>
-                      											<View style={styles.printLine}>
-                        												<View style={[styles.rectangle, styles.iconLayout]} />
-                      											</View>
-                    										</View>
-                  									</View>
-                								</View>
-              							</View>
-            						</View>
-            						<View style={styles.headlineContainer}>
-              							<Text style={styles.headlineTypo}>Categoría</Text>
-              							<View style={[styles.loginInput2, styles.loginBorder]}>
-                								<View style={styles.regularInputDoubleRow}>
-                  									<View style={styles.placeholderValue2}>
-                    										<View style={[styles.lgicaParent, styles.parentFlexBox]}>
-                      											<Text style={[styles.ingresaLasInstrucciones, styles.ingresaTypo]}>Lógica</Text>
-                      											<View style={styles.printLine}>
-                        												<View style={[styles.rectangle, styles.iconLayout]} />
-                      											</View>
-                    										</View>
-                  									</View>
-                  									<Image style={styles.flechaHaciaAbajoParaNavegaIcon} resizeMode="cover" source={require('@/assets/images/flecha_abajo.png')} />
-                								</View>
-              							</View>
-            						</View>
-            						<View>
-              							<View style={[styles.subirblanco1Parent, styles.headlineGroupSpaceBlock]}>
-                								<Image style={styles.flechaHaciaAbajoParaNavegaIcon} resizeMode="cover" source={require('@/assets/images/cargar.png')} />
-                								<Text style={styles.text}>Cargar ejercicio</Text>
-              							</View>
-            						</View>
-          					</View>
-        				</View>
-      			</View>);
-    		};
+
+export default function CrearQuizDeCdigo() {
+
+	return (
+		<View style={styles.crearQuizDeCdigo}>
+			<Image style={styles.imageIcon} resizeMode="cover" source={require('../../assets/images/relieve.png')} />
+			<View style={[styles.crearQuizDeCdigoChild, styles.statusBarLightPosition]} />
+			<Pressable style={styles.vector} >
+					<Image style={[styles.icon, styles.iconLayout]} resizeMode="cover" source={require('../../assets/images/vector-flecha.png')} />
+			</Pressable>
+			<Text style={styles.creaUnNuevo}>Crea un nuevo quiz</Text>
+			<View style={styles.headline}>
+			<View style={styles.frameParent}>
+				<View style={styles.loginInput1Layout}>
+					<Text style={[styles.headline1, styles.headlineTypo]}>Nombre del ejercicio</Text>
+					<View style={[styles.loginInput, styles.loginBorder]}>
+						<View style={styles.regularInputDoubleRow}>
+							<View style={styles.placeholderValue}>
+								<View style={styles.parentFlexBox}>
+										<Text style={styles.ingresaTypo}>Ingresa el nombre del ejercicio</Text>
+										<View style={styles.printLine}>
+											<View style={[styles.rectangle, styles.iconLayout]} />
+										</View>
+								</View>
+							</View>
+						</View>
+					</View>
+				</View>
+				<View style={styles.headlineGroupSpaceBlock}>
+					<Text style={styles.headlineTypo}>Instrucciones</Text>
+					<View style={[styles.loginInput1, styles.loginBorder]}>
+						<View style={styles.regularInputDoubleRow}>
+							<View style={styles.placeholderValue}>
+								<View style={[styles.ingresaLasInstruccionesParent, styles.parentFlexBox]}>
+									<Text style={[styles.ingresaLasInstrucciones, styles.ingresaTypo]}>Ingresa las instrucciones</Text>
+										<View style={styles.printLine}>
+											<View style={[styles.rectangle, styles.iconLayout]} />
+											</View>
+										</View>
+									</View>
+							</View>
+						</View>
+				</View>
+				<View style={styles.headlineContainer}>
+					<Text style={styles.headlineTypo}>Categoría</Text>
+					<View style={[styles.loginInput2, styles.loginBorder]}>
+						<View style={styles.regularInputDoubleRow}>
+							<View style={styles.placeholderValue2}>
+								<View style={[styles.lgicaParent, styles.parentFlexBox]}>
+									<Text style={[styles.ingresaLasInstrucciones, styles.ingresaTypo]}>Lógica</Text>
+										<View style={styles.printLine}>
+											<View style={[styles.rectangle, styles.iconLayout]} />
+										</View>
+									</View>
+								</View>
+								{/*Fecha abajo imagen */}
+							</View>
+						</View>
+					</View>
+					<View>
+						<View style={[styles.subirblanco1Parent, styles.headlineGroupSpaceBlock]}>
+							{/*Cargar imagen */}
+							<Text style={styles.text}>Cargar ejercicio</Text>
+						</View>
+					</View>
+				</View>
+			</View>
+		</View>
+	);
+};
     		
     		const styles = StyleSheet.create({
       			statusBarLightPosition: {
@@ -191,7 +189,6 @@ const CrearQuizDeCdigo = () => {
         				position: "absolute"
       			},
       			imageIcon: {
-        				top: 42,
         				left: -29,
         				width: 422,
         				height: 222,
@@ -364,4 +361,4 @@ const CrearQuizDeCdigo = () => {
       			}
     		});
     		
-    		export default CrearQuizDeCdigo;
+    		

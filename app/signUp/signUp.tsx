@@ -10,7 +10,6 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { supabase } from "../../lib/supabase";
 import { Link, router } from "expo-router";
 import { Formik } from "formik";
@@ -54,10 +53,8 @@ export default function SignUp() {
     router.replace('/signUp/confirmation'); // Reemplaza la ruta actual
   };
   */
-  async function signUpWithEmail(email: string, password: string, first_Name: string ,last_Name: string) {
+  async function signUpWithEmail(email: string, password: string, first_Name: string ,last_Name: string, middle_Name: string) {
     setLoading(true)
-  
-    
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -65,6 +62,7 @@ export default function SignUp() {
         data: {
           firstName: first_Name,
           lastName: last_Name,
+          middleName: middle_Name
         },
       },
     })
@@ -92,10 +90,7 @@ export default function SignUp() {
       validationSchema={validationSchema}
       onSubmit={async (values) => {
         const { firstName, lastName, middleName, email, password } = values;
-
-        // Llamar a signInWithEmail con los valores del formulario
-        
-        await signUpWithEmail(email, password, firstName, lastName);
+        await signUpWithEmail(email, password, firstName, lastName, middleName);
       }}
     >
       {({ handleChange, handleSubmit, values, errors, touched }) => (
@@ -207,7 +202,7 @@ export default function SignUp() {
               onPress={togglePasswordVisibility}
             >
               {/* font awesome icon  */}
-              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+              {/*showPassword ? <FaRegEye /> : <FaRegEyeSlash />*/}
             </TouchableOpacity>
 
             {touched.password && errors.password && (
