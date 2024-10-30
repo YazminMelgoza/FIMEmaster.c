@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { supabase } from "../../lib/supabase";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
@@ -45,28 +45,37 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  async function signUpWithEmail(email: string, password: string) {
-    setLoading(true);
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
+  /*
+  const irConfirmacion = () => {
+    router.replace('/signUp/confirmation'); // Reemplaza la ruta actual
+  };
+  */
+  async function signUpWithEmail(email: string, password: string, first_Name: string ,last_Name: string) {
+    setLoading(true)
+  
+    
+    const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
-    });
+      options: {
+        data: {
+          firstName: first_Name,
+          lastName: last_Name,
+        },
+      },
+    })
+    
+    if(error)
+    {
+      console.error('Error en la creación del usuario:', error.message);
 
-    if (error) {
-      Alert.alert(error.message);
-      console.log(error.message);
-    } else {
-      if (!session)
-        Alert.alert(
-          "Se ha enviado un enlace de confirmación al correo electrónico ingresado"
-        );
+    }else
+    {
+      router.replace('/signUp/confirmation');
     }
 
     setLoading(false);
@@ -85,7 +94,8 @@ export default function SignUp() {
         const { firstName, lastName, middleName, email, password } = values;
 
         // Llamar a signInWithEmail con los valores del formulario
-        await signUpWithEmail(email, password);
+        
+        await signUpWithEmail(email, password, firstName, lastName);
       }}
     >
       {({ handleChange, handleSubmit, values, errors, touched }) => (

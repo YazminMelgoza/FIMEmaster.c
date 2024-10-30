@@ -31,7 +31,7 @@ AppState.addEventListener("change", (state) => {
 export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const navigation = useNavigation();
+ 
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
