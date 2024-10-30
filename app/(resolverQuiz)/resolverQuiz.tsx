@@ -1,22 +1,42 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router'; 
+import { QuizService } from '../../services/quiz';
+import { Quiz } from '../../models/quiz';
+import ToastManager, { Toast } from 'toastify-react-native'; 
 
 const QuizScreen = () => {
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
+  const quizService = new QuizService();
+  
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true); // Loading state
 
-  const codeSnippet = `
-  #include <stdio.h>
-  int main()
-  {
-    int a, b, c;
-    a = 5;
-    b = 10;
-    c = a + b;
-    printf("El resultado es: %d", c);
-    return 0;
-  }
-  `;
+  useEffect(() => {
+    if (id) {
+      fetchQuiz(Number(id));
+    }
+  }, [id]);
+
+  const fetchQuiz = async (quizId: number) => {
+    setLoading(true); // Set loading to true when fetching starts
+    const { quiz, error } = await quizService.getQuizById(quizId);
+    
+    if (error) {
+      Toast.error('Error al obtener el quiz.');
+      console.error('Error al obtener el quiz:', error);
+    } else if (!quiz) {
+      Toast.warn('El quiz no existe');
+    } else {
+      setQuiz(quiz);
+      Toast.success("Quiz cargado");
+      console.log(quiz);
+    }
+    setLoading(false); // Set loading to false when fetching ends
+  };
 
   const options: string[] = [
     'b = 10;',
@@ -34,24 +54,32 @@ const QuizScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+      <ToastManager />
       <View style={styles.header}>
-        <Image
-          source={require('../../assets/images/imagetextura2.png')} 
-          style={styles.headerBackgroundImage}
-        />
-        <TouchableOpacity style={styles.backButton}>
+        <Image source={require('../../assets/images/imagetextura2.png')} style={styles.headerBackgroundImage} />
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <Image source={require('../../assets/images/flechaAtras.png')} />
         </TouchableOpacity>
         <Text style={styles.headerText}>Resolver Error</Text>
       </View>
 
-      {/* Fondo blanco ajustado */}
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <Text style={styles.codeHeader}>Código a resolver:</Text>
-        <View style={styles.codeBox}>
-          <Text style={styles.code}>{codeSnippet}</Text>
-        </View>
+
+        {loading ? ( // Show loading indicator while fetching
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : (
+          <View style={styles.codeBox}>
+            {quiz && quiz.wrongcode ? (
+              quiz.wrongcode.split('\n').map((line, index) => (
+                <Text key={index} style={styles.code}>{line}</Text>
+              ))
+            ) : (
+              <Text>No hay código disponible para resolver.</Text>
+            )}
+          </View>
+        )}
+
         <Text style={styles.lineNumber}>Línea #6:</Text>
         <Text style={styles.line}></Text>
         <Text style={styles.lineText}>b = 10</Text>
@@ -64,14 +92,14 @@ const QuizScreen = () => {
             style={[
               styles.optionButton,
               selectedOption === option && styles.selectedOption,
-              selectedOption !== null && !isCorrect(option) && selectedOption === option && styles.incorrectOption
+              selectedOption !== null && !isCorrect(option) && selectedOption === option && styles.incorrectOption,
             ]}
             onPress={() => handleOptionSelect(option)}
           >
             <Text style={styles.optionText}>{option}</Text>
           </TouchableOpacity>
         ))}
-        
+
         {selectedOption && (
           <View style={styles.feedbackContainer}>
             <Text style={styles.feedbackLabel}>Retroalimentación:</Text>
@@ -81,27 +109,27 @@ const QuizScreen = () => {
           </View>
         )}
 
-        {selectedOption === 'b = 10;' && (
+        {selectedOption === 'b = 10;' ? (
           <View style={styles.correctContainer}>
+          
             <Text style={styles.correctText}>¡CORRECTO!</Text>
-            <TouchableOpacity style={styles.continueButtonC}>
+            <TouchableOpacity style={styles.continueButtonC} onPress={() => {/* Handle continue action */}}>
               <Text style={styles.continueTextC}>CONTINUAR</Text>
             </TouchableOpacity>
           </View>
-        )}
-
-        {selectedOption && !isCorrect(selectedOption) && (
+        ) : selectedOption && !isCorrect(selectedOption) ? (
           <View style={styles.incorrectContainer}>
             <Text style={styles.incorrectText}>INCORRECTO</Text>
-            <TouchableOpacity style={styles.continueButtonI}>
+            <TouchableOpacity style={styles.continueButtonI} onPress={() => {/* Handle retry action */}}>
               <Text style={styles.continueTextI}>VOLVER A INTENTAR</Text>
             </TouchableOpacity>
           </View>
-        )}
+        ) : null}
       </ScrollView>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
