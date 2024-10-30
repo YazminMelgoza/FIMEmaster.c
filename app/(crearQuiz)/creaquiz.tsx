@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Image, StyleSheet, Text, View, Pressable } from "react-native";
 
-const CrearQuizDeCdigo = () => {
+export default function CrearQuizDeCdigo() {
   return (
     <View style={styles.crearQuizDeCdigo}>
       <Image
         style={styles.imageIcon}
         resizeMode="cover"
-        source={require("@assets/images/relieve.png")}
+        source={require("../../assets/images/relieve.png")}
       />
       <View
         style={[styles.crearQuizDeCdigoChild, styles.statusBarLightPosition]}
@@ -16,7 +16,7 @@ const CrearQuizDeCdigo = () => {
         <Image
           style={[styles.icon, styles.iconLayout]}
           resizeMode="cover"
-          source={require("@assets/images/vector-flecha.png")}
+          source={require("../../assets/images/vector-flecha.png")}
         />
       </Pressable>
       <Text style={styles.creaUnNuevo}>Crea un nuevo quiz</Text>
@@ -87,6 +87,7 @@ const CrearQuizDeCdigo = () => {
                     </View>
                   </View>
                 </View>
+                {/*Fecha abajo imagen */}
               </View>
             </View>
           </View>
@@ -97,7 +98,7 @@ const CrearQuizDeCdigo = () => {
                 styles.headlineGroupSpaceBlock,
               ]}
             >
-              {/* flecha hacia abajo icon TODO */}
+              {/*Cargar imagen */}
               <Text style={styles.text}>Cargar ejercicio</Text>
             </View>
           </View>
@@ -105,7 +106,7 @@ const CrearQuizDeCdigo = () => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   statusBarLightPosition: {
@@ -224,7 +225,6 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   imageIcon: {
-    top: 42,
     left: -29,
     width: 422,
     height: 222,
@@ -396,5 +396,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 });
-
-export default CrearQuizDeCdigo;
