@@ -13,11 +13,11 @@ import {
 } from "react-native";
 import { supabase } from "../lib/supabase";
 import { Button, Input } from "@rneui/themed";
+import { Feather } from "@expo/vector-icons";
 import { Link, Stack } from "expo-router";
 import { Formik } from "formik";
 import { useNavigation } from "@react-navigation/native";
 import * as Yup from "yup";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
 const screenHeight = Dimensions.get("window").height;
 AppState.addEventListener("change", (state) => {
@@ -143,7 +143,11 @@ export default function Auth() {
                 style={styles.eyeIcon}
                 onPress={togglePasswordVisibility}
               >
-                {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+                {showPassword ? (
+                  <Feather name="eye" size={20} color="#888" />
+                ) : (
+                  <Feather name="eye-off" size={20} color="#888" />
+                )}
               </TouchableOpacity>
               {touched.password && errors.password && (
                 <Text style={styles.errorText}>{errors.password}</Text>

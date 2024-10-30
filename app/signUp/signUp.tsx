@@ -10,12 +10,12 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { supabase } from "../../lib/supabase";
 import { Link } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
+import { Feather } from "@expo/vector-icons";
 // Esquema de validación Yup
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required("El nombre es obligatorio"),
@@ -196,8 +196,11 @@ export default function SignUp() {
               style={styles.eyeIcon}
               onPress={togglePasswordVisibility}
             >
-              {/* font awesome icon  */}
-              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+              {showPassword ? (
+                <Feather name="eye" size={24} color="black" />
+              ) : (
+                <Feather name="eye-off" size={24} color="black" />
+              )}
             </TouchableOpacity>
 
             {touched.password && errors.password && (
