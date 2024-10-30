@@ -12,10 +12,13 @@ export class QuizService {
             .insert([
                 {
                     authorId: quiz.authorId,
+                    title: quiz.title,
                     instructions: quiz.instructions,
                     categoryid: quiz.categoryid,
+                    questionsnumber: quiz.questionsnumber,
                     wrongcode: quiz.wrongcode,
                     solutioncode: quiz.solutioncode,
+                    createdat: quiz.createdat,
                 },
             ]);
 
