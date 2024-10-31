@@ -106,4 +106,20 @@ export class ExerciseService {
 
     return { quizzes: data as Tables<"exercises">[], error: null };
   }
+  //Método para obtener quizzes por title
+  public static async getQuizzes(
+    searchQuery: string
+  ): Promise<{ quizzes: Tables<"exercises">[]; error: PostgrestError | null }> {
+    const { data, error } = await supabase
+      .from('exercises') 
+      .select('exerciseid, instructions, categoryid, wrongcode, solutioncode, authorId, title, questionsnumber, createdat') 
+      .ilike('title', `%${searchQuery}%`);
+  
+    if (error) {
+      console.error('Error fetching quizzes:', error);
+      return { quizzes: [], error };
+    }
+  
+    return { quizzes: data as Tables<"exercises">[], error: null };
+  }
 }
