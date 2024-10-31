@@ -152,10 +152,11 @@ export default function Auth() {
                 <Text style={styles.errorText}>{errors.password}</Text>
               )}
             </View>
-
-            <TouchableOpacity>
-              <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
-            </TouchableOpacity>
+            <Link asChild href="olvidarpassword">
+              <TouchableOpacity>
+                <Text style={styles.forgotPassword}>Olvidé mi contraseña</Text>
+              </TouchableOpacity>
+            </Link>
           </View>
 
           <TouchableOpacity

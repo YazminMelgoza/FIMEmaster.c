@@ -25,10 +25,13 @@ export default function TabsLayout(){
                     setSession(session)
                 })       
                 supabase.auth.onAuthStateChange((_event, session) => {
+                    console.log("Evento: " + _event);
                     setSession(session);
+                    
+                    /*
                     if (session) {
                         router.navigate('/'); 
-                    }
+                    }*/
                 })
                 await Font.loadAsync(Entypo.font);
                 //await new Promise(resolve => setTimeout(resolve, 2000)); //Artificial Delay to see splashScreen

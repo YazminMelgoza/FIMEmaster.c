@@ -5,7 +5,7 @@ import { PostgrestError } from "@supabase/supabase-js";
 
 export class ExerciseService {
   // Método para insertar un nuevo quiz
-  public static async createQuiz(
+  public static async createExercise(
     quiz: Tables<"exercises">
   ): Promise<{ error: PostgrestError | null }> {
     const { data, error } = await supabase.from("exercises").insert([
@@ -31,7 +31,7 @@ export class ExerciseService {
   }
 
   // Método para eliminar un quiz por id
-  async deleteQuizById(
+  async deleteExerciseById(
     quizId: number
   ): Promise<{ error: PostgrestError | null }> {
     const { error } = await supabase
@@ -48,7 +48,7 @@ export class ExerciseService {
   }
 
   // Método para actualizar un quiz por id
-  async updateQuizById(
+  async updateExerciseById(
     quizId: number,
     updatedQuiz: Tables<"exercises">
   ): Promise<{ error: PostgrestError | null }> {
@@ -72,38 +72,54 @@ export class ExerciseService {
   }
 
   // Método para obtener quiz por id
-  async getQuizById(quizId: number): Promise<{
-    quiz: Tables<"exercises"> | null;
+  async getExerciseById(exerciseId: number): Promise<{
+    exercise: Tables<"exercises"> | null;
     error: PostgrestError | null;
   }> {
     const { data, error } = await supabase
       .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
       .select("*")
-      .eq("exerciseid", quizId)
+      .eq("exerciseid", exerciseId)
       .single();
 
     if (error) {
       console.error("Error al obtener el quiz:", error);
-      return { quiz: null, error };
+      return { exercise: null, error };
     }
 
-    return { quiz: data as Tables<"exercises">, error: null };
+    return { exercise: data as Tables<"exercises">, error: null };
   }
 
-  // Método para obtener quizzes por authorId
-  public static async getByAuthorId(
+  // Método para obtener exercises por authorId
+  public static async getExercisesByAuthorId(
     authorId: string
-  ): Promise<{ quizzes: Tables<"exercises">[]; error: PostgrestError | null }> {
+  ): Promise<{ exercises: Tables<"exercises">[]; error: PostgrestError | null }> {
     const { data, error } = await supabase
       .from("exercises")
       .select("*")
       .eq("authorId", authorId);
 
     if (error) {
-      console.error("Error al obtener los quizzes:", error);
-      return { quizzes: [], error };
+      console.error("Error al obtener los exercises:", error);
+      return { exercises: [], error };
     }
 
-    return { quizzes: data as Tables<"exercises">[], error: null };
+    return { exercises: data as Tables<"exercises">[], error: null };
+  }
+  //Método para obtener exercises por title
+  public static async getExercisesByTitle(
+    searchQuery: string
+  ): Promise<{ exercises: Tables<"exercises">[]; error: PostgrestError | null }> {
+    const { data, error } = await supabase
+      .from('exercises') 
+      .select('exerciseid, instructions, categoryid, wrongcode, solutioncode, authorId, title, questionsnumber, createdat') 
+      .ilike('title', `%${searchQuery}%`);
+  
+    if (error) {
+      console.error('Error fetching exercises:', error);
+      return { exercises: [], error };
+    }
+  
+    return { exercises: data as Tables<"exercises">[], error: null };
   }
 }

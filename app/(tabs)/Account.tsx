@@ -157,7 +157,7 @@ export default function Index() {
             />
           </View>
 
-          <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['Rubik'] leading-9">
+          <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['sans-serif'] leading-9">
             {profile.username || "Estudiante ITS"}
           </Text>
           <Link asChild href={"modificarUsuario"}>
@@ -169,12 +169,12 @@ export default function Index() {
             </View>
             <View className="w-1/5 flex h-full flex-col items-center">
               <View className="flex flex-col h-1/2 justify-end items-end">
-                <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['Rubik'] uppercase leading-[18px] tracking-wide">
+                <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['sans-serif'] uppercase leading-[18px] tracking-wide">
                   Puntos
                 </Text>
               </View>
               <View className="flex flex-col h-1/2 justify-start items-end">
-                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">
+                <Text className="w-8 text-center text-white text-base font-bold font-['sans-serif'] leading-normal">
                   590
                 </Text>
               </View>
@@ -187,12 +187,12 @@ export default function Index() {
             </View>
             <View className="w-1/6 flex h-full flex-col items-center">
               <View className="flex flex-col h-1/2 justify-end items-end">
-                <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['Rubik'] uppercase leading-[18px] tracking-wide">
+                <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['sans-serif'] uppercase leading-[18px] tracking-wide">
                   Puesto
                 </Text>
               </View>
               <View className="flex flex-col h-1/2 justify-start items-end">
-                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">
+                <Text className="w-8 text-center text-white text-base font-bold font-['sans-serif'] leading-normal">
                   #32
                 </Text>
               </View>
@@ -203,21 +203,21 @@ export default function Index() {
               <View className="flex w-full flex-col justify-center align-middle items-center h-auto pb-5">
                 <View className="w-[247px] text-center">
                   <View className="flex w-full flex-row items-center justify-center h-auto">
-                    <Text className="text-[#0b082a] text-xl font-medium font-['Rubik'] leading-7">
+                    <Text className="text-[#0b082a] text-xl font-medium font-['sans-serif'] leading-7">
                       Haz programado{" "}
                     </Text>
-                    <Text className="text-[#3aa66a] text-xl font-medium font-['Rubik'] leading-7">
+                    <Text className="text-[#3aa66a] text-xl font-medium font-['sans-serif'] leading-7">
                       24
                     </Text>
                   </View>
                   <View className="flex w-full flex-row items-center justify-center h-auto">
-                    <Text className="text-[#0b082a] text-xl font-medium font-['Rubik'] leading-7">
+                    <Text className="text-[#0b082a] text-xl font-medium font-['sans-serif'] leading-7">
                       {" "}
                     </Text>
-                    <Text className="text-[#3aa66a] text-xl font-medium font-['Rubik'] leading-7">
+                    <Text className="text-[#3aa66a] text-xl font-medium font-['sans-serif'] leading-7">
                       codigos{" "}
                     </Text>
-                    <Text className="text-[#0b082a] text-xl font-medium font-['Rubik'] leading-7">
+                    <Text className="text-[#0b082a] text-xl font-medium font-['sans-serif'] leading-7">
                       este mes!
                     </Text>
                   </View>
@@ -239,12 +239,12 @@ export default function Index() {
                   <View className="text-center">
                     <View className="flex flex-row w-full">
                       <View className="align-bottom items-end justify-end h-auto">
-                        <Text className="text-[#0b082a] text-[32px] font-bold font-['Rubik'] leading-[48px]">
+                        <Text className="text-[#0b082a] text-[32px] font-bold font-['sans-serif'] leading-[48px]">
                           37
                         </Text>
                       </View>
                       <View className="align-bottom items-end justify-end h-auto bottom-2">
-                        <Text className="align-bottom text-[#181254]/50 text-base font-medium font-['Rubik'] leading-normal">
+                        <Text className="align-bottom text-[#181254]/50 text-base font-medium font-['sans-serif'] leading-normal">
                           /50
                         </Text>
                       </View>
@@ -255,24 +255,24 @@ export default function Index() {
               <View className="flex flex-row gap-3 align-middle justify-center pb-6">
                 <View className="w-[140px] h-24 bg-white rounded-[20px] flex flex-col pl-6 pt-5 pb-5 pr-2">
                   <View className=" flex flex-row h-auto w-full">
-                    <Text className="text-[#0b082a] text-[32px] font-bold font-['Rubik'] leading-[48px]">
+                    <Text className="text-[#0b082a] text-[32px] font-bold font-['sans-serif'] leading-[48px]">
                       5
                     </Text>
                   </View>
                   <View className=" flex flex-row h-auto w-full">
-                    <Text className="text-[#0b082a] text-xs font-normal font-['Rubik'] leading-tight">
+                    <Text className="text-[#0b082a] text-xs font-normal font-['sans-serif'] leading-tight">
                       Quizzes Creados
                     </Text>
                   </View>
                 </View>
                 <View className="w-[140px] h-24 bg-[#3aa66a] rounded-[20px] flex flex-col pl-6 pt-5 pb-5 pr-2">
                   <View className=" flex flex-row h-auto w-full">
-                    <Text className="text-white text-[32px] font-bold font-['Rubik'] leading-[48px]">
+                    <Text className="text-white text-[32px] font-bold font-['sans-serif'] leading-[48px]">
                       5
                     </Text>
                   </View>
                   <View className=" flex flex-row h-auto w-full">
-                    <Text className="text-white text-xs font-normal font-['Rubik'] leading-tight">
+                    <Text className="text-white text-xs font-normal font-['sans-serif'] leading-tight">
                       Programados
                     </Text>
                   </View>
