@@ -10,7 +10,7 @@ export class UserService {
     const { data, error } = await supabase
       .from("users")
       .select("*")
-      .eq("userId", id)
+      .eq("id", id)
       .single(); // Solo esperamos un registro
 
     if (error) {
@@ -29,7 +29,7 @@ export class UserService {
       const { error } = await supabase
         .from("users")
         .update({
-          userId: user.userId,
+          id: user.id,
           username: user.username,
           website: user.website,
           avatar_url: user.avatar_url,
@@ -38,7 +38,7 @@ export class UserService {
           middlename: user.middlename,
           updated_at: new Date().toISOString(),
         })
-        .eq("userId", user.userId);
+        .eq("id", user.id);
 
       if (error) return error; // Devuelve el error de Supabase si hay un error
       console.log("Perfil actualizado:", user);

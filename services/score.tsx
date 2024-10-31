@@ -88,7 +88,7 @@ export class ScoreService {
     const { data, error } = await supabase
       .from("scores")
       .select("*")
-      .eq("userid", userId);
+      .eq("id", userId);
 
     if (error) {
       console.error("Error al obtener scores:", error);

@@ -42,7 +42,7 @@ export default function Account() {
   const updateProfile = async (updatedUser: Tables<"users">) => {
     try {
       setLoading(true);
-      if (!updatedUser.userId) throw new Error("No user on the session!");
+      if (!updatedUser.id) throw new Error("No user on the session!");
 
       const error = await UserService.updateUserProfileById({
         ...updatedUser,

@@ -80,7 +80,7 @@ export default function Index() {
     const { data, error, status } = await supabase
       .from("users")
       .select("*")
-      .eq("userId", session!.user.id)
+      .eq("id", session!.user.id)
       .single();
     if (data) setProfile(data);
     if (error instanceof Error) {
