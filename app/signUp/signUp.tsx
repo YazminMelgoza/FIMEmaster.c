@@ -205,9 +205,9 @@ export default function SignUp() {
               onPress={togglePasswordVisibility}
             >
               {showPassword ? (
-                <Feather name="eye" size={24} color="black" />
+                <Feather name="eye" size={20} color="#999" />
               ) : (
-                <Feather name="eye-off" size={24} color="black" />
+                <Feather name="eye-off" size={20} color="#999" />
               )}
             </TouchableOpacity>
 
