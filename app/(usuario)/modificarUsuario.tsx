@@ -8,6 +8,8 @@ import { router } from "expo-router";
 import { UserService } from "../../services/user";
 import { Toast } from "toastify-react-native";
 
+import { Text } from 'react-native';
+
 export default function Account() {
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
@@ -61,7 +63,7 @@ export default function Account() {
   };
 
   if (loading) {
-    return <View style={styles.container}>Loading...</View>;
+    return <View style={styles.container}><Text className="text-xl font-bold ">Loading...</Text></View>;
   }
 
   function updateUserState(user: Partial<Tables<"users">>) {

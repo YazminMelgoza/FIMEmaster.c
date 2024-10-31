@@ -108,5 +108,46 @@ export class UserService {
     console.log('Puesto del usuario:', rank);
     return { rank, error: null };
   }
+  static async getAttemptsByUserId(userId: string): Promise<{ attempts: any[] | null; error: PostgrestError | null }> {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1); // Resta un mes a la fecha actual
 
+    // Convertir la fecha a formato ISO
+    const isoDate = oneMonthAgo.toISOString();
+
+    const { data: attempts, error } = await supabase
+      .from('attempts') // Especificamos el tipo de Attempt aquí
+      .select('*')
+      .eq('userid', userId) // Filtrar por userId
+      .gte('attemptedat', isoDate); // Filtrar por fecha mayor o igual a un mes atrás
+
+    if (error) {
+      console.error('Error al obtener los intentos del usuario:', error);
+      return { attempts: null, error };
+    }
+
+    console.log('Intentos del usuario obtenidos:', attempts);
+    return { attempts, error: null };
+  }
+  static async getAttemptsCountByUserId(userId: string): Promise<{ count: number | null; error: PostgrestError | null }> {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1); // Resta un mes a la fecha actual
+
+    // Convertir la fecha a formato ISO
+    const isoDate = oneMonthAgo.toISOString();
+
+    const { count, error } = await supabase
+      .from('attempts') // Aquí especificamos la tabla
+      .select('attemptid', { count: 'exact' }) // Usamos count: 'exact' para contar los registros
+      .eq('userid', userId) // Filtrar por userId
+      .gte('attemptedat', isoDate); // Filtrar por fecha mayor o igual a un mes atrás
+
+    if (error) {
+      console.error('Error al contar los intentos del usuario:', error);
+      return { count: null, error };
+    }
+
+    console.log('Número de intentos del usuario en el último mes:', count);
+    return { count, error: null };
+  }
 }

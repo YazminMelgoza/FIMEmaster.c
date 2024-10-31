@@ -8,7 +8,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import Avatar from "../../components/Avatar";
 import { RootStackParamList } from "../types/RootStackParam";
-import { Session } from "@supabase/supabase-js";
+import { PostgrestError, Session } from "@supabase/supabase-js";
 import { Toast } from "toastify-react-native";
 
 type AccountScreenRouteProp = RouteProp<RootStackParamList, "account">;
@@ -20,12 +20,10 @@ import {
 } from "react-native-chart-kit";
 import { Tables } from "database.types";
 import { UserService } from "services/user";
+import { ExerciseService } from "services/exercise";
 
 export default function Index() {
-  const progressData = {
-    labels: ["Programs"],
-    data: [0.5], // Progreso (37/50 programas)
-  };
+  
   const barData = {
     labels: ["Arrays", "Matemáticas", "Lógica"],
     legend: ["Completado, Sin Completar"],
@@ -123,6 +121,66 @@ export default function Index() {
 
     fetchUserRank();
   }, [session]);
+  const [userExercises, setExercises] = useState<number | undefined>(undefined);
+
+useEffect(() => {
+  const fetchUserexercise = async () => {
+    if (session?.user?.id) {
+      const { exercises, error } = await UserService.getExercisesByUserId(session.user.id); // Cambiado a exercises
+      if (!error) {
+        setExercises(exercises?.length); // Actualiza el estado con los ejercicios obtenidos
+      } else {
+        console.error("Error al obtener los ejercicios del usuario:", error);
+      }
+    }
+  };
+
+  fetchUserexercise();
+}, [session?.user?.id]);
+  const [userCountAttempt, setUserCountAttempt] = useState<number | null>(null); // Cambiado a estado
+
+useEffect(() => {
+  const fetchUserCountAttempt = async () => {
+    if (session?.user?.id) {
+      const { count, error } = await UserService.getAttemptsCountByUserId(session.user.id); // Cambiado a 'count'
+      if (!error) {
+        setUserCountAttempt(count); // Actualiza el estado con el conteo obtenido
+      } else {
+        // Maneja el error si es necesario
+        console.error(error);
+      }
+    }
+  };
+
+  fetchUserCountAttempt();
+}, [session]);
+const [QuizNumberMonth, setQuizNumberMonth] = useState<number | null>(null); // Cambiado a estado
+
+useEffect(() => {
+  const fetchQuizNumber = async () => {
+    if (session?.user?.id) {
+      const { count, error } = await ExerciseService.getCurrentMonthQuizzesCount(); // Cambiado a 'count'
+      if (!error) {
+        setQuizNumberMonth(count); // Actualiza el estado con el conteo obtenido
+      } else {
+        // Maneja el error si es necesario
+        console.error(error);
+      }
+    }
+  };
+
+  fetchQuizNumber();
+}, [session]);
+const progressData = {
+  labels: ["Programs"],
+  data: [
+    userCountAttempt !== null && QuizNumberMonth !== null
+      ? userCountAttempt / QuizNumberMonth
+      : 0,
+  ], // Progreso (37/50 programas)
+};
+
+  
   async function updateProfile({
     username,
     website,
@@ -195,7 +253,7 @@ export default function Index() {
             {profile.username || "Estudiante ITS"}
           </Text>
           <Link asChild href={"modificarUsuario"}>
-            <Text>Clic here to go to Settings</Text>
+            <Text>Click here to go to Settings</Text>
           </Link>
           <View className="w-[90%] pl-3 h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
             <View className="w-1/6 flex justify-center items-center h-auto pl-4">
@@ -234,15 +292,16 @@ export default function Index() {
                 <View className="w-[247px] text-center">
                   <View className="flex w-full flex-row items-center justify-center h-auto">
                     <Text className="text-[#0b082a] text-xl font-medium font-['Rubik'] leading-7">
-                      Haz programado{" "}
+                      Haz programado {""}
                     </Text>
                     <Text className="text-[#3aa66a] text-xl font-medium font-['Rubik'] leading-7">
-                      24
+                      {userCountAttempt !== null ? userCountAttempt : "0"} 
                     </Text>
+                    
                   </View>
                   <View className="flex w-full flex-row items-center justify-center h-auto">
                     <Text className="text-[#0b082a] text-xl font-medium font-['Rubik'] leading-7">
-                      {" "}
+                    
                     </Text>
                     <Text className="text-[#3aa66a] text-xl font-medium font-['Rubik'] leading-7">
                       codigos{" "}
@@ -270,12 +329,13 @@ export default function Index() {
                     <View className="flex flex-row w-full">
                       <View className="align-bottom items-end justify-end h-auto">
                         <Text className="text-[#0b082a] text-[32px] font-bold font-['Rubik'] leading-[48px]">
-                          37
+                        {userScore !== null ? userCountAttempt : "0"} 
+
                         </Text>
                       </View>
                       <View className="align-bottom items-end justify-end h-auto bottom-2">
                         <Text className="align-bottom text-[#181254]/50 text-base font-medium font-['Rubik'] leading-normal">
-                          /50
+                          /{QuizNumberMonth !== null ? QuizNumberMonth : "0"}
                         </Text>
                       </View>
                     </View>
@@ -286,7 +346,7 @@ export default function Index() {
                 <View className="w-[140px] h-24 bg-white rounded-[20px] flex flex-col pl-6 pt-5 pb-5 pr-2">
                   <View className=" flex flex-row h-auto w-full">
                     <Text className="text-[#0b082a] text-[32px] font-bold font-['Rubik'] leading-[48px]">
-                      5
+                    {userExercises !== null ? userExercises : "0"}
                     </Text>
                   </View>
                   <View className=" flex flex-row h-auto w-full">
