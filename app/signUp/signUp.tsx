@@ -10,12 +10,12 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { supabase } from "../../lib/supabase";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
+import { Feather } from "@expo/vector-icons";
 // Esquema de validación Yup
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required("El nombre es obligatorio"),
@@ -48,25 +48,35 @@ export default function SignUp() {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  async function signUpWithEmail(email: string, password: string) {
+  /*
+  const irConfirmacion = () => {
+    router.replace('/signUp/confirmation'); // Reemplaza la ruta actual
+  };
+  */
+  async function signUpWithEmail(
+    email: string,
+    password: string,
+    first_Name: string,
+    last_Name: string,
+    middle_Name: string
+  ) {
     setLoading(true);
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
+      options: {
+        data: {
+          firstName: first_Name,
+          lastName: last_Name,
+          middleName: middle_Name,
+        },
+      },
     });
 
     if (error) {
-      Alert.alert(error.message);
-      console.log(error.message);
+      console.error("Error en la creación del usuario:", error.message);
     } else {
-      if (!session)
-        Alert.alert(
-          "Se ha enviado un enlace de confirmación al correo electrónico ingresado"
-        );
+      router.replace("/signUp/confirmation");
     }
 
     setLoading(false);
@@ -83,9 +93,7 @@ export default function SignUp() {
       validationSchema={validationSchema}
       onSubmit={async (values) => {
         const { firstName, lastName, middleName, email, password } = values;
-
-        // Llamar a signInWithEmail con los valores del formulario
-        await signUpWithEmail(email, password);
+        await signUpWithEmail(email, password, firstName, lastName, middleName);
       }}
     >
       {({ handleChange, handleSubmit, values, errors, touched }) => (
@@ -196,8 +204,11 @@ export default function SignUp() {
               style={styles.eyeIcon}
               onPress={togglePasswordVisibility}
             >
-              {/* font awesome icon  */}
-              {showPassword ? <FaRegEye /> : <FaRegEyeSlash />}
+              {showPassword ? (
+                <Feather name="eye" size={20} color="#999" />
+              ) : (
+                <Feather name="eye-off" size={20} color="#999" />
+              )}
             </TouchableOpacity>
 
             {touched.password && errors.password && (
