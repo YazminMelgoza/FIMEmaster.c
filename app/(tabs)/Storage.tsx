@@ -39,7 +39,7 @@ export default function About() {
   };
 
   const handleCreateQuiz = (quizId: number) => {
-    router.push({ pathname: 'iniciarQuiz', params: { id: quizId.toString() } });
+    router.push({ pathname: 'resolverQuiz', params: { id: quizId.toString() } });
   };
 
   return (
