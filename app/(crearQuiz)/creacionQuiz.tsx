@@ -98,7 +98,7 @@ export default function CrearQuiz() {
             createdat: new Date().toISOString(),
           };
           console.log(objQuiz);
-          ExerciseService.createQuiz(objQuiz).then((response) => {
+          ExerciseService.createExercise(objQuiz).then((response) => {
             if (response.error) {
               Alert.alert(
                 "Error",

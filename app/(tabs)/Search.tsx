@@ -52,8 +52,8 @@ export default function About() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const quizzesData = await ExerciseService.getQuizzes(searchQuery); 
-        setQuizzes(quizzesData.quizzes);
+        const quizzesData = await ExerciseService.getExercisesByTitle(searchQuery); 
+        setQuizzes(quizzesData.exercises);
       } catch (error) {
         console.error('Error fetching quizzes:', error);
       }
