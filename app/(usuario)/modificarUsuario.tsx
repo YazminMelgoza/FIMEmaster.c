@@ -6,7 +6,6 @@ import Avatar from "../../components/Avatar";
 import { Tables } from "database.types";
 import { router } from "expo-router";
 import { UserService } from "../../services/user";
-import { User } from "@supabase/supabase-js";
 import { Toast } from "toastify-react-native";
 
 export default function Account() {
@@ -16,179 +15,114 @@ export default function Account() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data, error: sessionError } = await supabase.auth.getUser();
-      const { user, error: fetchError } = await UserService.getUserProfileById(
-        (
-          await supabase.auth.getUser()
-        ).data?.user?.id!
-      );
+      try {
+        const { data: sessionData, error: sessionError } =
+          await supabase.auth.getUser();
+        if (sessionError) throw sessionError;
 
-      if (!user || fetchError || sessionError) {
-        Toast.error("Error al obtener el usuario.");
-        console.error(
-          "Error al obtener el usuario:",
-          fetchError || sessionError
-        );
-        return;
+        const userId = sessionData?.user?.id;
+        if (!userId) throw new Error("No user ID found");
+
+        const { user: fetchedUser, error: fetchError } =
+          await UserService.getUserProfileById(userId);
+        if (fetchError) throw fetchError;
+
+        setUser(fetchedUser);
+        setUserEmail(sessionData.user.email || "");
+      } catch (error) {
+        Toast.error("Error fetching user.");
+        console.error("Error fetching user:", error);
+      } finally {
+        setLoading(false);
       }
-
-      setUser(user);
-      setUserEmail(data.user.email || "");
     };
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    getProfile();
-  }, []);
-
-  async function getProfile() {
+  const updateProfile = async (updatedUser: Tables<"users">) => {
     try {
       setLoading(true);
-      if (!user?.userId) throw new Error("No user on the session!");
+      if (!updatedUser.userId) throw new Error("No user on the session!");
 
-      const { data, error, status } = await supabase
-        .from("users")
-        .select(
-          `username, website, avatar_url, updated_at,firstname,lastname,middlename`
-        )
-        .eq("userId", user.userId)
-        .single();
+      const error = await UserService.updateUserProfileById({
+        ...updatedUser,
+      });
 
-      if (error && status !== 406) {
-        throw error;
-      }
+      if (error) throw error;
 
-      if (data) {
-        setUser((prevUser) => ({
-          ...prevUser!,
-          updated_at: data.updated_at,
-          username: data.username,
-          firstname: data.firstname,
-          avatar_url: data.avatar_url,
-          website: data.website,
-          lastname: data.lastname,
-          middlename: data.middlename,
-        }));
-      }
+      Alert.alert("Profile updated successfully");
     } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message);
-      }
-    } finally {
-      console.log(user);
-      setLoading(false);
-    }
-  }
-
-  async function updateProfile(user: Tables<"users">) {
-    try {
-      setLoading(true);
-      if (user.userId === "") throw new Error("No user on the session!");
-      const { middlename, ...userProfile } = user;
-
-      const error = await UserService.updateUserProfileById(user);
-      if (!error) {
-        console.log("Perfil actualizado correctamente");
-        Alert.alert("Perfil actualizado correctamente");
-      } else {
-        console.error("Error al actualizar el perfil:", error);
-        Alert.alert("Error al actualizar el perfil...");
-      }
-
-      // Lanza el error si ocurrió
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message); // Muestra una alerta con el mensaje de error
-      }
+      Alert.alert(
+        error instanceof Error ? error.message : "Error updating profile."
+      );
     } finally {
       setLoading(false);
     }
-  }
-  if (!user) {
-    return <View style={styles.container}>Cargando...</View>;
+  };
+
+  if (loading) {
+    return <View style={styles.container}>Loading...</View>;
   }
 
+  function updateUserState(user: Partial<Tables<"users">>) {
+    setUser((prevUser) => ({
+      ...prevUser!,
+      ...user,
+    }));
+  }
   return (
     <View style={styles.container}>
-      <View>
-        <Avatar
-          size={200}
-          url={user.avatar_url || ""}
-          onUpload={(url: string) => {
-            setUser((prevUser) => ({
-              ...prevUser!,
-              avatar_url: url,
-            }));
-            //updateProfile({ username, website, avatar_url: url });
-          }}
-        />
-      </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={userEmail} disabled />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Nombre"
-          value={user.firstname || ""}
-          onChangeText={(text) =>
-            setUser((prevUser) => ({
-              ...prevUser!,
-              firstname: text,
-            }))
-          }
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Apellido Paterno"
-          value={user.lastname || ""}
-          onChangeText={(text) =>
-            setUser((prevUser) => ({
-              ...prevUser!,
-              lastname: text,
-            }))
-          }
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Apellido Materno"
-          value={user.middlename || ""}
-          onChangeText={(text) =>
-            setUser((prevUser) => ({
-              ...prevUser!,
-              middlename: text,
-            }))
-          }
-        />
-      </View>
-
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? "Cargando ..." : "Actualizar"}
-          onPress={() => updateProfile(user)}
-          disabled={loading}
-        />
-      </View>
-
-      <View style={styles.verticallySpaced}>
-        <Button
-          title="Sign Out"
-          onPress={() => {
-            supabase.auth
-              .signOut()
-              .then(() => {
-                console.log("Signed out");
-                router.navigate("/");
-              })
-              .catch(console.error);
-          }}
-        />
-      </View>
+      <Avatar
+        size={200}
+        url={user?.avatar_url || ""}
+        onUpload={(url) =>
+          updateUserState({
+            avatar_url: url,
+          })
+        }
+      />
+      <Input label="Email" value={userEmail} disabled />
+      <Input
+        label="First Name"
+        value={user?.firstname || ""}
+        onChangeText={(text) =>
+          updateUserState({
+            firstname: text,
+          })
+        }
+      />
+      <Input
+        label="Last Name"
+        value={user?.lastname || ""}
+        onChangeText={(text) =>
+          updateUserState({
+            lastname: text,
+          })
+        }
+      />
+      <Input
+        label="Middle Name"
+        value={user?.middlename || ""}
+        onChangeText={(text) =>
+          updateUserState({
+            middlename: text,
+          })
+        }
+      />
+      <Button
+        title={loading ? "Loading..." : "Update"}
+        onPress={() => updateProfile(user!)}
+        disabled={loading}
+      />
+      <Button
+        title="Sign Out"
+        onPress={() =>
+          supabase.auth
+            .signOut()
+            .then(() => router.navigate("/"))
+            .catch(console.error)
+        }
+      />
     </View>
   );
 }
@@ -197,13 +131,5 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: "stretch",
-  },
-  mt20: {
-    marginTop: 20,
   },
 });
