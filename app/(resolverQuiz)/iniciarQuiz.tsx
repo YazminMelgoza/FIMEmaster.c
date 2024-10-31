@@ -12,7 +12,7 @@ const QuizScreen = () => {
   const quizService = new QuizService();
   useEffect(() => {
     const fetchQuiz = async () => {
-      const { quiz, error } = await  quizService.getQuizById(quizId);
+      const { quiz, error } = await  QuizService.getQuizById(quizId);
       if (!error && quiz) setQuiz(quiz);
     };
     fetchQuiz();

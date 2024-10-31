@@ -65,7 +65,7 @@ export class QuizService {
     }
 
     // Método para obtener quiz por id
-    async getQuizById(quizId: number): Promise<{ quiz: Quiz | null; error: PostgrestError | null }> {
+    public static async getQuizById(quizId: number): Promise<{ quiz: Quiz | null; error: PostgrestError | null }> {
         const { data, error } = await supabase
             .from('exercises') // Cambia 'exercises' al nombre de tu tabla si es diferente
             .select('*')
