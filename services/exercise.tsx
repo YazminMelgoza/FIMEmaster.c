@@ -72,7 +72,7 @@ export class ExerciseService {
   }
 
   // Método para obtener quiz por id
-  async getQuizById(quizId: number): Promise<{
+  public static async getQuizById(quizId: number): Promise<{
     quiz: Tables<"exercises"> | null;
     error: PostgrestError | null;
   }> {
