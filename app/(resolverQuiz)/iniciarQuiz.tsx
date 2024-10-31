@@ -82,7 +82,7 @@ const QuizScreen = () => {
 
 
 
-export default QuizScreen;
+
 
 const styles = StyleSheet.create({
   container: {
