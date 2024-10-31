@@ -7,7 +7,7 @@ import { StyleSheet, View, Alert } from 'react-native';
 import { Button, Input } from '@rneui/themed';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Feather from '@expo/vector-icons/Feather';
-
+import {UserService} from '../../services/user'
 
 import { useRoute, RouteProp } from '@react-navigation/native';
 import Avatar from '../../components/Avatar';
@@ -108,7 +108,41 @@ export default function Index() {
       setLoading(false);
     }
   }
+  const [userScore, setUserScore] = useState<number | null>(null); // Cambiado a estado
 
+  useEffect(() => {
+    const fetchUserScore = async () => {
+      if (session?.user?.id) {
+        const { score, error } = await UserService.getUserScoreById(session.user.id);
+        if (!error) {
+          setUserScore(score); // Actualiza el estado con el score obtenido
+        } else {
+          // Maneja el error si es necesario
+          console.error(error);
+        }
+      }
+    };
+
+    fetchUserScore();
+  }, [session]);
+
+  const [userRank, setUserRank] = useState<number | null>(null); // Cambiado a estado
+
+  useEffect(() => {
+    const fetchUserRank = async () => {
+      if (session?.user?.id) {
+        const { rank, error } = await UserService.getUserRankById(session.user.id);
+        if (!error) {
+          setUserRank(rank); // Actualiza el estado con el score obtenido
+        } else {
+          // Maneja el error si es necesario
+          console.error(error);
+        }
+      }
+    };
+
+    fetchUserRank();
+  }, [session]);
   async function updateProfile({
     username,
     website,
@@ -192,7 +226,7 @@ export default function Index() {
                 <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['Rubik'] uppercase leading-[18px] tracking-wide">Puntos</Text>
               </View>
               <View className='flex flex-col h-1/2 justify-start items-end'>
-                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">590</Text>
+                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">{userScore !== null ? userScore : "0"}</Text>
               </View>
             </View>
             <View className="w-[15%] h-full bg-gradient-to-b flex items-end pr-2 justify-center from-white via-white to-white" >
@@ -207,7 +241,7 @@ export default function Index() {
                 <Text className="w-full opacity-50 text-center text-white text-xs font-medium font-['Rubik'] uppercase leading-[18px] tracking-wide">Puesto</Text>
               </View>
               <View className='flex flex-col h-1/2 justify-start items-end'>
-                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">#32</Text>
+                <Text className="w-8 text-center text-white text-base font-bold font-['Rubik'] leading-normal">#{userRank !== null ? userRank : "0"}</Text>
               </View>
             </View>
 
