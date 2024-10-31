@@ -58,7 +58,7 @@ export default function SignUp() {
     password: string,
     first_Name: string,
     last_Name: string,
-    middle_Name: string
+    middle_Name: string,
   ) {
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({

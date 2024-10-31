@@ -66,7 +66,7 @@ export default function Index() {
   // Obtenemos la sesión de los parámetros de la ruta
   const route = useRoute<AccountScreenRouteProp>();
   const [session, setSession] = useState<Session | null>(
-    route.params?.session || null
+    route.params?.session || null,
   );
 
   useEffect(() => {

@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     position: "absolute",
     top: 100,
-	fontWeight: "bold",
+    fontWeight: "bold",
     textAlign: "center",
     width: "70%",
   },

@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 
 const App: React.FC = () => {
   return (
@@ -7,11 +7,14 @@ const App: React.FC = () => {
       {/* Encabezado con imagen de fondo */}
       <View style={styles.header}>
         <Image
-          source={require('../../assets/images/imagetextura2.png')}
+          source={require("../../assets/images/imagetextura2.png")}
           style={styles.backgroundImage}
         />
         <TouchableOpacity style={styles.backButton}>
-          <Image source={require('../../assets/images/flechaAtras.png')} style={styles.backIcon} />
+          <Image
+            source={require("../../assets/images/flechaAtras.png")}
+            style={styles.backIcon}
+          />
         </TouchableOpacity>
         <Text style={styles.headerText}>Crear un nuevo quiz</Text>
       </View>
@@ -27,51 +30,51 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: "#F9F9F9",
   },
   header: {
     padding: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 20,
-    position: 'relative',
+    position: "relative",
   },
   backgroundImage: {
     width: 1000,
     height: 250,
-    position: 'absolute',
+    position: "absolute",
   },
   headerText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     left: 30,
     top: 40,
     zIndex: 1,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     left: 10,
     top: 65,
   },
   backIcon: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
     paddingTop: 30,
   },
   quizListContainer: {
     flex: 1,
     marginTop: 20,
-    width: '100%',
-    backgroundColor: '#fff',
+    width: "100%",
+    backgroundColor: "#fff",
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
     paddingHorizontal: 20,
-    paddingTop: 30, 
-    shadowColor: '#000',
+    paddingTop: 30,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -79,9 +82,9 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#00622A',
-    textAlign: 'left', 
-    marginLeft: 20,  
+    color: "#00622A",
+    textAlign: "left",
+    marginLeft: 20,
   },
 });
 

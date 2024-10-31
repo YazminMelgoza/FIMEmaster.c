@@ -1,24 +1,35 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, StatusBar } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StatusBar,
+} from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ForgotPasswordScreen() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
         <Ionicons name="arrow-back" size={24} color="black" />
       </TouchableOpacity>
 
       <Text style={styles.title}>Olvidé mi contraseña</Text>
 
       <Text style={styles.instructions}>
-        Ingresa tu correo para que te enviemos un enlace con el que podrás recuperar tu contraseña
+        Ingresa tu correo para que te enviemos un enlace con el que podrás
+        recuperar tu contraseña
       </Text>
 
       <TextInput
@@ -36,7 +47,8 @@ export default function ForgotPasswordScreen() {
 
       <TouchableOpacity>
         <Text style={styles.registerText}>
-          ¿No tienes una cuenta? <Text style={styles.registerLink}>Regístrate</Text>
+          ¿No tienes una cuenta?{" "}
+          <Text style={styles.registerLink}>Regístrate</Text>
         </Text>
       </TouchableOpacity>
     </View>
@@ -46,59 +58,59 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 20,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 20,
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#28a745', // Color verde
+    fontWeight: "bold",
+    color: "#28a745", // Color verde
     marginBottom: 20,
   },
   instructions: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 14,
-    color: '#6f6f6f',
+    color: "#6f6f6f",
     marginBottom: 20,
     paddingHorizontal: 10,
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    borderColor: '#d3d3d3',
+    borderColor: "#d3d3d3",
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: "#f2f2f2",
     marginBottom: 20,
   },
   button: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    backgroundColor: '#28a745', // Color verde del botón
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#28a745", // Color verde del botón
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 10,
     marginBottom: 20,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   registerText: {
     fontSize: 14,
-    color: '#6f6f6f',
+    color: "#6f6f6f",
   },
   registerLink: {
-    color: '#28a745', // Color verde del enlace
-    fontWeight: 'bold',
+    color: "#28a745", // Color verde del enlace
+    fontWeight: "bold",
   },
 });

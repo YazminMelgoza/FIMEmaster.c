@@ -21,34 +21,37 @@ export class UserService {
     console.log("Usuario obtenido:", data);
     return { user: data, error: null };
   }
-  static async getUserScoreById(id: string): Promise<{ score: number | null; error: PostgrestError | null }> {
+  static async getUserScoreById(
+    id: string
+  ): Promise<{ score: number | null; error: PostgrestError | null }> {
     const { data, error } = await supabase
-      .from('scores') // Cambia 'scores' al nombre de tu tabla si es diferente
-      .select('score')
-      .eq('userid', id)
+      .from("scores") // Cambia 'scores' al nombre de tu tabla si es diferente
+      .select("score")
+      .eq("userid", id)
       .single(); // Solo esperamos un registro
-  
+
     if (error) {
-      console.error('Error al obtener el puntaje del usuario:', error);
+      console.error("Error al obtener el puntaje del usuario:", error);
       return { score: null, error };
     }
-  
-    console.log('Puntaje obtenido:', data?.score);
-    return { score: data?.score ?? null, error: null };
 
+    console.log("Puntaje obtenido:", data?.score);
+    return { score: data?.score ?? null, error: null };
   }
-  static async getExercisesByUserId(authorId: string): Promise<{ exercises: any[] | null; error: PostgrestError | null }> {
+  static async getExercisesByUserId(
+    authorId: string
+  ): Promise<{ exercises: any[] | null; error: PostgrestError | null }> {
     const { data, error } = await supabase
-      .from('exercises') // Nombre de la tabla de ejercicios
-      .select('*')
-      .eq('authorId', authorId); // Filtrar por el ID del autor
+      .from("exercises") // Nombre de la tabla de ejercicios
+      .select("*")
+      .eq("authorId", authorId); // Filtrar por el ID del autor
 
     if (error) {
-      console.error('Error al obtener los ejercicios del usuario:', error);
+      console.error("Error al obtener los ejercicios del usuario:", error);
       return { exercises: null, error };
     }
 
-    console.log('Ejercicios obtenidos:', data);
+    console.log("Ejercicios obtenidos:", data);
     return { exercises: data, error: null };
   }
   // Función para actualizar el perfil de un usuario

@@ -41,7 +41,7 @@ export default function CrearQuiz() {
 
   const handleFilePicker = async (
     setFieldValue: (field: string, value: any) => void,
-    field: string
+    field: string,
   ) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -102,7 +102,7 @@ export default function CrearQuiz() {
             if (response.error) {
               Alert.alert(
                 "Error",
-                "Hubo un problema al crear el quiz. Intenta nuevamente."
+                "Hubo un problema al crear el quiz. Intenta nuevamente.",
               );
             } else {
               router.replace("finalizarQuiz");

@@ -53,7 +53,7 @@ export default function Account() {
       Alert.alert("Profile updated successfully");
     } catch (error) {
       Alert.alert(
-        error instanceof Error ? error.message : "Error updating profile."
+        error instanceof Error ? error.message : "Error updating profile.",
       );
     } finally {
       setLoading(false);
