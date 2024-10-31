@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router'; 
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { QuizService } from '../../services/quiz';
 import { Quiz } from '../../models/quiz';
-import ToastManager, { Toast } from 'toastify-react-native';  
+import ToastManager, { Toast } from 'toastify-react-native';
 
 const QuizScreen = () => {
   const router = useRouter();
-  const { id } = useLocalSearchParams();
-  
+  const { id } = useLocalSearchParams(); // Recibe el id del quiz desde los parámetros
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string>('');
   const [quiz, setQuiz] = useState<Quiz | null>(null);
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: boolean }>({});
 
   useEffect(() => {
     if (id) {
@@ -22,7 +20,7 @@ const QuizScreen = () => {
 
   const fetchQuiz = async (quizId: number) => {
     const { quiz, error } = await QuizService.getQuizById(quizId);
-    
+
     if (error) {
       Toast.error('Error al obtener el quiz.');
       console.error('Error al obtener el quiz:', error);
@@ -52,16 +50,16 @@ const QuizScreen = () => {
   return (
     <View style={styles.container}>
       <ToastManager />
-      
+
       {/* Header */}
       <View style={styles.header}>
         <Image
           source={require('../../assets/images/imagetextura2.png')}
           style={styles.backgroundImage}
         />
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()} 
+          onPress={() => router.back()}
         >
           <Image source={require('../../assets/images/flechaAtras.png')} />
         </TouchableOpacity>
@@ -80,7 +78,7 @@ const QuizScreen = () => {
             source={require('../../assets/images/fondoBlanco.jpg')}
             style={styles.whiteBackgroundImage}
           />
-          
+
           {quiz ? (
             <>
               {/* Code Container */}
@@ -107,7 +105,7 @@ const QuizScreen = () => {
                   <Text style={styles.optionText}>{option}</Text>
                 </TouchableOpacity>
               ))}
-              
+
               {selectedOption && (
                 <View style={styles.feedbackContainer}>
                   <Text style={styles.feedbackLabel}>Retroalimentación:</Text>
