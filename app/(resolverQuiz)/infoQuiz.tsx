@@ -1,17 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router'; 
-import { QuizService } from '../../services/quiz';
-import { Quiz } from '../../models/quiz';
-import ToastManager, { Toast } from 'toastify-react-native';  // Importa ToastManager y Toast
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { ExerciseService } from "../../services/exercise";
+import { Tables } from "database.types";
+import ToastManager, { Toast } from "toastify-react-native"; // Importa ToastManager y Toast
 
 const QuizScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const quizService = new QuizService();
+  const quizService = new ExerciseService();
 
-  const [quiz, setQuiz] = useState<Quiz | null>(null);
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: boolean }>({});
+  const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
+  const [selectedAnswers, setSelectedAnswers] = useState<{
+    [key: number]: boolean;
+  }>({});
 
   useEffect(() => {
     if (id) {
@@ -21,12 +30,12 @@ const QuizScreen = () => {
 
   const fetchQuiz = async (quizId: number) => {
     const { quiz, error } = await quizService.getQuizById(quizId);
-    
+
     if (error) {
-      Toast.error('Error al obtener el quiz.');
-      console.error('Error al obtener el quiz:', error);
+      Toast.error("Error al obtener el quiz.");
+      console.error("Error al obtener el quiz:", error);
     } else if (!quiz) {
-      Toast.warn('El quiz no existe');
+      Toast.warn("El quiz no existe");
     } else {
       setQuiz(quiz);
       Toast.success("Quiz cargado");
@@ -55,14 +64,14 @@ const QuizScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <Image
-          source={require('../../assets/images/imagetextura2.png')}
+          source={require("../../assets/images/imagetextura2.png")}
           style={styles.backgroundImage}
         />
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()} 
+          onPress={() => router.back()}
         >
-          <Image source={require('../../assets/images/flechaAtras.png')} />
+          <Image source={require("../../assets/images/flechaAtras.png")} />
         </TouchableOpacity>
         <Text style={styles.title}>Resolver Quiz</Text>
       </View>
@@ -76,19 +85,23 @@ const QuizScreen = () => {
         {/* White Background Container */}
         <View style={styles.whiteBackgroundContainer}>
           <Image
-            source={require('../../assets/images/fondoBlanco.jpg')}
+            source={require("../../assets/images/fondoBlanco.jpg")}
             style={styles.whiteBackgroundImage}
           />
-          
+
           {quiz ? (
             <>
               {/* Code Container */}
               <View style={styles.codeContainer}>
                 <Text style={styles.codeHeader}>Código a resolver:</Text>
                 <View style={styles.codeBox}>
-                  {quiz.wrongcode.split('\n').map((line, index) => (
-                    <Text key={index} style={styles.code}>{line}</Text>
-                  ))}
+                  {quiz.wrongcode
+                    .split("\n")
+                    .map((line: string, index: number) => (
+                      <Text key={index} style={styles.code}>
+                        {line}
+                      </Text>
+                    ))}
                 </View>
               </View>
               {/* Output Container */}
@@ -109,19 +122,19 @@ const QuizScreen = () => {
                   >
                     <View style={styles.answerBox}>
                       <Image
-                        source={require('../../assets/images/fime-logo2.png')}
+                        source={require("../../assets/images/fime-logo2.png")}
                         style={styles.answerImage}
                       />
                       <Text style={styles.answerText}>Línea #{lineNumber}</Text>
                       {selectedAnswers[lineNumber] && (
                         <Image
-                          source={require('../../assets/images/cancelar.png')}
+                          source={require("../../assets/images/cancelar.png")}
                           style={styles.answerImage}
                         />
                       )}
                       {!selectedAnswers[lineNumber] && (
                         <Image
-                          source={require('../../assets/images/comprobado.png')}
+                          source={require("../../assets/images/comprobado.png")}
                           style={styles.answerImage}
                         />
                       )}
@@ -140,10 +153,12 @@ const QuizScreen = () => {
             // Mostrar mensaje de error cuando no se encuentre el quiz
             <View style={styles.noQuizContainer}>
               <Image
-                source={require('../../assets/images/cancelar.png')}
+                source={require("../../assets/images/cancelar.png")}
                 style={styles.errorIcon}
               />
-              <Text style={styles.errorMessage}>No se encontró el quiz solicitado.</Text>
+              <Text style={styles.errorMessage}>
+                No se encontró el quiz solicitado.
+              </Text>
             </View>
           )}
         </View>
@@ -152,45 +167,44 @@ const QuizScreen = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   header: {
     padding: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    width: '100%',
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    width: "100%",
     marginBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
   },
   quizIdContainer: {
     padding: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   quizIdText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
     paddingTop: 70,
   },
   backgroundImage: {
     width: 1000,
     height: 250,
-    position: 'absolute',
+    position: "absolute",
   },
   title: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     left: 65,
     top: 40,
   },
@@ -200,12 +214,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   whiteBackgroundImage: {
-    position: 'absolute',
+    position: "absolute",
     width: "100%",
-    height: '100%',
+    height: "100%",
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -216,66 +230,66 @@ const styles = StyleSheet.create({
   },
   codeHeader: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
-    color: '#00622A',
+    color: "#00622A",
   },
   codeBox: {
-    backgroundColor: '#f9fff9',
+    backgroundColor: "#f9fff9",
     padding: 15,
     borderRadius: 10,
   },
   code: {
     fontSize: 16,
-    fontFamily: 'monospace',
-    color: '#333',
+    fontFamily: "monospace",
+    color: "#333",
   },
   outputContainer: {
     margin: 20,
   },
   outputHeader: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
-    color: '#00622A',
+    color: "#00622A",
   },
   outputBox: {
-    backgroundColor: '#f9fff9',
+    backgroundColor: "#f9fff9",
     padding: 15,
     borderRadius: 10,
   },
   output: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   answersContainer: {
     margin: 20,
   },
   answersHeader: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
-    color: '#00622A',
+    color: "#00622A",
   },
   answerOption: {
     marginBottom: 10,
   },
   answerBox: {
-    backgroundColor: '#f9fff9',
+    backgroundColor: "#f9fff9",
     padding: 15,
     borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   answerImage: {
     width: 40,
     height: 40,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginRight: 10,
   },
   answerText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     flex: 1,
   },
   completionContainer: {
@@ -283,13 +297,13 @@ const styles = StyleSheet.create({
   },
   completionText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#00622A',
+    fontWeight: "bold",
+    color: "#00622A",
   },
-  
+
   noQuizContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   errorIcon: {
@@ -299,8 +313,8 @@ const styles = StyleSheet.create({
   },
   errorMessage: {
     fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
+    color: "#333",
+    textAlign: "center",
   },
 });
 
