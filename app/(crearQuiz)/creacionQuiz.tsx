@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { View, Text, StyleSheet, TextInput, Button, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, Alert, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Formik } from 'formik';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { Quiz } from '../../models/quiz'; // Ajusta la ruta
 import { QuizService } from '../../services/quiz'; 
-import { router } from "expo-router";
+import { UserService } from '../../services/user';
+import { router, useRouter } from "expo-router";
+import { User } from '@supabase/supabase-js';
 
 export default function CrearQuiz() {
+    const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState('');
     const [website, setWebsite] = useState('');
@@ -24,7 +27,15 @@ export default function CrearQuiz() {
         const fetchUser = async () => {
             const { data, error } = await supabase.auth.getUser();
             if (data.user) {
-                setAuthorId(data.user.id); // Obtiene el ID del usuario
+                const id = data.user.id;
+                setAuthorId(data.user.id); // Obtiene el ID del usuario)
+
+                const { user, error: userError } = await UserService.getUserById(id);
+                if (user) {
+                    setUsername(username); // Guarda los datos del usuario
+                } else {
+                    console.error('Error al obtener el perfil del usuario:', userError);
+                }
             } else {
                 console.error('Error al obtener el usuario:', error);
             }
@@ -104,49 +115,79 @@ export default function CrearQuiz() {
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, setFieldValue, values }) => (
-                    <View>
-                        
-                        <Text>Author ID: {authorId}</Text>
-                        <Text>Title:</Text>
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={handleChange('title')}
-                            onBlur={handleBlur('title')}
-                            value={values.title}
-                        />
-                        <Text>Instructions:</Text>
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={handleChange('instructions')}
-                            onBlur={handleBlur('instructions')}
-                            value={values.instructions}
-                        />
-
-                        <Text>Category ID:</Text>
-                        <TextInput
-                            style={styles.input}
-                            keyboardType="numeric"
-                            onChangeText={handleChange('categoryid')} 
-                            onBlur={handleBlur('categoryid')}
-                            value={values.categoryid ? values.categoryid.toString() : ''} 
-                        />
-                        <Text>Cantidad de preguntas:</Text>
-                        <TextInput
-                            style={styles.input}
-                            keyboardType="numeric"
-                            onChangeText={handleChange('questionsnumber')} 
-                            onBlur={handleBlur('questionsnumber')}
-                            value={values.questionsnumber ? values.questionsnumber.toString() : ''} 
-                        />
-                        
-                        
-                        
-                        <Button title="Cargar Ejercicio" onPress={() => handleFilePicker(setFieldValue, 'solutioncode')} />
-                        <Text>Solution Code:</Text>
-                        <Text>{solutionCodeText}</Text>
-                        <Text>Wrong Code:</Text>
-                        <Text>{wrongCodeText}</Text>
-                        <Button  title="Crear Quiz" onPress={() => handleSubmit()} />
+                    <View style={styles.container}>
+                        <View style={styles.header}>
+                            <Image
+                                source={require('../../assets/images/relieve.png')}
+                                style={styles.headerBackgroundImage}
+                            />
+                            <View style={styles.headerContent}>
+                                <View style={styles.headerTextContainer}>
+                                    <View style={styles.backContainer}>
+                                        <TouchableOpacity
+                                            onPress={() => router.back()}>
+                                            <Image
+                                                source={require('../../assets/images/back-icon.png')}
+                                                style={styles.backImage}/>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <Text style={styles.headerText}>Crea un nuevo quiz</Text>
+                                </View>
+                            </View>
+                        </View>                    
+                        <View style={styles.main}>
+                            <Text style={styles.textAutorID}>Author ID: {username}</Text>
+                            <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={handleChange('title')}
+                                onBlur={handleBlur('title')}
+                                value={values.title}
+                                placeholder='Ingresa el nombre del ejercicio'
+                            />
+                            <Text style={styles.textTitleInput}>Instrucciones:</Text>
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={handleChange('instructions')}
+                                onBlur={handleBlur('instructions')}
+                                value={values.instructions}
+                                placeholder='Ingresa las instrucciones'
+                            />
+                            <Text style={styles.textTitleInput}>Categoría:</Text>
+                            <TextInput
+                                style={styles.input}
+                                keyboardType="numeric"
+                                onChangeText={handleChange('categoryid')} 
+                                onBlur={handleBlur('categoryid')}
+                                value={values.categoryid ? values.categoryid.toString() : ''}
+                                placeholder='Ingresa la categoría' 
+                            />
+                            <Text style={styles.textTitleInput}>Cantidad de preguntas:</Text>
+                            <TextInput
+                                style={styles.input}
+                                keyboardType="numeric"
+                                onChangeText={handleChange('questionsnumber')} 
+                                onBlur={handleBlur('questionsnumber')}
+                                value={values.questionsnumber ? values.questionsnumber.toString() : ''} 
+                                placeholder='Ingresa la cantidad de preguntas'
+                            />
+                            <TouchableOpacity
+                                style={styles.buttons}
+                                onPress={() => handleFilePicker(setFieldValue, 'solutioncode')}
+                            >
+                                <Text style={styles.buttonText}>Cargar Ejercicio</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.textTitleCode}>Solution Code:</Text>
+                            <Text>{solutionCodeText}</Text>
+                            <Text style={styles.textTitleCode}>Wrong Code:</Text>
+                            <Text>{wrongCodeText}</Text>
+                            <TouchableOpacity
+                                style={styles.buttons}
+                                onPress={() => handleSubmit()}
+                            >
+                                <Text style={styles.buttonText}>Crear Quiz</Text>
+                            </TouchableOpacity>
+                        </View> 
                     </View>
                 )}
             </Formik>
@@ -156,7 +197,8 @@ export default function CrearQuiz() {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
+        flexGrow: 1,
+        backgroundColor: '#fff',
     },
     input: {
         height: 40,
@@ -164,5 +206,75 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         marginBottom: 20,
         paddingHorizontal: 10,
+        borderRadius: 6,
+    },
+    header: {
+        flexDirection: 'column', 
+        padding: 20,
+        paddingBottom: 40,
+        marginBottom: 0,
+        position: 'relative', 
+    },
+    headerBackgroundImage: {
+        width: 360,
+        height: 150,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 0,
+    },
+    headerContent: {
+        flexDirection: 'row',
+        marginTop: 40, 
+    },
+    headerTextContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 0, 
+    },
+    backContainer: {
+        flexDirection: 'row',
+    },
+    backImage: {
+        marginTop: 20,
+        marginLeft: 20,
+        width: 13,
+        height: 24,
+    },
+    headerText: {
+        marginTop: 20,
+        marginLeft: 51,
+        fontSize: 24,
+        color: '#ffffff',
+    },
+    main: {
+        padding: 20, 
+    },
+    textAutorID: {
+        paddingBottom: 10,
+    },
+    textTitleInput: {
+        color: '#00622A',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    textTitleCode: {
+        paddingTop: 20,
+        color: '#00622A',
+        fontWeight: 'bold',
+    },
+    buttons: {
+        borderRadius: 6,
+        backgroundColor: '#178F49',
+        width: 320,
+        height: 48,
+        textAlign: 'center',
+        justifyContent: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 15,
+        textAlign: 'center',
+        fontWeight: 'bold',
     },
 });
