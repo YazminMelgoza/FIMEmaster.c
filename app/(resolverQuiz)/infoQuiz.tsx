@@ -17,6 +17,7 @@ const QuizScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const quizService = new ExerciseService();
+
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: boolean;
@@ -27,7 +28,7 @@ const QuizScreen = () => {
       fetchQuiz(Number(id));
     }
   }, [id]);
-
+  const [loading, setLoading] = useState(true);
   const fetchQuiz = async (quizId: number) => {
     setLoading(true); 
     const { exercise, error } = await quizService.getExerciseById(quizId);
