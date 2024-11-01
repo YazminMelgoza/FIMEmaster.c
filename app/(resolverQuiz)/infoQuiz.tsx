@@ -13,10 +13,10 @@ import { Tables } from "database.types";
 import ToastManager, { Toast } from "toastify-react-native"; // Importa ToastManager y Toast
 
 const QuizScreen = () => {
+  const [loading, setLoading] = useState(true); 
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const quizService = new ExerciseService();
-
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: boolean;
@@ -29,18 +29,19 @@ const QuizScreen = () => {
   }, [id]);
 
   const fetchQuiz = async (quizId: number) => {
+    setLoading(true); 
     const { exercise, error } = await quizService.getExerciseById(quizId);
-
     if (error) {
       Toast.error("Error al obtener el quiz.");
       console.error("Error al obtener el quiz:", error);
-    } else if (!quiz) {
+    } else if (!exercise) { 
       Toast.warn("El quiz no existe");
     } else {
-      setQuiz(quiz);
+      setQuiz(exercise);
       Toast.success("Quiz cargado");
-      console.log(quiz);
+      console.log(exercise);
     }
+    setLoading(false);  
   };
 
   const handleAnswerSelect = (lineNumber: number) => {
@@ -55,6 +56,18 @@ const QuizScreen = () => {
     const totalLines = 4;
     return Math.round((answeredCount / totalLines) * 100);
   };
+  if(loading)
+  {
+    return( 
+    <View style={styles.container}>
+      <View style={styles.noQuizContainer}>
+        <Text style={styles.errorMessage}>
+          Cargando...
+        </Text>
+      </View>
+
+    </View>);
+  }
 
   return (
     <View style={styles.container}>
