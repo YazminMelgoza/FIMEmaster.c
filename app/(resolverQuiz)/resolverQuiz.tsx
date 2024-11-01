@@ -11,10 +11,10 @@ const QuizScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams(); // Recibe el id del quiz desde los parámetros
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [feedback, setFeedback] = useState<string>('');
-  const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
-  const [questions, setQuestions] = useState<Tables<"questions">[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [feedback, setFeedback] = useState<string>(''); 
+  const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null); 
+  const [questions, setQuestions] = useState<Tables<"questions">[]>([]); 
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); 
   const [answers, setAnswers] = useState<Tables<"answers">[]>([]); // State to store answers
 
   useEffect(() => {
@@ -65,20 +65,23 @@ const QuizScreen = () => {
     }
   };
 
+  const handleRetry = () => {
+    setSelectedOption(null);
+    setFeedback('');
+  };
+
   const handleContinue = () => {
-    const selectedAnswer = answers.find(answer => answer.answer === selectedOption);
-    if (selectedAnswer?.iscorrect) {
-      setFeedback('');
-      setSelectedOption(null);
-      // Avanzar a la siguiente pregunta si hay más
-      if (currentQuestionIndex < questions.length - 1) {
-        const nextIndex = currentQuestionIndex + 1;
-        setCurrentQuestionIndex(nextIndex);
-        loadAnswersForQuestion(questions[nextIndex].questionid); // Load answers for the next question
-      } else {
-        // Mostrar mensaje de finalización o navegar
-        Toast.success("¡Quiz completado!");
-      }
+    setFeedback('');
+    setSelectedOption(null);
+    // Avanzar a la siguiente pregunta si hay más
+    if (currentQuestionIndex < questions.length - 1) {
+      const nextIndex = currentQuestionIndex + 1;
+      setCurrentQuestionIndex(nextIndex);
+      loadAnswersForQuestion(questions[nextIndex].questionid); // Load answers for the next question
+    } else {
+      // Mostrar mensaje de finalización o navegar
+      Toast.success("¡Quiz completado!");
+      router.navigate('/Storage');
     }
   };
 
@@ -125,10 +128,7 @@ const QuizScreen = () => {
                   {quiz.wrongcode.split('\n').map((line, index) => (
                     <Text key={index} style={styles.code}>{line}</Text>
                   ))}
-                  
                 </View>
-                <Text style={styles.codeHeader}>Numero de linea:</Text>
-                <Text style={styles.code}>#</Text>
               </View>
               <Text style={styles.question}>Selecciona la respuesta</Text>
               {answers.map((answer, index) => (
@@ -153,9 +153,20 @@ const QuizScreen = () => {
                 </View>
               )}
               {selectedOption && answers.find(answer => answer.answer === selectedOption)?.iscorrect && (
+                <View style={styles.correctContainer}>
+                   <Text style={styles.correctText}>¡CORRECTO!</Text>
                 <TouchableOpacity style={styles.continueButtonC} onPress={handleContinue}>
                   <Text style={styles.continueTextC}>CONTINUAR</Text>
                 </TouchableOpacity>
+                </View>
+              )}
+              {selectedOption && !answers.find(answer => answer.answer === selectedOption)?.iscorrect && (
+                <View style={styles.incorrectContainer}>
+                   <Text style={styles.incorrectText}>Incorrecto</Text>
+                <TouchableOpacity style={styles.continueButtonI} onPress={handleRetry}>
+                  <Text style={styles.continueTextI}>VOLVER A INTENTAR</Text>
+                </TouchableOpacity>
+                </View>
               )}
             </>
           )}
@@ -173,6 +184,13 @@ const QuizScreen = () => {
     </View>
   );
 };
+
+
+
+
+
+
+
 
 
 
