@@ -15,7 +15,7 @@ import ToastManager, { Toast } from "toastify-react-native"; // Importa ToastMan
 const QuizScreen = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const quizService = new ExerciseService();
+ 
 
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -31,6 +31,7 @@ const QuizScreen = () => {
   const fetchQuiz = async (quizId: number) => {
     setLoading(true); 
     const { exercise, error } = await quizService.getExerciseById(quizId);
+
     if (error) {
       Toast.error("Error al obtener el quiz.");
       console.error("Error al obtener el quiz:", error);

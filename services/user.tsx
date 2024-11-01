@@ -11,6 +11,7 @@ export class UserService {
       .from("users")
       .select("*")
       .eq("id", id)
+
       .single(); // Solo esperamos un registro
 
     if (error) {
