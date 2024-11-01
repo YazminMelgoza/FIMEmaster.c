@@ -7,7 +7,7 @@ export class UserService {
   // Función para obtener un usuario por ID
   static async getUserById(id: string): Promise<{ user: User | null; error: PostgrestError | null }> {
     const { data, error } = await supabase
-      .from('profiles') // Cambia 'profiles' al nombre de tu tabla si es diferente
+      .from('users') // Cambia 'profiles' al nombre de tu tabla si es diferente
       .select('*')
       .eq('id', id)
       .single(); // Solo esperamos un registro

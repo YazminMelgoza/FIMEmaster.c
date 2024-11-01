@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { View, Text, StyleSheet, TextInput, Button, Alert, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Formik } from 'formik';
+import * as Yup from 'yup';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { Quiz } from '../../models/quiz'; // Ajusta la ruta
@@ -9,6 +10,7 @@ import { QuizService } from '../../services/quiz';
 import { UserService } from '../../services/user';
 import { router, useRouter } from "expo-router";
 import { User } from '@supabase/supabase-js';
+import { Picker } from '@react-native-picker/picker';
 
 export default function CrearQuiz() {
     const router = useRouter();
@@ -16,25 +18,36 @@ export default function CrearQuiz() {
     const [username, setUsername] = useState('');
     const [website, setWebsite] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
+    const [firstname, setFirstname] = useState('');
+    const [middlename, setMiddlename] = useState('');
+    const [lastname, setLastname] = useState('');
     //Varibles para guardar el código
     const [wrongCodeText, setWrongCodeText] = useState('');
     const [solutionCodeText, setSolutionCodeText] = useState('');
     const [authorId, setAuthorId] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('');
     //Servicio de Quiz
     const quizService = new QuizService();
+    const categories = [
+        { label: 'Bucles', value: '1' },
+        { label: 'Condicionales', value: '2' },
+        { label: 'Funciones', value: '3' },
+        { label: 'Arreglos', value: '4' },
+        { label: 'Matrices', value: '5' },
+    ];
 
     useEffect(() => {
         const fetchUser = async () => {
             const { data, error } = await supabase.auth.getUser();
             if (data.user) {
-                const id = data.user.id;
+                const id = data.user.id
                 setAuthorId(data.user.id); // Obtiene el ID del usuario)
 
-                const { user, error: userError } = await UserService.getUserById(id);
-                if (user) {
-                    setUsername(username); // Guarda los datos del usuario
-                } else {
-                    console.error('Error al obtener el perfil del usuario:', userError);
+                const { user, error: userError} = await UserService.getUserById(id);
+                if(user) {
+                    setFirstname(user.firstname);
+                    setMiddlename(user.middlename || '');
+                    setLastname(user.lastname || '');
                 }
             } else {
                 console.error('Error al obtener el usuario:', error);
@@ -77,29 +90,39 @@ export default function CrearQuiz() {
         }
     };
 
+    const validationSchema = Yup.object().shape({
+        title: Yup.string().required('El título es obligatorio'),
+        instructions: Yup.string().required('Las instrucciones son obligatorias'),
+        categoryid: Yup.number().required('La categoría es obligatoria'),
+        questionsnumber: Yup.number().required('La cantidad de preguntas es obligatoria'),
+        solutioncode: Yup.string().required('El código de solución es obligatorio'),
+        wrongcode: Yup.string().required('El código incorrecto es obligatorio'),
+    });
+    
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Formik
                 initialValues={{
-                    exerciseid: 0,
+                    exerciseid: "0",
                     authorId: '',
                     instructions: '',
-                    categoryid: 0,
+                    categoryid: "",
                     wrongcode: '',
                     solutioncode: '',
                     title: '',
-                    questionsnumber: 0,
+                    questionsnumber: "",
                 }}
+                validationSchema={validationSchema}
                 onSubmit={async (values) => {
                     const objQuiz: Quiz = {
                         exerciseid: 0, 
                         authorId: authorId, 
                         instructions: values.instructions,
-                        categoryid: values.categoryid,
+                        categoryid: Number(values.categoryid),
                         wrongcode: values.wrongcode,
                         solutioncode: values.solutioncode,
                         title: values.title,
-                        questionsnumber: values.questionsnumber,
+                        questionsnumber: Number(values.questionsnumber),
                         createdat: new Date().toISOString(),
                     };
                     console.log(objQuiz);
@@ -114,7 +137,7 @@ export default function CrearQuiz() {
                     
                 }}
             >
-                {({ handleChange, handleBlur, handleSubmit, setFieldValue, values }) => (
+                {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
                     <View style={styles.container}>
                         <View style={styles.header}>
                             <Image
@@ -136,7 +159,7 @@ export default function CrearQuiz() {
                             </View>
                         </View>                    
                         <View style={styles.main}>
-                            <Text style={styles.textAutorID}>Author ID: {username}</Text>
+                            <Text style={styles.textAutorID}>Autor: {firstname + ' ' + lastname + ' ' + middlename}</Text>
                             <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
                             <TextInput
                                 style={styles.input}
@@ -145,6 +168,7 @@ export default function CrearQuiz() {
                                 value={values.title}
                                 placeholder='Ingresa el nombre del ejercicio'
                             />
+                            {errors.title && touched.title && <Text style={styles.errorText}>{errors.title}</Text>}
                             <Text style={styles.textTitleInput}>Instrucciones:</Text>
                             <TextInput
                                 style={styles.input}
@@ -153,24 +177,33 @@ export default function CrearQuiz() {
                                 value={values.instructions}
                                 placeholder='Ingresa las instrucciones'
                             />
+                            {errors.instructions && touched.instructions && <Text style={styles.errorText}>{errors.instructions}</Text>}
                             <Text style={styles.textTitleInput}>Categoría:</Text>
-                            <TextInput
-                                style={styles.input}
-                                keyboardType="numeric"
-                                onChangeText={handleChange('categoryid')} 
-                                onBlur={handleBlur('categoryid')}
-                                value={values.categoryid ? values.categoryid.toString() : ''}
-                                placeholder='Ingresa la categoría' 
-                            />
+                            <View style={styles.pickerContainer}>
+                                <Picker
+                                    style={styles.pickerText}
+                                    selectedValue={selectedCategory}
+                                    onValueChange={(itemValue) => {
+                                        setSelectedCategory(itemValue);
+                                        handleChange('categoryid')(itemValue); // Actualiza el valor en Formik
+                                        }}
+                                    >
+                                    {categories.map((category) => (
+                                    <Picker.Item key={category.value} label={category.label} value={category.value} style={styles.pickerItem} />
+                                ))}
+                            </Picker>
+                            </View>
+                            {errors.categoryid && touched.categoryid && <Text style={styles.errorText}>{errors.categoryid}</Text>}
                             <Text style={styles.textTitleInput}>Cantidad de preguntas:</Text>
                             <TextInput
                                 style={styles.input}
                                 keyboardType="numeric"
-                                onChangeText={handleChange('questionsnumber')} 
+                                onChangeText={(value) => setFieldValue('questionsnumber', value)} 
                                 onBlur={handleBlur('questionsnumber')}
                                 value={values.questionsnumber ? values.questionsnumber.toString() : ''} 
                                 placeholder='Ingresa la cantidad de preguntas'
                             />
+                            {errors.questionsnumber && touched.questionsnumber && <Text style={styles.errorText}>{errors.questionsnumber}</Text>}
                             <TouchableOpacity
                                 style={styles.buttons}
                                 onPress={() => handleFilePicker(setFieldValue, 'solutioncode')}
@@ -178,9 +211,11 @@ export default function CrearQuiz() {
                                 <Text style={styles.buttonText}>Cargar Ejercicio</Text>
                             </TouchableOpacity>
                             <Text style={styles.textTitleCode}>Solution Code:</Text>
+                            {errors.solutioncode && touched.solutioncode && <Text style={styles.errorText}>{errors.solutioncode}</Text>}
                             <Text>{solutionCodeText}</Text>
                             <Text style={styles.textTitleCode}>Wrong Code:</Text>
                             <Text>{wrongCodeText}</Text>
+                            {errors.wrongcode && touched.wrongcode && <Text style={styles.errorText}>{errors.wrongcode}</Text>}
                             <TouchableOpacity
                                 style={styles.buttons}
                                 onPress={() => handleSubmit()}
@@ -204,9 +239,24 @@ const styles = StyleSheet.create({
         height: 40,
         borderColor: 'gray',
         borderWidth: 1,
-        marginBottom: 20,
+        marginBottom: 10,
         paddingHorizontal: 10,
         borderRadius: 6,
+        justifyContent: 'center',
+    },
+    pickerContainer: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginBottom: 10,
+        borderRadius: 6,
+        justifyContent: 'center',
+    },
+    pickerText: {
+        color: '#A0A0A0',
+    },
+    pickerItem: {
+        fontSize: 14,
     },
     header: {
         flexDirection: 'column', 
@@ -251,7 +301,10 @@ const styles = StyleSheet.create({
         padding: 20, 
     },
     textAutorID: {
-        paddingBottom: 10,
+        paddingBottom: 20,
+        color: '#00622A',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
     textTitleInput: {
         color: '#00622A',
@@ -276,5 +329,9 @@ const styles = StyleSheet.create({
         fontSize: 15,
         textAlign: 'center',
         fontWeight: 'bold',
+    },
+    errorText: {
+        color: 'red',
+        marginBottom: 20,
     },
 });
