@@ -13,9 +13,10 @@ import { Tables } from "database.types";
 import ToastManager, { Toast } from "toastify-react-native"; // Importa ToastManager y Toast
 
 const QuizScreen = () => {
+  const [loading, setLoading] = useState(true); 
   const router = useRouter();
   const { id } = useLocalSearchParams();
- 
+  const quizService = new ExerciseService();
 
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -31,7 +32,6 @@ const QuizScreen = () => {
   const fetchQuiz = async (quizId: number) => {
     setLoading(true); 
     const { exercise, error } = await quizService.getExerciseById(quizId);
-
     if (error) {
       Toast.error("Error al obtener el quiz.");
       console.error("Error al obtener el quiz:", error);
@@ -57,6 +57,18 @@ const QuizScreen = () => {
     const totalLines = 4;
     return Math.round((answeredCount / totalLines) * 100);
   };
+  if(loading)
+  {
+    return( 
+    <View style={styles.container}>
+      <View style={styles.noQuizContainer}>
+        <Text style={styles.errorMessage}>
+          Cargando...
+        </Text>
+      </View>
+
+    </View>);
+  }
 
   return (
     <View style={styles.container}>

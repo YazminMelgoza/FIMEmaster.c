@@ -45,6 +45,7 @@
     "tailwind": "4.0.0",
     "toastify-react-native": "^5.0.2",
     "yup": "^1.4.0",
+    "@react-native-picker/picker": "2.7.5"
     "expo-barcode-scanner": "~13.0.1",
     "expo-camera": "~15.0.16"
   },
