@@ -27,20 +27,21 @@ const QuizScreen = () => {
       fetchQuiz(Number(id));
     }
   }, [id]);
-
+  const [loading, setLoading] = useState(true);
   const fetchQuiz = async (quizId: number) => {
+    setLoading(true); 
     const { exercise, error } = await quizService.getExerciseById(quizId);
-
     if (error) {
       Toast.error("Error al obtener el quiz.");
       console.error("Error al obtener el quiz:", error);
-    } else if (!quiz) {
+    } else if (!exercise) { 
       Toast.warn("El quiz no existe");
     } else {
-      setQuiz(quiz);
+      setQuiz(exercise);
       Toast.success("Quiz cargado");
-      console.log(quiz);
+      console.log(exercise);
     }
+    setLoading(false);  
   };
 
   const handleAnswerSelect = (lineNumber: number) => {
