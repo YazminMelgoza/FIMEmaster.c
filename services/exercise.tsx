@@ -80,15 +80,15 @@ export class ExerciseService {
     const { data, error } = await supabase
       .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
       .select("*")
-      .eq("exerciseid", exerciseId)
+      .eq("exerciseid", quizId)
       .single();
 
     if (error) {
       console.error("Error al obtener el quiz:", error);
-      return { exercise: null, error };
+      return { quiz: null, error };
     }
 
-    return { exercise: data as Tables<"exercises">, error: null };
+    return { quiz: data as Tables<"exercises">, error: null };
   }
 
   // Método para obtener exercises por authorId
