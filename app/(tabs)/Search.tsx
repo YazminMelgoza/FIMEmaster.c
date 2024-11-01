@@ -10,56 +10,62 @@ import {
   TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Tables } from "database.types";
-//import { getQuizzes, Quiz } from '../../services/search12';
+import { Tables } from 'database.types';
 import { ExerciseService } from 'services/exercise';
 
-const QuizItem: React.FC<{ quiz: Tables<"exercises"> ; onPress: () => void }> = ({ quiz, onPress }) => (
-  <TouchableOpacity
-    style={[styles.quizItem, { backgroundColor: '#fff', borderColor: '#ccc' }]}
-    onPress={onPress}
-  >
-    <View style={styles.quizItemDetails}>
-      <Text style={[styles.quizItemTitle, { color: '#333' }]}>
-        {quiz.title || 'Título no disponible'}
-      </Text>
-      <Text style={styles.quizItemDescription}>
-        Instrucciones: {quiz.instructions || 'No hay instrucciones'}
-      </Text>
-      <Text style={styles.quizItemDescription}>
-        Número de preguntas: {quiz.questionsnumber ?? 'No especificado'}
-      </Text>
-      <Text style={styles.quizItemDescription}>
-        Categoría ID: {quiz.categoryid}
-      </Text>
-      <Text style={styles.quizItemDescription}>
-        Autor ID: {quiz.authorId}
-      </Text>
-      <Text style={styles.quizItemDescription}>
-        Fecha de creación: {quiz.createdat ? new Date(quiz.createdat).toLocaleDateString() : 'No especificado'}
-      </Text>
-    </View>
-    <Icon name="arrow-forward-ios" size={20} color="#888" />
-  </TouchableOpacity>
-);
+// Función para obtener el color según el categoryid, maneja el caso de null
+const getColor = (categoryid: number | null): string => {
+  switch (categoryid) {
+    case 1:
+      return '#4CAF50';
+    case 2:
+      return '#9C27B0';
+    case 3:
+      return '#2196F3';
+    default:
+      return '#888'; 
+  }
+};
+
+// Componente para mostrar un ejercicio
+const QuizItem: React.FC<{ quiz: Tables<"exercises">; onPress: () => void }> = ({ quiz, onPress }) => {
+  const color = getColor(quiz.categoryid ?? null); // Maneja el caso en que categoryid es null
+
+  return (
+    <TouchableOpacity
+      style={[styles.quizItem, { backgroundColor: '#fff', borderColor: '#ccc' }]}
+      onPress={onPress}
+    >
+      <Icon name="bar-chart" size={20} color={color} style={styles.quizItemIcon} />
+      <View style={styles.quizItemDetails}>
+        <Text style={[styles.quizItemTitle, { color: '#333' }]}>
+          {quiz.title || 'Título no disponible'}
+        </Text>
+        <Text style={styles.quizItemDescription}>
+          {quiz.instructions || 'Sin instrucciones'}
+        </Text>
+      </View>
+      <Icon name="arrow-forward-ios" size={20} color={color} />
+    </TouchableOpacity>
+  );
+};
 
 export default function About() {
-  //const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [quizzes, setQuizzes] = useState<Tables<"exercises">[] | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // Llama a getQuizzes cada vez que cambia el searchQuery
+  // Llama a getExercisesByTitle cada vez que cambia el searchQuery
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const quizzesData = await ExerciseService.getExercisesByTitle(searchQuery); 
+        const quizzesData = await ExerciseService.getExercisesByTitle(searchQuery);
         setQuizzes(quizzesData.exercises);
       } catch (error) {
         console.error('Error fetching quizzes:', error);
       }
     };
     fetchData();
-  }, [searchQuery]); // Se vuelve a ejecutar cuando cambia searchQuery
+  }, [searchQuery]);
 
   const handleCreateQuiz = (id: number) => {
     console.log('Crear test');
@@ -80,7 +86,7 @@ export default function About() {
               placeholder="Buscar"
               placeholderTextColor="#888"
               value={searchQuery}
-              onChangeText={setSearchQuery} // Actualiza searchQuery cuando cambia el texto
+              onChangeText={setSearchQuery}
             />
             <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
           </View>
@@ -102,14 +108,13 @@ export default function About() {
               quiz={quiz} 
               onPress={() => handleCreateQuiz(quiz.exerciseid)} 
             />
-          )) }
+          ))}
         </View>
       </ScrollView>
     </View>
   );
 }
 
-// Estilos del componente
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -223,5 +228,8 @@ const styles = StyleSheet.create({
   quizItemDescription: {
     color: '#666',
     fontSize: 14,
+  },
+  quizItemIcon: {
+    marginRight: 10,
   },
 });
