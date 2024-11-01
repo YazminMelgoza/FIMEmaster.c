@@ -14,7 +14,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-picker/picker": "^2.9.0",
     "@rneui/themed": "^4.0.0-rc.8",
-    "@supabase/supabase-js": "^2.45.4",
+    "@supabase/supabase-js": "^2.46.1",
     "dependencies": "^0.0.1",
     "expo": "~51.0.28",
     "expo-constants": "~16.0.2",
@@ -41,6 +41,7 @@
     "react-native-web": "~0.19.10",
     "react-router-dom": "^6.27.0",
     "react-toastify": "^10.0.6",
+    "supabase": "^1.207.9",
     "tailwind": "4.0.0",
     "toastify-react-native": "^5.0.2",
     "yup": "^1.4.0"

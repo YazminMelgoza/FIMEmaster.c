@@ -5,12 +5,13 @@ import { Formik } from 'formik';
 import * as Yup from 'yup';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
-import { Quiz } from '../../models/quiz'; // Ajusta la ruta
-import { QuizService } from '../../services/quiz'; 
 import { UserService } from '../../services/user';
 import { router, useRouter } from "expo-router";
 import { User } from '@supabase/supabase-js';
 import { Picker } from '@react-native-picker/picker';
+import { Tables } from "database.types";
+import { ExerciseService } from "../../services/exercise";
+
 
 export default function CrearQuiz() {
     const router = useRouter();
@@ -26,8 +27,7 @@ export default function CrearQuiz() {
     const [solutionCodeText, setSolutionCodeText] = useState('');
     const [authorId, setAuthorId] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    //Servicio de Quiz
-    const quizService = new QuizService();
+    
     const categories = [
         { label: 'Bucles', value: '1' },
         { label: 'Condicionales', value: '2' },
@@ -43,9 +43,9 @@ export default function CrearQuiz() {
                 const id = data.user.id
                 setAuthorId(data.user.id); // Obtiene el ID del usuario)
 
-                const { user, error: userError} = await UserService.getUserById(id);
+                const { user, error: userError} = await UserService.getUserProfileById(id);
                 if(user) {
-                    setFirstname(user.firstname);
+                    setFirstname(user.firstname || '');
                     setMiddlename(user.middlename || '');
                     setLastname(user.lastname || '');
                 }
@@ -54,41 +54,41 @@ export default function CrearQuiz() {
             }
         };
 
-        fetchUser();
-    }, []);
+    fetchUser();
+  }, []);
 
+  const handleFilePicker = async (
+    setFieldValue: (field: string, value: any) => void,
+    field: string
+  ) => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: "text/plain", // Asegúrate de que solo seleccionas archivos de texto
+        copyToCacheDirectory: true, // Esto asegura que el archivo se copie al caché
+      });
 
-    const handleFilePicker = async (setFieldValue: (field: string, value: any) => void, field: string) => {
-        try {
-            const result = await DocumentPicker.getDocumentAsync({
-                type: 'text/plain', // Asegúrate de que solo seleccionas archivos de texto
-                copyToCacheDirectory: true, // Esto asegura que el archivo se copie al caché
-            });
+      if (!result.canceled) {
+        var uri2 = "";
+        result.assets.forEach((asset) => {
+          console.log(asset.uri); // URI de cada archivo
+          uri2 = asset.uri;
+          console.log(asset.name); // Nombre de cada archivo
+        });
+        const uri = uri2;
+        const fileContent = await FileSystem.readAsStringAsync(uri);
 
-            if (!result.canceled) {
-                var uri2 = "";
-                result.assets.forEach(asset => {
-                    console.log(asset.uri); // URI de cada archivo
-                    uri2 = asset.uri;
-                    console.log(asset.name); // Nombre de cada archivo
-                    
-                });
-                const uri = uri2;
-                const fileContent = await FileSystem.readAsStringAsync(uri);
-               
-                setFieldValue(field, fileContent);
-                setFieldValue('wrongcode', fileContent); // Se asigna el valor al campo wrongcode
-                //Se asigna el valor del código cargado
-                setSolutionCodeText(fileContent);
-                setWrongCodeText(fileContent);
-               
-            } else {
-                Alert.alert('Cancelado', 'No se seleccionó ningún archivo.');
-            }
-        } catch (err) {
-            Alert.alert('Error', 'Hubo un problema al seleccionar el archivo.');
-        }
-    };
+        setFieldValue(field, fileContent);
+        setFieldValue("wrongcode", fileContent); // Se asigna el valor al campo wrongcode
+        //Se asigna el valor del código cargado
+        setSolutionCodeText(fileContent);
+        setWrongCodeText(fileContent);
+      } else {
+        Alert.alert("Cancelado", "No se seleccionó ningún archivo.");
+      }
+    } catch (err) {
+      Alert.alert("Error", "Hubo un problema al seleccionar el archivo.");
+    }
+  };
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required('El título es obligatorio'),
@@ -114,7 +114,7 @@ export default function CrearQuiz() {
                 }}
                 validationSchema={validationSchema}
                 onSubmit={async (values) => {
-                    const objQuiz: Quiz = {
+                    const objQuiz: Tables<"exercises"> = {
                         exerciseid: 0, 
                         authorId: authorId, 
                         instructions: values.instructions,
@@ -126,13 +126,15 @@ export default function CrearQuiz() {
                         createdat: new Date().toISOString(),
                     };
                     console.log(objQuiz);
-                    QuizService.createQuiz(objQuiz).then(response => {
-                        if (response.error) {
-                            Alert.alert('Error', 'Hubo un problema al crear el quiz. Intenta nuevamente.');
-                        } else {
-                              router.replace("finalizarQuiz");
-                           
-                        }
+                    ExerciseService.createExercise(objQuiz).then((response) => {
+                      if (response.error) {
+                        Alert.alert(
+                          "Error",
+                          "Hubo un problema al crear el quiz. Intenta nuevamente."
+                        );
+                      } else {
+                        router.replace("finalizarQuiz");
+                      }
                     });
                     
                 }}

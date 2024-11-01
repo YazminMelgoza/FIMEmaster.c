@@ -15,6 +15,7 @@ import { Link, router } from "expo-router";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
+import { Feather } from "@expo/vector-icons";
 // Esquema de validación Yup
 const validationSchema = Yup.object().shape({
   firstName: Yup.string().required("El nombre es obligatorio"),
@@ -44,7 +45,6 @@ export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
 
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -53,8 +53,14 @@ export default function SignUp() {
     router.replace('/signUp/confirmation'); // Reemplaza la ruta actual
   };
   */
-  async function signUpWithEmail(email: string, password: string, first_Name: string ,last_Name: string, middle_Name: string) {
-    setLoading(true)
+  async function signUpWithEmail(
+    email: string,
+    password: string,
+    first_Name: string,
+    last_Name: string,
+    middle_Name: string
+  ) {
+    setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -62,18 +68,15 @@ export default function SignUp() {
         data: {
           firstName: first_Name,
           lastName: last_Name,
-          middleName: middle_Name
+          middleName: middle_Name,
         },
       },
-    })
-    
-    if(error)
-    {
-      console.error('Error en la creación del usuario:', error.message);
+    });
 
-    }else
-    {
-      router.replace('/signUp/confirmation');
+    if (error) {
+      console.error("Error en la creación del usuario:", error.message);
+    } else {
+      router.replace("/signUp/confirmation");
     }
 
     setLoading(false);
@@ -201,8 +204,11 @@ export default function SignUp() {
               style={styles.eyeIcon}
               onPress={togglePasswordVisibility}
             >
-              {/* font awesome icon  */}
-              {/*showPassword ? <FaRegEye /> : <FaRegEyeSlash />*/}
+              {showPassword ? (
+                <Feather name="eye" size={20} color="#999" />
+              ) : (
+                <Feather name="eye-off" size={20} color="#999" />
+              )}
             </TouchableOpacity>
 
             {touched.password && errors.password && (

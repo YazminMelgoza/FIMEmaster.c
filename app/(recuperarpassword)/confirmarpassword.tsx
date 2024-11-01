@@ -1,6 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { router } from "expo-router";
+import { supabase } from "../../lib/supabase";
 
 export default function SigInScreen() {
     const navigation = useNavigation();
@@ -9,12 +11,25 @@ export default function SigInScreen() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+    const confirmarPassword = async () =>
+    {
+        
+        if(password != "")
+        {
+            const { data, error } = await supabase.auth.updateUser({
+                password: password
+            })
+            console.log("Password Cambiado");
+            router.navigate("/");
+        }
+        
+    }
 
     return (
         <View style={styles.container}>
             <TouchableOpacity
                 style={styles.backButton}
-                onPress={() => navigation.goBack()} // Navega hacia atrás al presionar
+                onPress={() => navigation.goBack()} 
             >
                 <Image
                     source={require('../../assets/images/arrow-back.png')}
@@ -54,7 +69,8 @@ export default function SigInScreen() {
                     />
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.buttonContainer}>
+
+            <TouchableOpacity style={styles.buttonContainer} onPress={() => confirmarPassword()}>
                 <Text style={styles.buttonText}>Cambiar tu contraseña</Text>
             </TouchableOpacity>
         </View>

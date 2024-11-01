@@ -1,199 +1,135 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
-import { StyleSheet, View, Alert } from 'react-native';
-import { Button, Input } from '@rneui/themed';
-import Avatar from '../../components/Avatar';
-import { User } from '../../models/user'; 
+import { StyleSheet, View, Alert, Text } from "react-native";
+import { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabase";
+import { Button, Input } from "@rneui/themed";
+import Avatar from "../../components/Avatar";
+import { Tables } from "database.types";
 import { router } from "expo-router";
-import { UserService } from '../../services/user'; 
-
-
+import { UserService } from "../../services/user";
+import { Toast } from "toastify-react-native";
 export default function Account() {
-  const [loading, setLoading] = useState(true);
-  const [userEmail, setUserEmail] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [userEmail, setUserEmail] = useState("");
+    const [user, setUser] = useState<Tables<"users"> | null>(null);
+    //Obtiene sesion actual
+    useEffect(() => {
+        const fetchUser = async () => {
+        try {
+            const { data: sessionData, error: sessionError } =
+            await supabase.auth.getUser();
+            if (sessionError) throw sessionError;
 
-  const [user, setUser] = useState<User>({
-    id: '',
-    updated_at: '',
-    username: '',
-    firstname: '',
-    avatar_url: '',
-    website: '',
-    lastname: '',
-    middlename: ''
-  });
+            const userId = sessionData?.user?.id;
+            if (!userId) throw new Error("No user ID found");
 
-  useEffect(() => {
-    const fetchUser = async () => {
-        const { data, error } = await supabase.auth.getUser();
-        if (data.user) {
-          setUser((prevUser) => ({
-            ...prevUser,
-            id: data.user.id,
-          }));
-          setUserEmail(data.user.email || '');
-        } else {
-            console.error('Error al obtener el usuario:', error);
+            const { user: fetchedUser, error: fetchError } =
+            await UserService.getUserProfileById(userId);
+            if (fetchError) throw fetchError;
+
+            setUser(fetchedUser);
+            setUserEmail(sessionData.user.email || "");
+        } catch (error) {
+            Toast.error("Error fetching user.");
+            console.error("Error fetching user:", error);
+        } finally {
+            setLoading(false);
+        }
+        };
+        fetchUser();
+    }, []);
+    //Función para hacer el update
+    const updateProfile = async (updatedUser: Tables<"users">) => {
+        try {
+          setLoading(true);
+          if (!updatedUser.id) throw new Error("No user on the session!");
+    
+          const error = await UserService.updateUserProfileById({
+            ...updatedUser,
+          });
+    
+          if (error) throw error;
+    
+          Alert.alert("Profile updated successfully");
+        } catch (error) {
+          Alert.alert(
+            error instanceof Error ? error.message : "Error updating profile."
+          );
+        } finally {
+          setLoading(false);
         }
     };
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    if (user.id) {
-      getProfile();
+    //Función para update el estado del objeto user
+    if (loading) {
+        return <View style={styles.container}>
+                <Text>Loading...</Text>
+            </View>;
     }
-  }, [user.id]);
-
-  async function getProfile() {
-    try {
-      setLoading(true);
-      if (user.id == "") throw new Error('No user on the session!');
-
-      const { data, error, status } = await supabase
-        .from('profiles')
-        .select(`username, website, avatar_url, updated_at,firstname,lastname,middlename`)
-        .eq('id', user.id)
-        .single();
-
-      if (error && status !== 406) {
-        throw error;
-      }
-
-      if (data) {
+    
+    function updateUserState(user: Partial<Tables<"users">>) {
         setUser((prevUser) => ({
-          ...prevUser,
-          updated_at: data.updated_at,
-          username: data.username,
-          firstname: data.firstname,
-          avatar_url: data.avatar_url,
-          website: data.website,
-          lastname: data.lastname,
-          middlename: data.middlename,
+            ...prevUser!,
+            ...user,
         }));
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message);
-      }
-    } finally {
-      console.log(user);
-      setLoading(false);
     }
-  }
-
-  async function updateProfile(user: User) {
-    try {
-      setLoading(true); 
-      if (user.id === "") throw new Error('No user on the session!'); 
-      const error = await UserService.updateUserById(user); 
-      if (!error) {
-        console.log('Perfil actualizado correctamente');
-        Alert.alert('Perfil actualizado correctamente');
-      } else {
-        console.error('Error al actualizar el perfil:', error);
-        Alert.alert('Error al actualizar el perfil...');
-      }
-  
-      // Lanza el error si ocurrió
-      if (error) {
-        throw error;
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        Alert.alert(error.message); // Muestra una alerta con el mensaje de error
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-  
-  return (
-    <View style={styles.container}>
-      <View>
-        <Avatar
-          size={200}
-          url={user.avatar_url || ''}
-          onUpload={(url: string) => {
-            setUser((prevUser) => ({
-              ...prevUser,
-              avatar_url: url,  
-            }));
-            //updateProfile({ username, website, avatar_url: url });
-          }}
-        />
-      </View>
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Input label="Email" value={userEmail} disabled />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Nombre"
-          value={user.firstname || ''}
-          onChangeText={(text) =>  setUser((prevUser) => ({
-            ...prevUser,
-            firstname: text,  
-          }))
-
-          }
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Apellido Paterno"
-          value={user.lastname || ''}
-          onChangeText={(text) => setUser((prevUser) => ({
-            ...prevUser,
-            lastname: text,  
-          }))
-
-          }
-        />
-      </View>
-      <View style={styles.verticallySpaced}>
-        <Input
-          label="Apellido Materno"
-          value={user.middlename || ''}
-          onChangeText={(text) => setUser((prevUser) => ({
-            ...prevUser,
-            middlename: text,  
-          }))
-
-          }
-        />
-      </View>
-
-      <View style={[styles.verticallySpaced, styles.mt20]}>
-        <Button
-          title={loading ? 'Cargando ...' : 'Actualizar'}
-          onPress={() => updateProfile(user)}
-          disabled={loading}
-        />
-      </View>
-
-      <View style={styles.verticallySpaced}>
-        <Button title="Sign Out" onPress={() =>{
-          supabase.auth.signOut().then(() => {
-            console.log("Signed out");
-            router.navigate('/');
-          }).catch(console.error);
-        }} />
-      </View>
-    </View>
-  );
+    return(
+        <View style={styles.container}>
+            <Avatar
+                size={200}
+                url={user?.avatar_url || ""}
+                onUpload={(url) =>
+                updateUserState({
+                    avatar_url: url,
+                })
+                }
+            />
+            <Input label="Email" value={userEmail} disabled />
+            <Input
+                label="First Name"
+                value={user?.firstname || ""}
+                onChangeText={(text) =>
+                updateUserState({
+                    firstname: text,
+                })
+                }
+            />
+            <Input
+                label="Last Name"
+                value={user?.lastname || ""}
+                onChangeText={(text) =>
+                updateUserState({
+                    lastname: text,
+                })
+                }
+            />
+            <Input
+                label="Middle Name"
+                value={user?.middlename || ""}
+                onChangeText={(text) =>
+                updateUserState({
+                    middlename: text,
+                })
+                }
+            />
+            <Button
+                title={loading ? "Loading..." : "Update"}
+                onPress={() => updateProfile(user!)}
+                disabled={loading}
+            />
+            <Button
+                title="Sign Out"
+                onPress={() =>
+                supabase.auth
+                    .signOut()
+                    .then(() => router.navigate("/"))
+                    .catch(console.error)
+                }
+            />
+        </View>
+    );
 }
-
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 40,
-    padding: 12,
-  },
-  verticallySpaced: {
-    paddingTop: 4,
-    paddingBottom: 4,
-    alignSelf: 'stretch',
-  },
-  mt20: {
-    marginTop: 20,
-  },
-});
+    container: {
+      marginTop: 40,
+      padding: 12,
+    },
+  });
