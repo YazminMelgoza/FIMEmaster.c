@@ -43,7 +43,9 @@
     "supabase": "^1.207.9",
     "tailwind": "4.0.0",
     "toastify-react-native": "^5.0.2",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "expo-camera": "~15.0.16",
+    "expo-barcode-scanner": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

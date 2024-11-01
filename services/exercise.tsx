@@ -89,6 +89,24 @@ export class ExerciseService {
 
     return { quiz: data as Tables<"exercises">, error: null };
   }
+    // Método para obtener quiz por id
+    public static async getQuizByIds(quizId: number): Promise<{
+      quiz: Tables<"exercises"> | null;
+      error: PostgrestError | null;
+    }> {
+      const { data, error } = await supabase
+        .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
+        .select("*")
+        .eq("exerciseid", quizId)
+        .single();
+  
+      if (error) {
+        console.error("Error al obtener el quiz:", error);
+        return { quiz: null, error };
+      }
+  
+      return { quiz: data as Tables<"exercises">, error: null };
+    }
 
   // Método para obtener quizzes por authorId
   public static async getByAuthorId(
