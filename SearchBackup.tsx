@@ -1,5 +1,6 @@
-import { router } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+import { router, Link } from 'expo-router';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,67 +11,64 @@ import {
   TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Tables } from 'database.types';
-import { ExerciseService } from 'services/exercise';
-
-// Función para obtener el color según el categoryid, maneja el caso de null
-const getColor = (categoryid: number | null): string => {
-  switch (categoryid) {
-    case 1:
-      return '#4CAF50';
-    case 2:
-      return '#9C27B0';
-    case 3:
-      return '#2196F3';
-    default:
-      return '#888'; 
-  }
-};
-
-// Componente para mostrar un ejercicio
-const QuizItem: React.FC<{ quiz: Tables<"exercises">; onPress: () => void }> = ({ quiz, onPress }) => {
-  const color = getColor(quiz.categoryid ?? null); // Maneja el caso en que categoryid es null
-
-  return (
-    <TouchableOpacity
-      style={[styles.quizItem, { backgroundColor: '#fff', borderColor: '#ccc' }]}
-      onPress={onPress}
-    >
-      <Icon name="bar-chart" size={20} color={color} style={styles.quizItemIcon} />
-      <View style={styles.quizItemDetails}>
-        <Text style={[styles.quizItemTitle, { color: '#333' }]}>
-          {quiz.title || 'Título no disponible'}
-        </Text>
-        <Text style={styles.quizItemDescription}>
-          {quiz.instructions || 'Sin instrucciones'}
-        </Text>
-      </View>
-      <Icon name="arrow-forward-ios" size={20} color={color} />
-    </TouchableOpacity>
-  );
-};
 
 export default function About() {
-  const [quizzes, setQuizzes] = useState<Tables<"exercises">[] | null>(null);
+  const [quizzes, setQuizzes] = useState([
+    {
+      title: 'Error de condicion while',
+      description: 'Maria de Leon',
+      iconType: 'image', // Cambiamos el tipo a 'image'
+      icon:'',
+      imageSource: require('../../assets/images/user.png'), // Ruta de la imagen personalizada
+      color: '#4CAF50',
+      textColor: '#2D2D2D',
+    },
+    {
+      title: 'Programa Arrays',
+      description: 'Estructura de Datos',
+      iconType: 'icon', // Tipo icono
+      icon: 'reorder',
+      color: '#2196F3',
+      textColor: '#2D2D2D',
+    },
+    {
+      title: 'Programa calculadora',
+      description: 'Lógica matemática',
+      iconType: 'icon', // Tipo icono
+      icon: 'bar-chart',
+      color: '#9C27B0',
+      textColor: '#2D2D2D',
+    },
+    {
+      title: 'Programa calculadora',
+      description: 'Lógica matemática',
+      iconType: 'icon', // Tipo icono
+      icon: 'bar-chart',
+      color: '#9C27B0',
+      textColor: '#2D2D2D',
+    },
+    {
+      title: 'Programa calculadora',
+      description: 'Lógica matemática',
+      iconType: 'icon', // Tipo icono
+      icon: 'bar-chart',
+      color: '#9C27B0',
+      textColor: '#2D2D2D',
+    },
+    // Puedes agregar más items si lo deseas
+  ]);
+
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTab, setSelectedTab] = useState('home');
 
-  // Llama a getExercisesByTitle cada vez que cambia el searchQuery
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const quizzesData = await ExerciseService.getExercisesByTitle(searchQuery);
-        setQuizzes(quizzesData.exercises);
-      } catch (error) {
-        console.error('Error fetching quizzes:', error);
-      }
-    };
-    fetchData();
-  }, [searchQuery]);
-
-  const handleCreateQuiz = (id: number) => {
+  const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.navigate(`infoQuiz/${id}`);
+    router.navigate('infoQuiz');
   };
+
+  const filteredQuizzes = quizzes.filter((quiz) =>
+    quiz.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <View style={styles.container}>
@@ -80,13 +78,14 @@ export default function About() {
           style={styles.headerBackgroundImage}
         />
         <View style={styles.headerContent}>
+          {/* Barra de búsqueda */}
           <View style={styles.searchContainer}>
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar"
               placeholderTextColor="#888"
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={(text) => setSearchQuery(text)}
             />
             <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
           </View>
@@ -102,12 +101,27 @@ export default function About() {
             <Text style={styles.quizListTitle}>Ejercicios</Text>
           </View>
 
-          {quizzes?.map((quiz) => (
-            <QuizItem 
-              key={quiz.exerciseid} 
-              quiz={quiz} 
-              onPress={() => handleCreateQuiz(quiz.exerciseid)} 
-            />
+          {filteredQuizzes.map((quiz, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[styles.quizItem, { backgroundColor: '#fff', borderColor: quiz.color }]}
+              onPress={handleCreateQuiz}
+            >
+              <View style={styles.quizItemIcon}>
+                {quiz.iconType === 'image' ? (
+                  <Image source={quiz.imageSource} style={styles.quizImage} />
+                ) : (
+                  <Icon name={quiz.icon} size={30} color={quiz.color} />
+                )}
+              </View>
+              <View style={styles.quizItemDetails}>
+                <Text style={[styles.quizItemTitle, { color: quiz.textColor }]}>
+                  {quiz.title}
+                </Text>
+                <Text style={styles.quizItemDescription}>{quiz.description}</Text>
+              </View>
+              <Icon name="arrow-forward-ios" size={20} color={quiz.color} />
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
@@ -159,7 +173,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    flex: 1,
+    flex: 1, // Esto hará que el input ocupe todo el espacio disponible
   },
   searchInput: {
     flex: 1,
@@ -174,7 +188,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   rayas: {
-    marginTop: 30,
+    marginTop:30,
     width: 30,
     height: 30,
   },
@@ -218,6 +232,19 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  quizItemIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  quizImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+  },
   quizItemDetails: {
     flex: 1,
   },
@@ -229,7 +256,6 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 14,
   },
-  quizItemIcon: {
-    marginRight: 10,
-  },
 });
+
+

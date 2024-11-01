@@ -31,6 +31,7 @@ const QuizScreen = () => {
   const fetchQuiz = async (quizId: number) => {
     const { quiz, error } = await ExerciseService.getQuizById(quizId);
 
+
     if (error) {
       Toast.error("Error al obtener el quiz.");
       console.error("Error al obtener el quiz:", error);
