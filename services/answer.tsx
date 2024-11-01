@@ -1,11 +1,10 @@
-// AnswerService.ts
 import { supabase } from "../lib/supabase";
 import { Tables } from "database.types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 export class AnswerService {
   // Método para crear una nueva respuesta
-  async createAnswer(
+  static async createAnswer(
     answer: Tables<"answers">
   ): Promise<{ error: PostgrestError | null }> {
     const { data, error } = await supabase.from("answers").insert([
@@ -26,7 +25,7 @@ export class AnswerService {
   }
 
   // Método para eliminar una respuesta por ID
-  async deleteAnswerById(
+  static async deleteAnswerById(
     answerId: number
   ): Promise<{ error: PostgrestError | null }> {
     const { error } = await supabase
@@ -44,7 +43,7 @@ export class AnswerService {
   }
 
   // Método para eliminar todas las respuestas por ID de pregunta
-  async deleteAllAnswersByQuestionId(
+  static async deleteAllAnswersByQuestionId(
     questionId: number
   ): Promise<{ error: PostgrestError | null }> {
     const { error } = await supabase
@@ -64,7 +63,7 @@ export class AnswerService {
   }
 
   // Método para actualizar una respuesta por ID
-  async updateAnswerById(
+  static async updateAnswerById(
     answerId: number,
     updatedAnswer: Tables<"answers">
   ): Promise<{ error: PostgrestError | null }> {
@@ -83,7 +82,7 @@ export class AnswerService {
   }
 
   // Método para obtener una respuesta por ID
-  async getAnswerById(
+  static async getAnswerById(
     answerId: number
   ): Promise<{
     answer: Tables<"answers"> | null;
@@ -105,7 +104,7 @@ export class AnswerService {
   }
 
   // Método para obtener todas las respuestas por ID de pregunta
-  async getAllAnswersByQuestionId(questionId: number): Promise<{
+  static async getAllAnswersByQuestionId(questionId: number): Promise<{
     answers: Tables<"answers">[] | null;
     error: PostgrestError | null;
   }> {

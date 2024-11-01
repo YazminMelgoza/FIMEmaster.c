@@ -47,7 +47,7 @@ export default function About() {
 
   const handleCreateQuiz = (quizId: number) => {
     console.log("Crear test con ID:", quizId);
-    router.push(`infoQuiz?id=${quizId}`);
+    router.push({ pathname: 'iniciarQuiz', params: { id: quizId.toString() } });
   };
 
   return (
