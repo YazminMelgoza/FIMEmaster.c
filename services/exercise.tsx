@@ -80,15 +80,15 @@ export class ExerciseService {
     const { data, error } = await supabase
       .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
       .select("*")
-      .eq("exerciseid", exerciseId)
+      .eq("exerciseid", quizId)
       .single();
 
     if (error) {
       console.error("Error al obtener el quiz:", error);
-      return { exercise: null, error };
+      return { quiz: null, error };
     }
 
-    return { exercise: data as Tables<"exercises">, error: null };
+    return { quiz: data as Tables<"exercises">, error: null };
   }
 
   // Método para obtener exercises por authorId
@@ -122,5 +122,23 @@ export class ExerciseService {
     }
   
     return { exercises: data as Tables<"exercises">[], error: null };
+  }
+  public static async getCurrentMonthQuizzesCount(): Promise<{ count: number; error: PostgrestError | null }> {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1; // Los meses en JavaScript son 0-indexados
+
+    const { data, error } = await supabase
+      .from("exercises")
+      .select("exerciseid", { count: "exact" }) // Contar los quizzes
+      .gte("createdat", `${year}-${month.toString().padStart(2, '0')}-01`) // Fecha de inicio del mes
+      .lt("createdat", `${year}-${(month + 1).toString().padStart(2, '0')}-01`); // Fecha de inicio del siguiente mes
+      console.log(data?.length);
+
+    if (error) {
+      console.error("Error al obtener la cantidad de quizzes:", error);
+      return { count: 0, error };
+    }
+    return { count: data?.length || 0, error: null };
   }
 }
