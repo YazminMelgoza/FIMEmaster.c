@@ -1,4 +1,7 @@
 import React from "react";
+import { NativeWindStyleSheet } from "nativewind";
+
+
 import {
   View,
   Text,

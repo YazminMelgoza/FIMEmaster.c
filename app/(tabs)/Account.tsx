@@ -23,17 +23,9 @@ import { UserService } from "services/user";
 import { ExerciseService } from "services/exercise";
 
 export default function Index() {
-  
-  const barData = {
-    labels: ["Arrays", "Matemáticas", "Lógica"],
-    legend: ["Completado, Sin Completar"],
-    data: [
-      [30, 70],
-      [40, 60],
-      [70, 30],
-    ], // Datos para cada categoría,
-    barColors: ["#28db49", "#ff1e46"],
-  };
+
+
+
   const chartConfig = {
     backgroundGradientFrom: "#e6e6fa",
     backgroundGradientTo: "#e6e6fa",
@@ -123,64 +115,83 @@ export default function Index() {
   }, [session]);
   const [userExercises, setExercises] = useState<number | undefined>(undefined);
 
-useEffect(() => {
-  const fetchUserexercise = async () => {
-    if (session?.user?.id) {
-      const { exercises, error } = await UserService.getExercisesByUserId(session.user.id); // Cambiado a exercises
-      if (!error) {
-        setExercises(exercises?.length); // Actualiza el estado con los ejercicios obtenidos
-      } else {
-        console.error("Error al obtener los ejercicios del usuario:", error);
+  useEffect(() => {
+    const fetchUserexercise = async () => {
+      if (session?.user?.id) {
+        const { exercises, error } = await UserService.getExercisesByUserId(session.user.id); // Cambiado a exercises
+        if (!error) {
+          setExercises(exercises?.length); // Actualiza el estado con los ejercicios obtenidos
+        } else {
+          console.error("Error al obtener los ejercicios del usuario:", error);
+        }
       }
-    }
-  };
+    };
 
-  fetchUserexercise();
-}, [session?.user?.id]);
+    fetchUserexercise();
+  }, [session?.user?.id]);
   const [userCountAttempt, setUserCountAttempt] = useState<number | null>(null); // Cambiado a estado
 
-useEffect(() => {
-  const fetchUserCountAttempt = async () => {
-    if (session?.user?.id) {
-      const { count, error } = await UserService.getAttemptsCountByUserId(session.user.id); // Cambiado a 'count'
-      if (!error) {
-        setUserCountAttempt(count); // Actualiza el estado con el conteo obtenido
-      } else {
-        // Maneja el error si es necesario
-        console.error(error);
+  useEffect(() => {
+    const fetchUserCountAttempt = async () => {
+      if (session?.user?.id) {
+        const { count, error } = await UserService.getAttemptsCountByUserId(session.user.id); // Cambiado a 'count'
+        if (!error) {
+          setUserCountAttempt(count); // Actualiza el estado con el conteo obtenido
+        } else {
+          // Maneja el error si es necesario
+          console.error(error);
+        }
       }
-    }
+    };
+
+    fetchUserCountAttempt();
+  }, [session]);
+  const [QuizNumberMonth, setQuizNumberMonth] = useState<number | null>(null); // Cambiado a estado
+
+  useEffect(() => {
+    const fetchQuizNumber = async () => {
+      if (session?.user?.id) {
+        const { count, error } = await ExerciseService.getCurrentMonthQuizzesCount(); // Cambiado a 'count'
+        if (!error) {
+          setQuizNumberMonth(count); // Actualiza el estado con el conteo obtenido
+        } else {
+          // Maneja el error si es necesario
+          console.error(error);
+        }
+      }
+    };
+
+    fetchQuizNumber();
+  }, [session]);
+  type BarChartData = {
+    labels: string[];
+    legend: string[];
+    data: number[][];
+    barColors: string[];
   };
 
-  fetchUserCountAttempt();
-}, [session]);
-const [QuizNumberMonth, setQuizNumberMonth] = useState<number | null>(null); // Cambiado a estado
+  const [barData, setBarData] = useState<BarChartData | null>(null);
 
-useEffect(() => {
-  const fetchQuizNumber = async () => {
-    if (session?.user?.id) {
-      const { count, error } = await ExerciseService.getCurrentMonthQuizzesCount(); // Cambiado a 'count'
-      if (!error) {
-        setQuizNumberMonth(count); // Actualiza el estado con el conteo obtenido
-      } else {
-        // Maneja el error si es necesario
-        console.error(error);
+  useEffect(() => {
+    const fetchChartData = async () => {
+      if (session?.user?.id) {
+        const chartData = await UserService.getBarChartData(session.user.id);
+        setBarData(chartData);
       }
-    }
+    };
+    fetchChartData();
+  }, [session?.user?.id]);
+
+  const progressData = {
+    labels: ["Programs"],
+    data: [
+      userCountAttempt !== null && QuizNumberMonth !== null
+        ? userCountAttempt / QuizNumberMonth
+        : 0,
+    ], // Progreso (37/50 programas)
   };
 
-  fetchQuizNumber();
-}, [session]);
-const progressData = {
-  labels: ["Programs"],
-  data: [
-    userCountAttempt !== null && QuizNumberMonth !== null
-      ? userCountAttempt / QuizNumberMonth
-      : 0,
-  ], // Progreso (37/50 programas)
-};
 
-  
   async function updateProfile({
     username,
     website,
@@ -295,13 +306,13 @@ const progressData = {
                       Haz programado {""}
                     </Text>
                     <Text className="text-[#3aa66a] text-xl font-medium font-['Rubik'] leading-7">
-                      {userCountAttempt !== null ? userCountAttempt : "0"} 
+                      {userCountAttempt !== null ? userCountAttempt : "0"}
                     </Text>
-                    
+
                   </View>
                   <View className="flex w-full flex-row items-center justify-center h-auto">
                     <Text className="text-[#0b082a] text-xl font-medium font-['Rubik'] leading-7">
-                    
+
                     </Text>
                     <Text className="text-[#3aa66a] text-xl font-medium font-['Rubik'] leading-7">
                       codigos{" "}
@@ -329,7 +340,7 @@ const progressData = {
                     <View className="flex flex-row w-full">
                       <View className="align-bottom items-end justify-end h-auto">
                         <Text className="text-[#0b082a] text-[32px] font-bold font-['Rubik'] leading-[48px]">
-                        {userScore !== null ? userCountAttempt : "0"} 
+                          {userCountAttempt !== null ? userCountAttempt : "0"}
 
                         </Text>
                       </View>
@@ -346,7 +357,7 @@ const progressData = {
                 <View className="w-[140px] h-24 bg-white rounded-[20px] flex flex-col pl-6 pt-5 pb-5 pr-2">
                   <View className=" flex flex-row h-auto w-full">
                     <Text className="text-[#0b082a] text-[32px] font-bold font-['Rubik'] leading-[48px]">
-                    {userExercises !== null ? userExercises : "0"}
+                      {userExercises !== null ? userExercises : "0"}
                     </Text>
                   </View>
                   <View className=" flex flex-row h-auto w-full">
@@ -358,7 +369,7 @@ const progressData = {
                 <View className="w-[140px] h-24 bg-[#3aa66a] rounded-[20px] flex flex-col pl-6 pt-5 pb-5 pr-2">
                   <View className=" flex flex-row h-auto w-full">
                     <Text className="text-white text-[32px] font-bold font-['Rubik'] leading-[48px]">
-                      5
+                      {userCountAttempt !== null ? userCountAttempt : "0"}
                     </Text>
                   </View>
                   <View className=" flex flex-row h-auto w-full">
@@ -372,7 +383,7 @@ const progressData = {
             <View className=" w-auto h-auto pt-4">
               <View className=" flex align-middle items-center border-2 rounded-3xl border-green-300">
                 <StackedBarChart
-                  data={barData}
+                  data={barData || { labels: [], legend: [], data: [], barColors: [] }}
                   width={300}
                   height={220}
                   yAxisLabel=""
@@ -390,16 +401,7 @@ const progressData = {
           </View>
         </View>
 
-        <View style={styles.quizListContainer}>
-          <View style={styles.quizListHeader}>
-            <Text style={styles.quizListTitle}>Quiz Recientes</Text>
-            <Link asChild href="historialQuiz">
-              <TouchableOpacity style={styles.quizListSeeAll}>
-                <Text style={styles.quizListSeeAllText}>ver todos</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-        </View>
+
       </ScrollView>
     </View>
   );

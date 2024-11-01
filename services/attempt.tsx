@@ -75,4 +75,26 @@ export class AttemptService {
 
     return { data, error };
   }
+
+  static async getAttemptsLastMonth(userId: string): Promise<{ attempts: any[] | null; error: PostgrestError | null }> {
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1); // Resta un mes a la fecha actual
+
+  // Convertir la fecha a formato ISO
+  const isoDate = oneMonthAgo.toISOString();
+
+  const { data: attempts, error } = await supabase
+    .from('attempts')
+    .select('*')
+    .eq('userid', userId) // Filtrar por userId
+    .gte('attemptedat', isoDate); // Filtrar por fecha mayor o igual a un mes atrás
+
+  if (error) {
+    console.error('Error al obtener los intentos del usuario del último mes:', error);
+    return { attempts: null, error };
+  }
+
+  console.log('Intentos del usuario del último mes obtenidos:', attempts);
+  return { attempts, error: null };
+}
 }

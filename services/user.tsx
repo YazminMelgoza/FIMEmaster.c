@@ -52,6 +52,7 @@ export class UserService {
     console.log('Ejercicios obtenidos:', data);
     return { exercises: data, error: null };
   }
+  
   // Función para actualizar el perfil de un usuario
   static async updateUserProfileById(
     user: Tables<"users">
@@ -150,4 +151,112 @@ export class UserService {
     console.log('Número de intentos del usuario en el último mes:', count);
     return { count, error: null };
   }
+  static async getBarChartData(userId: string) {
+    try {
+      // Obtener los intentos del usuario en el último mes
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+      const isoDate = oneMonthAgo.toISOString();
+  
+      // Obtener los attempts del usuario en el último mes
+      const { data: attemptsData, error: attemptsError } = await supabase
+        .from('attempts')
+        .select('exerciseid, attemptedat')
+        .eq('userid', userId)
+        .gte('attemptedat', isoDate);
+  
+      if (attemptsError) throw attemptsError;
+  
+      if (!attemptsData || attemptsData.length === 0) {
+        console.log("No hay intentos para el usuario en el último mes.");
+        return null;
+      }
+      console.log("Attempts data:", attemptsData);
+  
+      // Obtener los IDs de los ejercicios a partir de los attempts
+      const exerciseIds = [...new Set(attemptsData.map((attempt) => attempt.exerciseid))];
+      console.log("Exercise IDs:", exerciseIds);
+  
+      // Obtener los ejercicios y sus categorías correspondientes a los attempts
+      const { data: exercisesData, error: exercisesError } = await supabase
+        .from('exercises')
+        .select('exerciseid, categoryid')
+        .in('exerciseid', exerciseIds);
+  
+      if (exercisesError) throw exercisesError;
+      console.log("Exercises data:", exercisesData);
+  
+      // Obtener las tres primeras categorías de los ejercicios de los attempts
+      const categoryIds = [...new Set(exercisesData.map((exercise) => exercise.categoryid))].slice(0, 3);
+      console.log("Category IDs:", categoryIds);
+  
+      // Obtener nombres de las categorías
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('categories')
+        .select('categoryid, name')
+        .in('categoryid', categoryIds);
+  
+      if (categoriesError) throw categoriesError;
+      console.log("Categories data:", categoriesData);
+  
+      // Obtener respuestas correctas e incorrectas de la tabla 'answers'
+      const { data: answersData, error: answersError } = await supabase
+        .from('answers')
+        .select('iscorrect, questionid');
+  
+      if (answersError) throw answersError;
+      console.log("Answers data:", answersData);
+  
+      // Calcular los datos de correctos e incorrectos para cada categoría
+      const chartData = categoryIds.map((categoryId) => {
+        const categoryName = categoriesData.find((category) => category.categoryid === categoryId)?.name;
+  
+        // Obtener los ejercicios de esta categoría
+        const exercisesInCategory = exercisesData.filter((exercise) => exercise.categoryid === categoryId);
+  
+        // Filtrar los attempts para esta categoría y verificar si la respuesta fue correcta
+        const correctAnswers = exercisesInCategory.filter((exercise) =>
+          answersData.some((answer) => answer.iscorrect && answer.questionid === exercise.exerciseid)
+        ).length;
+        const incorrectAnswers = exercisesInCategory.filter((exercise) =>
+          answersData.some((answer) => !answer.iscorrect && answer.questionid === exercise.exerciseid)
+        ).length;
+  
+        // Calcular porcentajes
+        const totalAnswers = correctAnswers + incorrectAnswers;
+        const correctPercentage = totalAnswers > 0 ? (correctAnswers / totalAnswers) * 100 : 0;
+        const incorrectPercentage = totalAnswers > 0 ? (incorrectAnswers / totalAnswers) * 100 : 0;
+  
+        console.log(`Data for category ${categoryName}:`, {
+          correctPercentage,
+          incorrectPercentage,
+          correctAnswers,
+          incorrectAnswers,
+        });
+  
+        return {
+          label: categoryName || "Categoría desconocida",
+          data: [correctPercentage, incorrectPercentage],
+        };
+      });
+  
+      // Configuración final para la gráfica
+      const chartConfig = {
+        labels: chartData.map((category) => category.label),
+        legend: ["Completado", "Sin Completar"],
+        data: chartData.map((category) => category.data),
+        barColors: ["#28db49", "#ff1e46"],
+      };
+      
+      console.log("Final chart data:", chartConfig);
+      return chartConfig;
+  
+    } catch (error) {
+      console.error("Error al obtener los datos para la gráfica:", error);
+      return null;
+    }
+  }
+  
+  
+  
 }
