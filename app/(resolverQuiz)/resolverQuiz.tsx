@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ExerciseService } from "../../services/exercise";
+import { QuestionService } from "../../services/question";
+import { AnswerService } from "../../services/answer"; // Import AnswerService
 import { Tables } from "database.types";
 import ToastManager, { Toast } from 'toastify-react-native';
 
@@ -11,46 +13,80 @@ const QuizScreen = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string>('');
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
+  const [questions, setQuestions] = useState<Tables<"questions">[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Tables<"answers">[]>([]); // State to store answers
 
   useEffect(() => {
     if (id) {
-      fetchQuiz(Number(id));
+      fetchQuizAndQuestions(Number(id));
     }
   }, [id]);
 
-  const fetchQuiz = async (quizId: number) => {
-    const { quiz, error } = await ExerciseService.getQuizById(quizId);
+  const fetchQuizAndQuestions = async (quizId: number) => {
+    const { quiz, error: quizError } = await ExerciseService.getQuizById(quizId);
+    if (quizError || !quiz) {
+      Toast.warn('El quiz no existe o hubo un error.');
+      console.error('Error al obtener el quiz:', quizError);
+      return;
+    }
+    setQuiz(quiz);
+    Toast.success("Quiz cargado");
 
-    if (error) {
-      Toast.error('Error al obtener el quiz.');
-      console.error('Error al obtener el quiz:', error);
-    } else if (!quiz) {
-      Toast.warn('El quiz no existe');
+    const { questions, error: questionError } = await QuestionService.getAllQuestionsByExerciseId(quizId);
+    if (questionError || !questions) {
+      Toast.warn('No se pudieron cargar las preguntas.');
+      console.error('Error al obtener preguntas:', questionError);
     } else {
-      setQuiz(quiz);
-      Toast.success("Quiz cargado");
-      console.log(quiz);
+      setQuestions(questions);
+      Toast.success("Preguntas cargadas");
+      console.log(questions);
+      loadAnswersForQuestion(questions[0].questionid); // Load answers for the first question
+    }
+  };
+
+  const loadAnswersForQuestion = async (questionId: number) => {
+    const { answers, error } = await AnswerService.getAllAnswersByQuestionId(questionId);
+    if (error) {
+      Toast.warn('No se pudieron cargar las respuestas.');
+      console.error('Error al obtener respuestas:', error);
+      setAnswers([]);
+    } else {
+      setAnswers(answers || []);
+      console.log(`Respuestas para la pregunta ${questionId}:`, answers);
     }
   };
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
-    setFeedback(option === 'b = 10;' ? '¡Correcto!' : 'Las líneas de código terminan con ;');
+    const selectedAnswer = answers.find(answer => answer.answer === option);
+    if (selectedAnswer) {
+      setFeedback(selectedAnswer.iscorrect ? '¡Correcto!' : 'Las líneas de código terminan con ;');
+    }
   };
 
-  const isCorrect = (option: string) => option === 'b = 10;';
+  const handleContinue = () => {
+    const selectedAnswer = answers.find(answer => answer.answer === selectedOption);
+    if (selectedAnswer?.iscorrect) {
+      setFeedback('');
+      setSelectedOption(null);
+      // Avanzar a la siguiente pregunta si hay más
+      if (currentQuestionIndex < questions.length - 1) {
+        const nextIndex = currentQuestionIndex + 1;
+        setCurrentQuestionIndex(nextIndex);
+        loadAnswersForQuestion(questions[nextIndex].questionid); // Load answers for the next question
+      } else {
+        // Mostrar mensaje de finalización o navegar
+        Toast.success("¡Quiz completado!");
+      }
+    }
+  };
 
-  const options: string[] = [
-    'b = 10;',
-    'b == 10',
-    'b = 10',
-    'b. = 10.',
-  ];
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <View style={styles.container}>
       <ToastManager />
-
       {/* Header */}
       <View style={styles.header}>
         <Image
@@ -65,12 +101,6 @@ const QuizScreen = () => {
         </TouchableOpacity>
         <Text style={styles.title}>Resolver Quiz</Text>
       </View>
-
-      {/* Mostrar el ID del Quiz */}
-      <View style={styles.quizIdContainer}>
-        <Text style={styles.quizIdText}>ID del Quiz: {id}</Text>
-      </View>
-
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         {/* White Background Container */}
         <View style={styles.whiteBackgroundContainer}>
@@ -78,63 +108,58 @@ const QuizScreen = () => {
             source={require('../../assets/images/fondoBlanco.jpg')}
             style={styles.whiteBackgroundImage}
           />
-
-          {quiz ? (
+          {quiz && questions.length > 0 && (
             <>
               {/* Code Container */}
               <View style={styles.codeContainer}>
+                <Text style={styles.codeHeader}>Pregunta {currentQuestionIndex + 1}:</Text>
+                {currentQuestion ? (
+                  <View style={styles.codeBox}>
+                    <Text style={styles.code}>{currentQuestion.question}</Text>
+                  </View>
+                ) : (
+                  <Text>No hay preguntas disponibles para este quiz.</Text>
+                )}
                 <Text style={styles.codeHeader}>Código a resolver:</Text>
                 <View style={styles.codeBox}>
                   {quiz.wrongcode.split('\n').map((line, index) => (
                     <Text key={index} style={styles.code}>{line}</Text>
                   ))}
+                  
                 </View>
+                <Text style={styles.codeHeader}>Numero de linea:</Text>
+                <Text style={styles.code}>#</Text>
               </View>
-
               <Text style={styles.question}>Selecciona la respuesta</Text>
-              {options.map((option, index) => (
+              {answers.map((answer, index) => (
                 <TouchableOpacity
                   key={index}
                   style={[
                     styles.optionButton,
-                    selectedOption === option && styles.selectedOption,
-                    selectedOption !== null && !isCorrect(option) && selectedOption === option && styles.incorrectOption
+                    selectedOption === answer.answer && styles.selectedOption,
+                    selectedOption !== null && !answer.iscorrect && selectedOption === answer.answer && styles.incorrectOption
                   ]}
-                  onPress={() => handleOptionSelect(option)}
+                  onPress={() => handleOptionSelect(answer.answer)}
                 >
-                  <Text style={styles.optionText}>{option}</Text>
+                  <Text style={styles.optionText}>{answer.answer}</Text>
                 </TouchableOpacity>
               ))}
-
               {selectedOption && (
                 <View style={styles.feedbackContainer}>
                   <Text style={styles.feedbackLabel}>Retroalimentación:</Text>
-                  <Text style={[styles.feedback, isCorrect(selectedOption) ? styles.correctFeedback : styles.incorrectFeedback]}>
+                  <Text style={[styles.feedback, answers.find(answer => answer.answer === selectedOption)?.iscorrect ? styles.correctFeedback : styles.incorrectFeedback]}>
                     {feedback}
                   </Text>
                 </View>
               )}
-
-              {selectedOption === 'b = 10;' && (
-                <View style={styles.correctContainer}>
-                  <Text style={styles.correctText}>¡CORRECTO!</Text>
-                  <TouchableOpacity style={styles.continueButtonC} onPress={() => {/* Handle continue action */}}>
-                    <Text style={styles.continueTextC}>CONTINUAR</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {selectedOption && !isCorrect(selectedOption) && (
-                <View style={styles.incorrectContainer}>
-                  <Text style={styles.incorrectText}>INCORRECTO</Text>
-                  <TouchableOpacity style={styles.continueButtonI} onPress={() => {/* Handle retry action */}}>
-                    <Text style={styles.continueTextI}>VOLVER A INTENTAR</Text>
-                  </TouchableOpacity>
-                </View>
+              {selectedOption && answers.find(answer => answer.answer === selectedOption)?.iscorrect && (
+                <TouchableOpacity style={styles.continueButtonC} onPress={handleContinue}>
+                  <Text style={styles.continueTextC}>CONTINUAR</Text>
+                </TouchableOpacity>
               )}
             </>
-          ) : (
-            // Mostrar mensaje de error cuando no se encuentre el quiz
+          )}
+          {!quiz && (
             <View style={styles.noQuizContainer}>
               <Image
                 source={require('../../assets/images/cancelar.png')}
@@ -148,6 +173,13 @@ const QuizScreen = () => {
     </View>
   );
 };
+
+
+
+
+
+
+
 
 
 const styles = StyleSheet.create({

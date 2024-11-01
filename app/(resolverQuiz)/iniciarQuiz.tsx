@@ -63,13 +63,13 @@ const QuizScreen = () => {
           </View>
           {quiz && (
             <View style={styles.infoContainer}>
-              <Text style={styles.quizTitle}>{quiz.instructions}</Text>
+              <Text style={styles.quizTitle}>{quiz.title}</Text>
               <Text style={styles.instructions}>Instrucciones:</Text>
-              <Text style={styles.instructionsDetails}>Analiza el código y resuelve los errores.</Text>
+              <Text style={styles.instructionsDetails}>{quiz.instructions}</Text>
               <Text style={styles.category}>Categoría:</Text>
               <Text style={styles.bold}>{quiz.categoryid}</Text>
               <Text style={styles.completed}>
-                Completado: <Text style={styles.bold}>50%</Text>
+                Completado: <Text style={styles.bold}>{quiz.questionsnumber}</Text>
               </Text>
             </View>
           )}
