@@ -75,7 +75,7 @@ export default function Index()
 
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>
-            <Link asChild href="scan" >
+            <Link asChild href="signUp/verification" >
                 <TouchableOpacity style={styles.button}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Icon name="qr-code" size={50} color="#3BA76B" />
