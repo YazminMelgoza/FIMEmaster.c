@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
         position: 'relative', 
     },
     headerBackgroundImage: {
-        width: 360,
+        width: 500,
         height: 150,
         position: 'absolute',
         top: 0,
