@@ -58,10 +58,12 @@ const QuizScreen = () => {
   };
 
   const handleOptionSelect = (option: string) => {
-    setSelectedOption(option);
-    const selectedAnswer = answers.find(answer => answer.answer === option);
-    if (selectedAnswer) {
-      setFeedback(selectedAnswer.iscorrect ? '¡Correcto!' : 'Las líneas de código terminan con ;');
+    if (!selectedOption) { // Check if an option has already been selected
+      setSelectedOption(option);
+      const selectedAnswer = answers.find(answer => answer.answer === option);
+      if (selectedAnswer) {
+        setFeedback(selectedAnswer.iscorrect ? '¡Correcto!' : 'Las líneas de código terminan con ;');
+      }
     }
   };
 
@@ -140,6 +142,7 @@ const QuizScreen = () => {
                     selectedOption !== null && !answer.iscorrect && selectedOption === answer.answer && styles.incorrectOption
                   ]}
                   onPress={() => handleOptionSelect(answer.answer)}
+                  disabled={!!selectedOption} // Disable the button if an option is already selected
                 >
                   <Text style={styles.optionText}>{answer.answer}</Text>
                 </TouchableOpacity>
