@@ -8,8 +8,8 @@ import { Tables } from "database.types";
 import ToastManager, { Toast } from 'toastify-react-native';
 
 const QuizScreen = () => {
-  const router = useRouter();
   const { id } = useLocalSearchParams(); // Recibe el id del quiz desde los parámetros
+  const router = useRouter();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string>(''); 
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null); 
@@ -25,12 +25,12 @@ const QuizScreen = () => {
 
   const fetchQuizAndQuestions = async (quizId: number) => {
     const { exercise, error: quizError } = await ExerciseService.getExerciseById(quizId);
-    if (quizError || !quiz) {
+    if (quizError || !exercise) {
       Toast.warn('El quiz no existe o hubo un error.');
       console.error('Error al obtener el quiz:', quizError);
       return;
     }
-    setQuiz(quiz);
+    setQuiz(exercise);
     Toast.success("Quiz cargado");
 
     const { questions, error: questionError } = await QuestionService.getAllQuestionsByExerciseId(quizId);
@@ -81,7 +81,7 @@ const QuizScreen = () => {
     } else {
       // Mostrar mensaje de finalización o navegar
       Toast.success("¡Quiz completado!");
-      router.navigate('/Storage');
+      router.replace('terminarQuiz');
     }
   };
 
