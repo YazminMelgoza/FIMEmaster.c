@@ -1,95 +1,143 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useRouter } from 'expo-router'; // Importa useRouter para la navegación
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { ExerciseService } from "../../services/exercise";
+import { UserService } from 'services/user';
+import { Tables } from "database.types";
+import ToastManager, { Toast } from 'toastify-react-native';
+
+
 const QuizScreen = () => {
-    const router = useRouter(); 
-  return (
+  const [loading, setLoading] = useState(true); 
+  const router = useRouter();
+  const { id } = useLocalSearchParams();
+  const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
+  const [author, setAuthor] = useState<Tables<"users"> | null>(null);
+  // Define la URL predeterminada
+  
+
+  useEffect(() => {
+    if (id) {
+      fetchQuiz(Number(id));
+    }
+  }, [id]);
+
+  const fetchQuiz = async (quizId: number) => {
+    setLoading(true); 
+    const { exercise, error } = await ExerciseService.getExerciseById(quizId);
+    if (error) {
+      Toast.error('Error al obtener el quiz.');
+      console.error('Error al obtener el quiz:', error);
+    } else if (!exercise) {
+      Toast.warn('El quiz no existe');
+    } else {
+      setQuiz(exercise); 
+      const { user, error: errorUser } = await UserService.getUserProfileById(exercise.authorId);
+      if(errorUser)
+      {
+
+      }else if(!user)
+      {
+
+      }else
+      {
+        setAuthor(user);
+      }
+      Toast.success("Quiz cargado");
+      console.log(exercise);
+    }
+    setLoading(false); 
+  };
+  const encodeBase64 = (data: string) => {
+    try {
+      const decodedData = btoa(data);
+      return decodedData;
+    } catch (error) {
+      console.error("Error decodificando Base64: ", error);
+      return null;
+    }
+  };
+  if(loading)
+  {
+    return( 
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        {/* Imagen de fondo del header */}
-        <Image
-          source={require('../../assets/images/imagetextura2.png')}
-          style={styles.backgroundImage}
-        />
-
-        {/* Contenido encima de la imagen: flecha y título */}
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => router.back()} >
-          <Image source={require('../../assets/images/flechaAtras.png')} />
-        </TouchableOpacity>
-
-        <Text style={styles.title}>Iniciar Quiz</Text>
+        <Text style={styles.title}>
+          Cargando...
+        </Text>
       </View>
 
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        {/* Imagen en blanco de fondo */}
-        <View style={styles.whiteBackgroundContainer}>
-          <Image
-            source={require('../../assets/images/fondoBlanco.jpg')}
-            style={styles.whiteBackgroundImage}
-          />
+    </View>);
+  }
 
-          {/* Profile */}
+  return (
+    <View style={styles.container}>
+      <ToastManager />
+      <View style={styles.header}>
+        <Image source={require('../../assets/images/imagetextura2.png')} style={styles.backgroundImage} />
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Image source={require('../../assets/images/flechaAtras.png')} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Iniciar Quiz</Text>
+      </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.whiteBackgroundContainer}>
+          <Image source={require('../../assets/images/fondoBlanco.jpg')} style={styles.whiteBackgroundImage} />
           <View style={styles.profileContainer}>
-            <Image
-              source={require('../../assets/images/usuario.png')}
-              style={styles.profileImage}
+            <Image 
+              source={{ uri: author?.avatar_url || 'require("../../assets/images/usuario.png")' }}
+              style={styles.profileImage} 
+              onError={() => console.log('Error al cargar la imagen')}
             />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>María del Carmen</Text>
+              <Text style={styles.userName}>
+                {author?.firstname || "No Definido"} {author?.lastname}
+              </Text>
             </View>
           </View>
-
-          {/* Start Quiz Button */}
-         <View style={styles.startButtons}>
-            <TouchableOpacity 
-            style={styles.startButton}
-            onPress={() => router.push('/quiz')} // Navega a la pantalla de detalles del quiz
+          <View style={styles.startButtons}>
+            <TouchableOpacity
+              style={styles.startButton}
+              onPress={() => router.push(`/resolverQuiz?id=${id}`)} // Pass the quiz ID to resolverQuiz
             >
-                <Icon name="play-circle" size={100} color="#0A8754" />
-                <Text style={styles.startText}>Empezar + 10pts</Text>
-               
+              <Icon name="play-circle" size={100} color="#0A8754" />
+              <Text style={styles.startText}>Empezar + 10pts</Text>
             </TouchableOpacity>
+          </View>
+          {quiz && (
+            <View style={styles.infoContainer}>
+              <Text style={styles.quizTitle}>{quiz.title}</Text>
+              <Text style={styles.instructions}>Instrucciones:</Text>
+              <Text style={styles.instructionsDetails}>{quiz.instructions}</Text>
+              <Text style={styles.category}>Categoría:</Text>
+              <Text style={styles.bold}>{quiz.categoryid}</Text>
+              <Text style={styles.completed}>
+                Completado: <Text style={styles.bold}>{quiz.questionsnumber}</Text>
+              </Text>
             </View>
-         
+          )}
+          { quiz?
+            <View style={styles.qrContainer}>
+              <View style={styles.qrCodeWrapper}>
+                <Text style={styles.qrCodeText}>Código QR</Text>
+                <QRCode value={encodeBase64(Array.isArray(id) ? id.join(',') : id) || ""} size={270} />
+              </View>
+            </View> : 
+            <View style={styles.qrContainer}>
+              <View style={styles.qrCodeWrapper}>
+                <Text style={styles.qrCodeText}>Código QR No disponible</Text>
+              </View>
+            </View>
+          }
           
-         
-          {/* Quiz Info */}
-          <View style={styles.infoContainer}>
-            <Text style={styles.quizTitle}>Suma de enteros</Text>
-            <Text style={styles.instructions}>Instrucciones:</Text>
-            <Text style={styles.instructionsDetails}>
-              Analiza el código y resuelve los errores.
-            </Text>
-            <Text style={styles.category}>
-              Categoría:
-            </Text>
-            <Text style={styles.bold}>Lógica</Text>
-            <Text style={styles.completed}>
-              Completado: <Text style={styles.bold}>50%</Text> </Text>
-          </View>
-
-          {/* QR Code */}
-          <View style={styles.qrContainer}>
-            
-            <View style={styles.qrCodeWrapper}>
-            <Text style={styles.qrCodeText}>Codigo QR</Text>
-              <QRCode
-                value="codigo qr"
-                size={270}
-              />
-            </View>
-            
-          </View>
         </View>
       </ScrollView>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

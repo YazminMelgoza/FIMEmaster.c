@@ -1,7 +1,13 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 
 export default function TerminarQuizScreen() {
+    const router = useRouter();
+    const volverQuiz = () => {
+        router.navigate("iniciarQuiz");
+
+    }
     return (
         <View style={styles.containerMain}>
             <View style={styles.containerTop}>
@@ -23,7 +29,7 @@ export default function TerminarQuizScreen() {
                     />
                     <Text style={styles.textMain}>Haz finalizado el ejercicio</Text>
                     <Text style={styles.textPoints}>+10 puntos</Text>
-                    <TouchableOpacity style={styles.buttonBack}>
+                    <TouchableOpacity style={styles.buttonBack} onPress={() => {volverQuiz();}}>
                         <Text style={styles.textButton}>Volver al inicio</Text>
                     </TouchableOpacity>
             </View>

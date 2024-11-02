@@ -1,109 +1,124 @@
-// AnswerService.ts
-import { supabase } from '../lib/supabase';
-import { Answer } from '../models/answer';
-import { PostgrestError } from '@supabase/supabase-js'; 
+import { supabase } from "../lib/supabase";
+import { Tables } from "database.types";
+import { PostgrestError } from "@supabase/supabase-js";
 
 export class AnswerService {
+  // Método para crear una nueva respuesta
+  static async createAnswer(
+    answer: Tables<"answers">
+  ): Promise<{ error: PostgrestError | null }> {
+    const { data, error } = await supabase.from("answers").insert([
+      {
+        questionid: answer.questionid,
+        answer: answer.answer,
+        iscorrect: answer.iscorrect,
+      },
+    ]);
 
-    // Método para crear una nueva respuesta
-    async createAnswer(answer: Answer): Promise<{ error: PostgrestError | null }> {
-        const { data, error } = await supabase
-            .from('answers') 
-            .insert([
-                {
-                    questionid: answer.questionid,
-                    answer: answer.answer,
-                    iscorrect: answer.iscorrect,
-                },
-            ]);
-
-        if (error) {
-            console.error('Error al insertar la respuesta:', error);
-            return { error };
-        }
-
-        console.log('Respuesta creada:', data);
-        return { error: null };
+    if (error) {
+      console.error("Error al insertar la respuesta:", error);
+      return { error };
     }
 
-    // Método para eliminar una respuesta por ID
-    async deleteAnswerById(answerId: number): Promise<{ error: PostgrestError | null }> {
-        const { error } = await supabase
-            .from('answers')
-            .delete()
-            .match({ answerid: answerId });
+    console.log("Respuesta creada:", data);
+    return { error: null };
+  }
 
-        if (error) {
-            console.error('Error al eliminar la respuesta:', error);
-            return { error };
-        }
+  // Método para eliminar una respuesta por ID
+  static async deleteAnswerById(
+    answerId: number
+  ): Promise<{ error: PostgrestError | null }> {
+    const { error } = await supabase
+      .from("answers")
+      .delete()
+      .match({ answerid: answerId });
 
-        console.log(`Respuesta con ID ${answerId} eliminada.`);
-        return { error: null };
+    if (error) {
+      console.error("Error al eliminar la respuesta:", error);
+      return { error };
     }
 
-    // Método para eliminar todas las respuestas por ID de pregunta
-    async deleteAllAnswersByQuestionId(questionId: number): Promise<{ error: PostgrestError | null }> {
-        const { error } = await supabase
-            .from('answers')
-            .delete()
-            .match({ questionid: questionId });
+    console.log(`Respuesta con ID ${answerId} eliminada.`);
+    return { error: null };
+  }
 
-        if (error) {
-            console.error('Error al eliminar las respuestas:', error);
-            return { error };
-        }
+  // Método para eliminar todas las respuestas por ID de pregunta
+  static async deleteAllAnswersByQuestionId(
+    questionId: number
+  ): Promise<{ error: PostgrestError | null }> {
+    const { error } = await supabase
+      .from("answers")
+      .delete()
+      .match({ questionid: questionId });
 
-        console.log(`Todas las respuestas para la pregunta con ID ${questionId} han sido eliminadas.`);
-        return { error: null };
+    if (error) {
+      console.error("Error al eliminar las respuestas:", error);
+      return { error };
     }
 
-    // Método para actualizar una respuesta por ID
-    async updateAnswerById(answerId: number, updatedAnswer: Answer): Promise<{ error: PostgrestError | null }> {
-        const { error } = await supabase
-            .from('answers')
-            .update(updatedAnswer)
-            .match({ answerid: answerId });
+    console.log(
+      `Todas las respuestas para la pregunta con ID ${questionId} han sido eliminadas.`
+    );
+    return { error: null };
+  }
 
-        if (error) {
-            console.error('Error al actualizar la respuesta:', error);
-            return { error };
-        }
+  // Método para actualizar una respuesta por ID
+  static async updateAnswerById(
+    answerId: number,
+    updatedAnswer: Tables<"answers">
+  ): Promise<{ error: PostgrestError | null }> {
+    const { error } = await supabase
+      .from("answers")
+      .update(updatedAnswer)
+      .match({ answerid: answerId });
 
-        console.log(`Respuesta con ID ${answerId} actualizada.`);
-        return { error: null };
+    if (error) {
+      console.error("Error al actualizar la respuesta:", error);
+      return { error };
     }
 
-    // Método para obtener una respuesta por ID
-    async getAnswerById(answerId: number): Promise<{ answer: Answer | null; error: PostgrestError | null }> {
-        const { data, error } = await supabase
-            .from('answers')
-            .select('*')
-            .eq('answerid', answerId)
-            .single();
+    console.log(`Respuesta con ID ${answerId} actualizada.`);
+    return { error: null };
+  }
 
-        if (error) {
-            console.error('Error al obtener la respuesta:', error);
-            return { answer: null, error };
-        }
+  // Método para obtener una respuesta por ID
+  static async getAnswerById(
+    answerId: number
+  ): Promise<{
+    answer: Tables<"answers"> | null;
+    error: PostgrestError | null;
+  }> {
+    const { data, error } = await supabase
+      .from("answers")
+      .select("*")
+      .eq("answerid", answerId)
+      .single();
 
-        console.log('Respuesta obtenida:', data);
-        return { answer: data as Answer, error: null };
+    if (error) {
+      console.error("Error al obtener la respuesta:", error);
+      return { answer: null, error };
     }
 
-    // Método para obtener todas las respuestas por ID de pregunta
-    async getAllAnswersByQuestionId(questionId: number): Promise<{ answers: Answer[] | null; error: PostgrestError | null }> {
-        const { data, error } = await supabase
-            .from('answers')
-            .select('*')
-            .eq('questionid', questionId);
+    console.log("Respuesta obtenida:", data);
+    return { answer: data, error: null };
+  }
 
-        if (error) {
-            console.error('Error al obtener las respuestas:', error);
-            return { answers: null, error };
-        }
+  // Método para obtener todas las respuestas por ID de pregunta
+  static async getAllAnswersByQuestionId(questionId: number): Promise<{
+    answers: Tables<"answers">[] | null;
+    error: PostgrestError | null;
+  }> {
+    const { data, error } = await supabase
+      .from("answers")
+      .select("*")
+      .eq("questionid", questionId);
 
-        console.log('Respuestas obtenidas:', data);
-        return { answers: data as Answer[], error: null };
+    if (error) {
+      console.error("Error al obtener las respuestas:", error);
+      return { answers: null, error };
     }
+
+    console.log("Respuestas obtenidas:", data);
+    return { answers: data as Tables<"answers">[], error: null };
+  }
 }

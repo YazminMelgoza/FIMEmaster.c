@@ -1,15 +1,22 @@
-import { router } from 'expo-router';
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { QuizService } from '../../services/quiz';
-import { Quiz } from '../../models/quiz';
-import { supabase } from '../../lib/supabase'; // Asegúrate de que esta ruta es correcta
-import ToastManager, { Toast } from 'toastify-react-native';
+import { router } from "expo-router";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { ExerciseService } from "../../services/exercise";
+import { supabase } from "../../lib/supabase"; // Asegúrate de que esta ruta es correcta
+import ToastManager, { Toast } from "toastify-react-native";
+import { Tables } from "database.types";
 
 export default function About() {
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [authorId, setAuthorId] = useState<string>('');
+  const [quizzes, setQuizzes] = useState<Tables<"exercises">[]>([]);
+  const [authorId, setAuthorId] = useState<string>("");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -18,29 +25,29 @@ export default function About() {
         setAuthorId(data.user.id);
         fetchQuizzes(data.user.id);
       } else {
-        console.error('Error al obtener el usuario:', error);
-        Toast.error('Error al obtener el usuario.');
+        console.error("Error al obtener el usuario:", error);
+        Toast.error("Error al obtener el usuario.");
       }
     };
     fetchUser();
   }, []);
 
   const fetchQuizzes = async (userId: string) => {
-    const { quizzes, error } = await QuizService.getQuizzesByAuthorId(userId);
+    const { exercises, error } = await ExerciseService.getExercisesByAuthorId(userId);
     if (error) {
-      console.error('Error al obtener los quizzes:', error);
-      Toast.error('Error al obtener los quizzes.');
-    } else if (!quizzes || quizzes.length === 0) {
-      Toast.warn('No existen quizzes.');
+      console.error("Error al obtener los quizzes:", error);
+      Toast.error("Error al obtener los quizzes.");
+    } else if (!exercises || exercises.length === 0) {
+      Toast.warn("No existen quizzes.");
     } else {
-      setQuizzes(quizzes);
+      setQuizzes(exercises);
       Toast.success("Quizzes cargados.");
     }
   };
 
   const handleCreateQuiz = (quizId: number) => {
-    console.log('Crear test con ID:', quizId);
-    router.push(`infoQuiz?id=${quizId}`);
+    console.log("Crear test con ID:", quizId);
+    router.push({ pathname: 'iniciarQuiz', params: { id: quizId.toString() } });
   };
 
   return (
@@ -48,7 +55,7 @@ export default function About() {
       <ToastManager />
       <View style={styles.header}>
         <Image
-          source={require('../../assets/images/imagetextura2.png')}
+          source={require("../../assets/images/imagetextura2.png")}
           style={styles.headerBackgroundImage}
         />
         <View style={styles.headerContent}>
@@ -65,7 +72,7 @@ export default function About() {
           {quizzes.map((quiz) => (
             <TouchableOpacity
               key={quiz.exerciseid}
-              style={[styles.quizItem, { backgroundColor: '#fff' }]}
+              style={[styles.quizItem, { backgroundColor: "#fff" }]}
               onPress={() => handleCreateQuiz(quiz.exerciseid)}
             >
               <View style={styles.quizItemIcon}>
@@ -73,7 +80,9 @@ export default function About() {
               </View>
               <View style={styles.quizItemDetails}>
                 <Text style={styles.quizItemTitle}>{quiz.instructions}</Text>
-                <Text style={styles.quizItemDescription}>Categoría ID: {quiz.categoryid}</Text>
+                <Text style={styles.quizItemDescription}>
+                  Categoría ID: {quiz.categoryid}
+                </Text>
               </View>
               <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
             </TouchableOpacity>
@@ -87,21 +96,21 @@ export default function About() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: "#F7F7F7",
   },
   header: {
-    flexDirection: 'column',
+    flexDirection: "column",
     padding: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     paddingBottom: 40,
     marginBottom: 0,
-    position: 'relative',
+    position: "relative",
   },
   headerBackgroundImage: {
     width: 1000,
     height: 250,
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     borderBottomLeftRadius: 20,
@@ -109,30 +118,30 @@ const styles = StyleSheet.create({
     zIndex: 0,
   },
   headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 40,
   },
   headerTextContainer: {
-    flexDirection: 'column',
-    alignItems: 'flex-start',
+    flexDirection: "column",
+    alignItems: "flex-start",
     marginLeft: 10,
   },
   headerName: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 5,
     marginLeft: 10,
   },
   whiteBackgroundContainer: {
     flexGrow: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
     padding: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
@@ -144,23 +153,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   quizListHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 10,
   },
   quizListTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   quizItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 22,
     borderRadius: 15,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     marginBottom: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -170,8 +179,8 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 15,
   },
   quizItemDetails: {
@@ -179,10 +188,10 @@ const styles = StyleSheet.create({
   },
   quizItemTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   quizItemDescription: {
-    color: '#666',
+    color: "#666",
     fontSize: 14,
   },
 });

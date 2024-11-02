@@ -43,12 +43,12 @@ export default function Index()
     console.log('Crear test');
     router.navigate('iniciarQuiz');
   };
-  /*
+  
   const handleScanCode = () => {
     console.log('Escanear código');
     router.replace('/(creacionquiz)/qr/scan'); 
 
-  };*/
+  };
 
   return (
     
@@ -72,6 +72,7 @@ export default function Index()
           <Image source={require('../../assets/images/user.png')} style={styles.profileImage} />
         </View>
       </View>
+      
 
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>
