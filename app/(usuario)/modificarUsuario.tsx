@@ -1,18 +1,17 @@
+import { StyleSheet, View, Alert, Text } from "react-native";
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
-import { StyleSheet, View, Alert } from "react-native";
 import { Button, Input } from "@rneui/themed";
 import Avatar from "../../components/Avatar";
 import { Tables } from "database.types";
 import { router } from "expo-router";
 import { UserService } from "../../services/user";
 import { Toast } from "toastify-react-native";
-
 export default function Account() {
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
   const [user, setUser] = useState<Tables<"users"> | null>(null);
-
+  //Obtiene sesion actual
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -38,7 +37,7 @@ export default function Account() {
     };
     fetchUser();
   }, []);
-
+  //Función para hacer el update
   const updateProfile = async (updatedUser: Tables<"users">) => {
     try {
       setLoading(true);
@@ -53,15 +52,19 @@ export default function Account() {
       Alert.alert("Profile updated successfully");
     } catch (error) {
       Alert.alert(
-        error instanceof Error ? error.message : "Error updating profile.",
+        error instanceof Error ? error.message : "Error updating profile."
       );
     } finally {
       setLoading(false);
     }
   };
-
+  //Función para update el estado del objeto user
   if (loading) {
-    return <View style={styles.container}>Loading...</View>;
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
   function updateUserState(user: Partial<Tables<"users">>) {
@@ -126,7 +129,6 @@ export default function Account() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     marginTop: 40,

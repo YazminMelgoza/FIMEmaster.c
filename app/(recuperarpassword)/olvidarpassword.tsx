@@ -9,10 +9,49 @@ import {
 } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+  StatusBar,
+} from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { useNavigation } from "@react-navigation/native";
+import { supabase } from "../../lib/supabase";
+import { router } from "expo-router";
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
   const navigation = useNavigation();
+
+  const enviarEmail = async () => {
+    if (email != "") {
+      router.push(`codigopassword?emailRecibido=${email}`);
+    }
+    /*
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+    console.log("email enviado");
+    */
+  };
+  const confirmarToken = async (token: string) => {
+    console.log("Token: " + token + " Email:" + email);
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: "email",
+    });
+    if (!error && data) {
+      console.log("Verificación completada con éxito:", data);
+      router.replace("confirmarpassword");
+    } else {
+      console.error("Error en la verificación:", error?.message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -29,7 +68,8 @@ export default function ForgotPasswordScreen() {
 
       <Text style={styles.instructions}>
         Ingresa tu correo para que te enviemos un enlace con el que podrás
-        recuperar tu contraseña
+        recuperar tu contraseña Ingresa tu correo para que te enviemos un código
+        con el que podrás recuperar tu contraseña
       </Text>
 
       <TextInput
@@ -40,9 +80,17 @@ export default function ForgotPasswordScreen() {
         onChangeText={setEmail}
         autoCapitalize="none"
       />
+      <TextInput
+        style={styles.input}
+        placeholder="codigo"
+        keyboardType="default"
+        value={token}
+        onChangeText={setToken}
+        autoCapitalize="none"
+      />
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Log In</Text>
+      <TouchableOpacity style={styles.button} onPress={() => enviarEmail()}>
+        <Text style={styles.buttonText}>Enviar código</Text>
       </TouchableOpacity>
 
       <TouchableOpacity>

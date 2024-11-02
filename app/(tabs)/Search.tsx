@@ -1,6 +1,8 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, Link } from "expo-router";
 import React, { useState } from "react";
+import { router } from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +13,47 @@ import {
   TextInput,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Tables } from 'database.types';
+import { ExerciseService } from 'services/exercise';
+
+// Función para obtener el color según el categoryid, maneja el caso de null
+const getColor = (categoryid: number | null): string => {
+  switch (categoryid) {
+    case 1:
+      return '#4CAF50';
+    case 2:
+      return '#9C27B0';
+    case 3:
+      return '#2196F3';
+    default:
+      return '#888'; 
+  }
+};
+
+// Componente para mostrar un ejercicio
+const QuizItem: React.FC<{ quiz: Tables<"exercises">; onPress: () => void }> = ({ quiz, onPress }) => {
+  const color = getColor(quiz.categoryid ?? null); // Maneja el caso en que categoryid es null
+
+  return (
+    <TouchableOpacity
+      style={[styles.quizItem, { backgroundColor: '#fff', borderColor: '#ccc' }]}
+      onPress={onPress}
+    >
+      <Icon name="bar-chart" size={20} color={color} style={styles.quizItemIcon} />
+      <View style={styles.quizItemDetails}>
+        <Text style={[styles.quizItemTitle, { color: '#333' }]}>
+          {quiz.title || 'Título no disponible'}
+        </Text>
+        <Text style={styles.quizItemDescription}>
+          {quiz.instructions || 'Sin instrucciones'}
+        </Text>
+      </View>
+      <Icon name="arrow-forward-ios" size={20} color={color} />
+    </TouchableOpacity>
+  );
+};
 
 export default function About() {
   const [quizzes, setQuizzes] = useState([
@@ -60,15 +103,29 @@ export default function About() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTab, setSelectedTab] = useState("home");
+  const [quizzes, setQuizzes] = useState<Tables<"exercises">[] | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Llama a getExercisesByTitle cada vez que cambia el searchQuery
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const quizzesData = await ExerciseService.getExercisesByTitle(searchQuery);
+        setQuizzes(quizzesData.exercises);
+      } catch (error) {
+        console.error('Error fetching quizzes:', error);
+      }
+    };
+    fetchData();
+  }, [searchQuery]);
 
   const handleCreateQuiz = () => {
     console.log("Crear test");
     router.navigate("infoQuiz");
+  const handleCreateQuiz = (id: number) => {
+    console.log('Crear test');
+    router.navigate(`infoQuiz/${id}`);
   };
-
-  const filteredQuizzes = quizzes.filter((quiz) =>
-    quiz.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
 
   return (
     <View style={styles.container}>
@@ -78,14 +135,13 @@ export default function About() {
           style={styles.headerBackgroundImage}
         />
         <View style={styles.headerContent}>
-          {/* Barra de búsqueda */}
           <View style={styles.searchContainer}>
             <TextInput
               style={styles.searchInput}
               placeholder="Buscar"
               placeholderTextColor="#888"
               value={searchQuery}
-              onChangeText={(text) => setSearchQuery(text)}
+              onChangeText={setSearchQuery}
             />
             <Icon
               name="search"
@@ -135,6 +191,12 @@ export default function About() {
               </View>
               <Icon name="arrow-forward-ios" size={20} color={quiz.color} />
             </TouchableOpacity>
+          {quizzes?.map((quiz) => (
+            <QuizItem 
+              key={quiz.exerciseid} 
+              quiz={quiz} 
+              onPress={() => handleCreateQuiz(quiz.exerciseid)} 
+            />
           ))}
         </View>
       </ScrollView>
@@ -186,7 +248,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    flex: 1, // Esto hará que el input ocupe todo el espacio disponible
+    flex: 1,
   },
   searchInput: {
     flex: 1,
@@ -268,5 +330,8 @@ const styles = StyleSheet.create({
   quizItemDescription: {
     color: "#666",
     fontSize: 14,
+  },
+  quizItemIcon: {
+    marginRight: 10,
   },
 });

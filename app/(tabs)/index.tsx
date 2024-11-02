@@ -42,12 +42,12 @@ export default function Index() {
     console.log("Crear test");
     router.navigate("iniciarQuiz");
   };
-  /*
+  
   const handleScanCode = () => {
     console.log('Escanear código');
     router.replace('/(creacionquiz)/qr/scan'); 
 
-  };*/
+  };
 
   return (
     <View style={styles.container}>
@@ -73,6 +73,7 @@ export default function Index() {
           />
         </View>
       </View>
+      
 
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>

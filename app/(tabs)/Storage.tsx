@@ -33,21 +33,21 @@ export default function About() {
   }, []);
 
   const fetchQuizzes = async (userId: string) => {
-    const { quizzes, error } = await ExerciseService.getByAuthorId(userId);
+    const { exercises, error } = await ExerciseService.getExercisesByAuthorId(userId);
     if (error) {
       console.error("Error al obtener los quizzes:", error);
       Toast.error("Error al obtener los quizzes.");
-    } else if (!quizzes || quizzes.length === 0) {
+    } else if (!exercises || exercises.length === 0) {
       Toast.warn("No existen quizzes.");
     } else {
-      setQuizzes(quizzes);
+      setQuizzes(exercises);
       Toast.success("Quizzes cargados.");
     }
   };
 
   const handleCreateQuiz = (quizId: number) => {
     console.log("Crear test con ID:", quizId);
-    router.push(`infoQuiz?id=${quizId}`);
+    router.push({ pathname: 'iniciarQuiz', params: { id: quizId.toString() } });
   };
 
   return (
