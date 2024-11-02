@@ -24,7 +24,7 @@ const QuizScreen = () => {
   }, [id]);
 
   const fetchQuizAndQuestions = async (quizId: number) => {
-    const { quiz, error: quizError } = await ExerciseService.getQuizById(quizId);
+    const { exercise, error: quizError } = await ExerciseService.getExerciseById(quizId);
     if (quizError || !quiz) {
       Toast.warn('El quiz no existe o hubo un error.');
       console.error('Error al obtener el quiz:', quizError);

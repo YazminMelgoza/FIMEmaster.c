@@ -16,7 +16,6 @@ const QuizScreen = () => {
   const [loading, setLoading] = useState(true); 
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const quizService = new ExerciseService();
 
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -28,10 +27,9 @@ const QuizScreen = () => {
       fetchQuiz(Number(id));
     }
   }, [id]);
-  const [loading, setLoading] = useState(true);
   const fetchQuiz = async (quizId: number) => {
     setLoading(true); 
-    const { exercise, error } = await quizService.getExerciseById(quizId);
+    const { exercise, error } = await ExerciseService.getExerciseById(quizId);
     if (error) {
       Toast.error("Error al obtener el quiz.");
       console.error("Error al obtener el quiz:", error);

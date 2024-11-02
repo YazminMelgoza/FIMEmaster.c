@@ -30,7 +30,7 @@ const EscanearCodigo: React.FC = () => {
 
   const handleCreateQuiz = (quizId: number) => {
     console.log("Crear test con ID:", quizId);
-    router.push(`infoQuiz?id=${quizId}`);
+    router.push(`iniciarQuiz?id=${quizId}`);
   };
 
   const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
