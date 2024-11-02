@@ -11,6 +11,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { ExerciseService } from "../../services/exercise";
 import { Tables } from "database.types";
 import ToastManager, { Toast } from "toastify-react-native"; // Importa ToastManager y Toast
+import {CircularProgress} from "../../components/ProgressElipse";
 
 const QuizScreen = () => {
   const [loading, setLoading] = useState(true); 

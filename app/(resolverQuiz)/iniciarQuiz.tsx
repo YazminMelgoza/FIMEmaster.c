@@ -7,6 +7,7 @@ import { ExerciseService } from "../../services/exercise";
 import { UserService } from 'services/user';
 import { Tables } from "database.types";
 import ToastManager, { Toast } from 'toastify-react-native';
+import {CircularProgress} from "../../components/ProgressElipse";
 
 
 const QuizScreen = () => {
@@ -62,14 +63,9 @@ const QuizScreen = () => {
   if(loading)
   {
     return( 
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>
-          Cargando...
-        </Text>
-      </View>
-
-    </View>);
+      <View style={styles.container}>
+        <CircularProgress/>
+      </View>);
   }
 
   return (

@@ -41,13 +41,7 @@ export default function Index()
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.navigate('iniciarQuiz');
-  };
-  
-  const handleScanCode = () => {
-    console.log('Escanear código');
-    router.replace('/(creacionquiz)/qr/scan'); 
-
+    router.push({ pathname: 'iniciarQuiz', params: { id: "1" } });
   };
 
   return (
