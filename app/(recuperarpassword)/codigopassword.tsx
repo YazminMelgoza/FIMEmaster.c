@@ -112,11 +112,12 @@ useEffect(() => {
       />
       {/* INPUT DE CODIGO */}
       <View style={[styles.rectangleParent, styles.logPosition]}>
+
         <View style={styles.container}>
           {code.map((digit, index) => (
             <TextInput
               key={index}
-              ref={(ref) => (inputs.current[index] = ref)} // Asigna el ref a cada campo
+              ref={(ref) => (inputs.current[index] = ref)} 
               style={styles.input}
               maxLength={1}
               keyboardType="numeric"
@@ -160,19 +161,19 @@ const styles = StyleSheet.create({
       fontSize: 24,
       textAlign: 'center',
       borderBottomWidth: 2,
-      borderColor: '#333',    // Color de la línea inferior
-      width: 40,              // Ajusta el ancho de cada campo de dígito
+      borderColor: '#333',    
+      width: 40,              
       paddingVertical: 10,
   },
   //Estilos para carga
   containerCarga: {
-    flex: 1, // Permite que el contenedor ocupe todo el espacio disponible
-    justifyContent: 'center', // Centra verticalmente
-    alignItems: 'center', // Centra horizontalmente
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
   },
   textCarga: {
-      fontSize: 18, // Tamaño del texto
-      textAlign: 'center', // Alineación del texto (opcional)
+      fontSize: 18, 
+      textAlign: 'center', 
   },
   // Otros estilos
   buttonPosition: {

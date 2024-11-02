@@ -4,13 +4,19 @@ import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ExerciseService } from "../../services/exercise";
+import { UserService } from 'services/user';
 import { Tables } from "database.types";
 import ToastManager, { Toast } from 'toastify-react-native';
 
+
 const QuizScreen = () => {
+  const [loading, setLoading] = useState(true); 
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
+  const [author, setAuthor] = useState<Tables<"users"> | null>(null);
+  // Define la URL predeterminada
+  
 
   useEffect(() => {
     if (id) {
@@ -19,19 +25,52 @@ const QuizScreen = () => {
   }, [id]);
 
   const fetchQuiz = async (quizId: number) => {
-    const { quiz, error } = await ExerciseService.getQuizById(quizId);
-    
+    setLoading(true); 
+    const { exercise, error } = await ExerciseService.getExerciseById(quizId);
     if (error) {
       Toast.error('Error al obtener el quiz.');
       console.error('Error al obtener el quiz:', error);
-    } else if (!quiz) {
+    } else if (!exercise) {
       Toast.warn('El quiz no existe');
     } else {
-      setQuiz(quiz);  // Set the quiz state directly with the retrieved quiz
+      setQuiz(exercise); 
+      const { user, error: errorUser } = await UserService.getUserProfileById(exercise.authorId);
+      if(errorUser)
+      {
+
+      }else if(!user)
+      {
+
+      }else
+      {
+        setAuthor(user);
+      }
       Toast.success("Quiz cargado");
-      console.log(quiz);
+      console.log(exercise);
+    }
+    setLoading(false); 
+  };
+  const encodeBase64 = (data: string) => {
+    try {
+      const decodedData = btoa(data);
+      return decodedData;
+    } catch (error) {
+      console.error("Error decodificando Base64: ", error);
+      return null;
     }
   };
+  if(loading)
+  {
+    return( 
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          Cargando...
+        </Text>
+      </View>
+
+    </View>);
+  }
 
   return (
     <View style={styles.container}>
@@ -47,9 +86,15 @@ const QuizScreen = () => {
         <View style={styles.whiteBackgroundContainer}>
           <Image source={require('../../assets/images/fondoBlanco.jpg')} style={styles.whiteBackgroundImage} />
           <View style={styles.profileContainer}>
-            <Image source={require('../../assets/images/usuario.png')} style={styles.profileImage} />
+            <Image 
+              source={{ uri: author?.avatar_url || 'require("../../assets/images/usuario.png")' }}
+              style={styles.profileImage} 
+              onError={() => console.log('Error al cargar la imagen')}
+            />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>María del Carmen</Text>
+              <Text style={styles.userName}>
+                {author?.firstname || "No Definido"} {author?.lastname}
+              </Text>
             </View>
           </View>
           <View style={styles.startButtons}>
@@ -73,12 +118,20 @@ const QuizScreen = () => {
               </Text>
             </View>
           )}
-          <View style={styles.qrContainer}>
-            <View style={styles.qrCodeWrapper}>
-              <Text style={styles.qrCodeText}>Código QR</Text>
-              <QRCode value={`quiz-${id}`} size={270} />
+          { quiz?
+            <View style={styles.qrContainer}>
+              <View style={styles.qrCodeWrapper}>
+                <Text style={styles.qrCodeText}>Código QR</Text>
+                <QRCode value={encodeBase64(Array.isArray(id) ? id.join(',') : id) || ""} size={270} />
+              </View>
+            </View> : 
+            <View style={styles.qrContainer}>
+              <View style={styles.qrCodeWrapper}>
+                <Text style={styles.qrCodeText}>Código QR No disponible</Text>
+              </View>
             </View>
-          </View>
+          }
+          
         </View>
       </ScrollView>
     </View>
