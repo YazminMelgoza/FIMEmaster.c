@@ -82,9 +82,7 @@ export class AnswerService {
   }
 
   // Método para obtener una respuesta por ID
-  static async getAnswerById(
-    answerId: number
-  ): Promise<{
+  static async getAnswerById(answerId: number): Promise<{
     answer: Tables<"answers"> | null;
     error: PostgrestError | null;
   }> {

@@ -85,9 +85,7 @@ export class QuestionService {
   }
 
   // Función para obtener una pregunta por ID
-  static async getQuestionById(
-    questionId: number
-  ): Promise<{
+  static async getQuestionById(questionId: number): Promise<{
     question: Tables<"questions"> | null;
     error: PostgrestError | null;
   }> {
@@ -106,9 +104,7 @@ export class QuestionService {
   }
 
   // Función para obtener todas las preguntas por ID de ejercicio
-  static async getAllQuestionsByExerciseId(
-    exerciseId: number
-  ): Promise<{
+  static async getAllQuestionsByExerciseId(exerciseId: number): Promise<{
     questions: Tables<"questions">[] | null;
     error: PostgrestError | null;
   }> {
