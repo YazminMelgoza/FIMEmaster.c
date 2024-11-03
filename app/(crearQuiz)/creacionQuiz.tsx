@@ -21,6 +21,7 @@ import { User } from "@supabase/supabase-js";
 import { Picker } from "@react-native-picker/picker";
 import { Tables } from "database.types";
 import { ExerciseService } from "../../services/exercise";
+import { generateQuestionsAndAnswers } from "helpers/generateQuestionsAndAnswers";
 
 export default function CrearQuiz() {
   const router = useRouter();
@@ -127,8 +128,7 @@ export default function CrearQuiz() {
         }}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
-          const objQuiz: Tables<"exercises"> = {
-            exerciseid: 0,
+          const objQuiz = {
             authorId: authorId,
             instructions: values.instructions,
             categoryid: Number(values.categoryid),
@@ -138,10 +138,12 @@ export default function CrearQuiz() {
             questionsnumber: Number(values.questionsnumber),
             createdat: new Date().toISOString(),
           };
-          console.log(objQuiz);
+          const result = generateQuestionsAndAnswers(
+            objQuiz as Tables<"exercises">
+          );
           router.push({
             pathname: "confirmarQuiz",
-            params: { jsonExercise: JSON.stringify(objQuiz) },
+            params: { jsonExercise: JSON.stringify(result) },
           });
         }}
       >
