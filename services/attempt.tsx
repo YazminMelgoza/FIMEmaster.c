@@ -14,6 +14,9 @@ export class AttemptService {
         score: attempt.score,
         attemptedat: attempt.attemptedat,
         userid: attempt.userid,
+        attemptid:attempt.attemptid,
+        totalerrorcount:attempt.totalerrorcount,
+        errorcountbytype:attempt.errorcountbytype,
       },
     ]);
 
