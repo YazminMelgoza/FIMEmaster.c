@@ -163,7 +163,7 @@ export default function CrearQuiz() {
                             </View>
                         </View>
                         <View className='w-full h-full bg-[#3aa66a] flex items-center'>
-                            <View className='p-5 w-[90%] bg-white rounded-xl'>
+                            <View className='p-5 w-[90%] h-full bg-white rounded-xl'>
                                 <Text style={styles.textAutorID}>Autor: {firstname + ' ' + lastname + ' ' + middlename}</Text>
                                 <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
                                 <TextInput
