@@ -6,13 +6,16 @@ import {
   QuestionPayload,
   generateQuestionsAndAnswers,
 } from "helpers/generateQuestionsAndAnswers";
-import { QuestionService } from "./question";
+import { QuestionService, QuestionWithAnswers } from "./question";
 
+export type ExerciseDetails = Tables<"exercises"> & {
+  questions: QuestionWithAnswers[];
+};
 export class ExerciseService {
   // Método para insertar un nuevo quiz
   public static async createExercise(
     quiz: Tables<"exercises">
-  ): Promise<{ error: PostgrestError | null }> {
+  ): Promise<{ data: ExerciseDetails | null; error: PostgrestError | null }> {
     const questionsAndAnswers = generateQuestionsAndAnswers(quiz);
     console.log("Preguntas y respuestas generadas:", questionsAndAnswers);
 
@@ -34,10 +37,10 @@ export class ExerciseService {
 
     if (error) {
       console.error("Error al insertar el quiz:", error);
-      return { error };
+      return { data: null, error };
     }
 
-    const { error: questionError } =
+    const { data: questionsWithAnswers, error: questionError } =
       await QuestionService.createQuestionWithAnswers(
         questionsAndAnswers,
         data[0].exerciseid
@@ -45,10 +48,16 @@ export class ExerciseService {
 
     if (questionError) {
       console.error("Error al insertar las preguntas:", questionError);
-      return { error: questionError };
+      return { data: null, error: questionError };
     }
     console.log("Ejercicio creado creado:", data);
-    return { error: null };
+    return {
+      data: {
+        ...data[0],
+        questions: questionsWithAnswers || [],
+      },
+      error: null,
+    };
   }
 
   // Método para eliminar un quiz por id

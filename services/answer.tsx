@@ -11,16 +11,19 @@ export class AnswerService {
   // Método para crear una nueva respuesta
   static async createAnswers(
     answers: AnswerPayload[]
-  ): Promise<{ error: PostgrestError | null }> {
-    const { data, error } = await supabase.from("answers").insert(answers);
+  ): Promise<{ data: Tables<"answers">[]; error: PostgrestError | null }> {
+    const { data, error } = await supabase
+      .from("answers")
+      .insert(answers)
+      .select();
 
     if (error) {
       console.error("Error al insertar la respuesta:", error);
-      return { error };
+      return { data: [], error };
     }
 
     console.log("Respuesta creada:", data);
-    return { error: null };
+    return { data, error: null };
   }
 
   // Método para eliminar una respuesta por ID

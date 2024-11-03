@@ -4,6 +4,9 @@ import { PostgrestError } from "@supabase/supabase-js";
 import { QuestionPayload } from "helpers/generateQuestionsAndAnswers";
 import { AnswerService } from "./answer";
 
+export type QuestionWithAnswers = Tables<"questions"> & {
+  possibleAnswers: Tables<"answers">[];
+};
 export class QuestionService {
   // Función para insertar una nueva pregunta
   static async createQuestion(
@@ -34,9 +37,12 @@ export class QuestionService {
   static async createQuestionWithAnswers(
     questions: QuestionPayload[],
     exerciseId: number
-  ): Promise<{ error: PostgrestError | null }> {
+  ): Promise<{
+    data: QuestionWithAnswers[] | null;
+    error: PostgrestError | null;
+  }> {
+    let questionsWithAnswers: QuestionWithAnswers[] = [];
     for (const question of questions) {
-      console.log(exerciseId);
       const { data, error } = await supabase
         .from("questions")
         .insert([
@@ -55,7 +61,7 @@ export class QuestionService {
 
       if (error || !data) {
         console.error("Error al crear la pregunta:", error);
-        return { error };
+        return { data: null, error };
       }
 
       const questionId = data[0].questionid;
@@ -66,16 +72,16 @@ export class QuestionService {
         iscorrect: answer.isCorrect,
       }));
 
-      const { error: answersError } = await AnswerService.createAnswers(
-        answersWithQuestionId
-      );
+      const { data: dataAnswers, error: answersError } =
+        await AnswerService.createAnswers(answersWithQuestionId);
 
       if (answersError) {
         console.error("Error al crear las respuestas:", answersError);
-        return { error: answersError };
+        return { data: null, error: answersError };
       }
+      questionsWithAnswers.push({ ...data[0], possibleAnswers: dataAnswers });
     }
-    return { error: null };
+    return { data: questionsWithAnswers, error: null };
   }
   // Función para eliminar una pregunta por ID
   static async deleteQuestionById(
