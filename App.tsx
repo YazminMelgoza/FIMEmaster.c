@@ -1,12 +1,17 @@
-import React, { useCallback, useState, useEffect } from 'react';
-import { View } from 'react-native';
-import { supabase } from './lib/supabase';
-import Auth from './app/Auth';
-import Account from './app/(tabs)/Account';
-import { Session } from '@supabase/supabase-js';
-import Entypo from '@expo/vector-icons/Entypo';
-import * as SplashScreen from 'expo-splash-screen';
-import * as Font from 'expo-font';
+import React, { useCallback, useState, useEffect } from "react";
+import { View } from "react-native";
+import { supabase } from "./lib/supabase";
+import Auth from "./app/Auth";
+import Account from "./app/(tabs)/Account";
+import { Session } from "@supabase/supabase-js";
+import Entypo from "@expo/vector-icons/Entypo";
+import * as SplashScreen from "expo-splash-screen";
+import * as Font from "expo-font";
+import { NativeWindStyleSheet } from "nativewind";
+
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,9 +44,20 @@ export default function App() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      {session && session.user ? <Account key={session.user.id} session={session} /> : <Auth />}
-      
+    <View
+      style={{
+        flex: 1,
+        width: "100%",
+        maxWidth: 400,
+        backgroundColor: "#F00",
+        marginHorizontal: "auto",
+      }}
+    >
+      {session && session.user ? (
+        <Account key={session.user.id} session={session} />
+      ) : (
+        <Auth />
+      )}
     </View>
   );
 }

@@ -46,7 +46,7 @@ const QuizScreen = () => {
             <Text style={styles.quizTitle}>Suma de enteros</Text>
             <Text style={styles.instructions}>Instrucciones:</Text>
             <Text style={styles.instructionsDetails}>
-              {ObjExercise?.instructions}
+              Analiza el código y resuelve los errores.
             </Text>
             <Text style={styles.category}>Categoría:</Text>
             <Text style={styles.categoryUpdate}>Lógica</Text>
@@ -71,9 +71,9 @@ const QuizScreen = () => {
 
           {/* Output Section */}
           <View style={styles.outputContainer}>
-            <Text style={styles.outputHeader}>Numero de preguntas:</Text>
+            <Text style={styles.outputHeader}>Output Esperado:</Text>
             <View style={styles.outputBox}>
-              <Text style={styles.output}>5</Text>
+              <Text style={styles.output}>El resultado es 15</Text>
             </View>
           </View>
 
@@ -277,8 +277,8 @@ const styles = StyleSheet.create({
     elevation: 3, 
   },
   answerImage: {
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     marginRight: 10,
   },
   answerText: {
