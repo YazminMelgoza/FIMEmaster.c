@@ -2,30 +2,51 @@
 import { Tables } from "database.types";
 import { supabase } from "../lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
+import {
+  QuestionPayload,
+  generateQuestionsAndAnswers,
+} from "helpers/generateQuestionsAndAnswers";
+import { QuestionService } from "./question";
 
 export class ExerciseService {
   // Método para insertar un nuevo quiz
   public static async createExercise(
     quiz: Tables<"exercises">
   ): Promise<{ error: PostgrestError | null }> {
-    const { data, error } = await supabase.from("exercises").insert([
-      {
-        authorId: quiz.authorId,
-        title: quiz.title,
-        instructions: quiz.instructions,
-        categoryid: quiz.categoryid,
-        questionsnumber: quiz.questionsnumber,
-        wrongcode: quiz.wrongcode,
-        solutioncode: quiz.solutioncode,
-        createdat: quiz.createdat,
-      },
-    ]);
+    const questionsAndAnswers = generateQuestionsAndAnswers(quiz);
+    console.log("Preguntas y respuestas generadas:", questionsAndAnswers);
+
+    const { data, error } = await supabase
+      .from("exercises")
+      .insert([
+        {
+          authorId: quiz.authorId,
+          title: quiz.title,
+          instructions: quiz.instructions,
+          categoryid: quiz.categoryid,
+          questionsnumber: quiz.questionsnumber,
+          wrongcode: quiz.wrongcode,
+          solutioncode: quiz.solutioncode,
+          createdat: quiz.createdat,
+        },
+      ])
+      .select();
 
     if (error) {
       console.error("Error al insertar el quiz:", error);
       return { error };
     }
 
+    const { error: questionError } =
+      await QuestionService.createQuestionWithAnswers(
+        questionsAndAnswers,
+        data[0].exerciseid
+      );
+
+    if (questionError) {
+      console.error("Error al insertar las preguntas:", questionError);
+      return { error: questionError };
+    }
     console.log("Ejercicio creado creado:", data);
     return { error: null };
   }
