@@ -65,41 +65,41 @@ export default function CrearQuiz() {
       }
     };
 
-    fetchUser();
-  }, []);
+        fetchUser();
+    }, []);
 
-  const handleFilePicker = async (
-    setFieldValue: (field: string, value: any) => void,
-    field: string
-  ) => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "text/plain", // Asegúrate de que solo seleccionas archivos de texto
-        copyToCacheDirectory: true, // Esto asegura que el archivo se copie al caché
-      });
+    const handleFilePicker = async (
+        setFieldValue: (field: string, value: any) => void,
+        field: string
+    ) => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: "text/plain", // Asegúrate de que solo seleccionas archivos de texto
+                copyToCacheDirectory: true, // Esto asegura que el archivo se copie al caché
+            });
 
-      if (!result.canceled) {
-        var uri2 = "";
-        result.assets.forEach((asset) => {
-          console.log(asset.uri); // URI de cada archivo
-          uri2 = asset.uri;
-          console.log(asset.name); // Nombre de cada archivo
-        });
-        const uri = uri2;
-        const fileContent = await FileSystem.readAsStringAsync(uri);
+            if (!result.canceled) {
+                var uri2 = "";
+                result.assets.forEach((asset) => {
+                    console.log(asset.uri); // URI de cada archivo
+                    uri2 = asset.uri;
+                    console.log(asset.name); // Nombre de cada archivo
+                });
+                const uri = uri2;
+                const fileContent = await FileSystem.readAsStringAsync(uri);
 
-        setFieldValue(field, fileContent);
-        setFieldValue("wrongcode", fileContent); // Se asigna el valor al campo wrongcode
-        //Se asigna el valor del código cargado
-        setSolutionCodeText(fileContent);
-        setWrongCodeText(fileContent);
-      } else {
-        Alert.alert("Cancelado", "No se seleccionó ningún archivo.");
-      }
-    } catch (err) {
-      Alert.alert("Error", "Hubo un problema al seleccionar el archivo.");
-    }
-  };
+                setFieldValue(field, fileContent);
+                setFieldValue("wrongcode", fileContent); // Se asigna el valor al campo wrongcode
+                //Se asigna el valor del código cargado
+                setSolutionCodeText(fileContent);
+                setWrongCodeText(fileContent);
+            } else {
+                Alert.alert("Cancelado", "No se seleccionó ningún archivo.");
+            }
+        } catch (err) {
+            Alert.alert("Error", "Hubo un problema al seleccionar el archivo.");
+        }
+    };
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required("El título es obligatorio"),

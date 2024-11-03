@@ -1,6 +1,10 @@
 import { router, Link  } from 'expo-router';
 import React, { useState } from 'react';
+import { NativeWindStyleSheet } from "nativewind";
 
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 import {
   View,
   Text,

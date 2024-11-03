@@ -1,21 +1,13 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Tables } from "database.types";
 
 const QuizScreen = () => {
   const router = useRouter();
   const { jsonExercise } = useLocalSearchParams();
-  const ObjExercise = jsonExercise
-    ? (JSON.parse(jsonExercise as string) as Tables<"exercises">)
-    : null;
+  const ObjExercise = jsonExercise ? JSON.parse(jsonExercise as string) as Tables<"exercises"> : null;
+
 
   return (
     <View style={styles.container}>
