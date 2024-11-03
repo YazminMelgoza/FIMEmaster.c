@@ -10,7 +10,7 @@ import Avatar from "../../components/Avatar";
 import { RootStackParamList } from "../types/RootStackParam";
 import { PostgrestError, Session } from "@supabase/supabase-js";
 import { Toast } from "toastify-react-native";
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 type AccountScreenRouteProp = RouteProp<RootStackParamList, "account">;
 import { Text, TouchableOpacity, Image, ScrollView } from "react-native";
 import {
@@ -226,13 +226,11 @@ export default function Index() {
         contentContainerStyle={styles.whiteBackgroundContainer}
       >
         <View style={styles.buttonsContainer}>
-          <View className="h-32 w-full">
-            <TouchableOpacity style={styles.backButton}>
-              <Image
-                source={require("../../assets/images/flechaAtras.png")}
-                style={styles.backIcon}
-              />
-            </TouchableOpacity>
+          <View className="h-32 flex flex-col items-end justify-center w-full">
+
+            <Link asChild href={"modificarUsuario"}>
+              <FontAwesome name="gear" size={36} color="white" />
+            </Link>
           </View>
         </View>
 
@@ -263,9 +261,6 @@ export default function Index() {
           <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['sans-serif'] leading-9">
             {profile.username || "Estudiante ITS"}
           </Text>
-          <Link asChild href={"modificarUsuario"}>
-            <Text>Click here to go to Settings</Text>
-          </Link>
           <View className="w-[90%] pl-3 h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
             <View className="w-1/6 flex justify-center items-center h-auto pl-4">
               <AntDesign name="staro" size={32} color="white" />

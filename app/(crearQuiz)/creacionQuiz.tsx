@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  Button,
-  Alert,
-  ScrollView,
-  Image,
-  TouchableOpacity,
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    Button,
+    Alert,
+    ScrollView,
+    Image,
+    TouchableOpacity,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -24,47 +24,47 @@ import { ExerciseService } from "../../services/exercise";
 import { generateQuestionsAndAnswers } from "helpers/generateQuestionsAndAnswers";
 
 export default function CrearQuiz() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
-  const [website, setWebsite] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [middlename, setMiddlename] = useState("");
-  const [lastname, setLastname] = useState("");
-  //Varibles para guardar el código
-  const [wrongCodeText, setWrongCodeText] = useState("");
-  const [solutionCodeText, setSolutionCodeText] = useState("");
-  const [authorId, setAuthorId] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+    const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [username, setUsername] = useState("");
+    const [website, setWebsite] = useState("");
+    const [avatarUrl, setAvatarUrl] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [middlename, setMiddlename] = useState("");
+    const [lastname, setLastname] = useState("");
+    //Varibles para guardar el código
+    const [wrongCodeText, setWrongCodeText] = useState("");
+    const [solutionCodeText, setSolutionCodeText] = useState("");
+    const [authorId, setAuthorId] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
 
-  const categories = [
-    { label: "Bucles", value: "1" },
-    { label: "Condicionales", value: "2" },
-    { label: "Funciones", value: "3" },
-    { label: "Arreglos", value: "4" },
-    { label: "Matrices", value: "5" },
-  ];
+    const categories = [
+        { label: "Bucles", value: "1" },
+        { label: "Condicionales", value: "2" },
+        { label: "Funciones", value: "3" },
+        { label: "Arreglos", value: "4" },
+        { label: "Matrices", value: "5" },
+    ];
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data, error } = await supabase.auth.getUser();
-      if (data.user) {
-        const id = data.user.id;
-        setAuthorId(data.user.id); // Obtiene el ID del usuario)
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data, error } = await supabase.auth.getUser();
+            if (data.user) {
+                const id = data.user.id;
+                setAuthorId(data.user.id); // Obtiene el ID del usuario)
 
-        const { user, error: userError } = await UserService.getUserProfileById(
-          id
-        );
-        if (user) {
-          setFirstname(user.firstname || "");
-          setMiddlename(user.middlename || "");
-          setLastname(user.lastname || "");
-        }
-      } else {
-        console.error("Error al obtener el usuario:", error);
-      }
-    };
+                const { user, error: userError } = await UserService.getUserProfileById(
+                    id
+                );
+                if (user) {
+                    setFirstname(user.firstname || "");
+                    setMiddlename(user.middlename || "");
+                    setLastname(user.lastname || "");
+                }
+            } else {
+                console.error("Error al obtener el usuario:", error);
+            }
+        };
 
         fetchUser();
     }, []);
@@ -102,16 +102,16 @@ export default function CrearQuiz() {
         }
     };
 
-  const validationSchema = Yup.object().shape({
-    title: Yup.string().required("El título es obligatorio"),
-    instructions: Yup.string().required("Las instrucciones son obligatorias"),
-    categoryid: Yup.number().required("La categoría es obligatoria"),
-    questionsnumber: Yup.number().required(
-      "La cantidad de preguntas es obligatoria"
-    ),
-    solutioncode: Yup.string().required("El código de solución es obligatorio"),
-    wrongcode: Yup.string().required("El código incorrecto es obligatorio"),
-  });
+    const validationSchema = Yup.object().shape({
+        title: Yup.string().required("El título es obligatorio"),
+        instructions: Yup.string().required("Las instrucciones son obligatorias"),
+        categoryid: Yup.number().required("La categoría es obligatoria"),
+        questionsnumber: Yup.number().required(
+            "La cantidad de preguntas es obligatoria"
+        ),
+        solutioncode: Yup.string().required("El código de solución es obligatorio"),
+        wrongcode: Yup.string().required("El código incorrecto es obligatorio"),
+    });
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -274,107 +274,107 @@ export default function CrearQuiz() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#fff",
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    justifyContent: "center",
-  },
-  pickerContainer: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-    borderRadius: 6,
-    justifyContent: "center",
-  },
-  pickerText: {
-    color: "#A0A0A0",
-  },
-  pickerItem: {
-    fontSize: 14,
-  },
-  header: {
-    flexDirection: "column",
-    padding: 20,
-    paddingBottom: 40,
-    marginBottom: 0,
-    position: "relative",
-  },
-  headerBackgroundImage: {
-    width: 500,
-    height: 150,
-    position: "absolute",
-    top: 0,
-    left: 0,
-    zIndex: 0,
-  },
-  headerContent: {
-    flexDirection: "row",
-    marginTop: 40,
-  },
-  headerTextContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginLeft: 0,
-  },
-  backContainer: {
-    flexDirection: "row",
-  },
-  backImage: {
-    marginTop: 20,
-    marginLeft: 20,
-    width: 13,
-    height: 24,
-  },
-  headerText: {
-    marginTop: 20,
-    marginLeft: 51,
-    fontSize: 24,
-    color: "#ffffff",
-  },
-  main: {
-    padding: 20,
-  },
-  textAutorID: {
-    paddingBottom: 20,
-    color: "#00622A",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  textTitleInput: {
-    color: "#00622A",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  textTitleCode: {
-    paddingTop: 20,
-    color: "#00622A",
-    fontWeight: "bold",
-  },
-  buttons: {
-    borderRadius: 6,
-    backgroundColor: "#178F49",
-    width: 320,
-    height: 48,
-    textAlign: "center",
-    justifyContent: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 15,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    marginBottom: 20,
-  },
+    container: {
+        flexGrow: 1,
+        backgroundColor: "#fff",
+    },
+    input: {
+        height: 40,
+        borderColor: "gray",
+        borderWidth: 1,
+        marginBottom: 10,
+        paddingHorizontal: 10,
+        borderRadius: 6,
+        justifyContent: "center",
+    },
+    pickerContainer: {
+        height: 40,
+        borderColor: "gray",
+        borderWidth: 1,
+        marginBottom: 10,
+        borderRadius: 6,
+        justifyContent: "center",
+    },
+    pickerText: {
+        color: "#A0A0A0",
+    },
+    pickerItem: {
+        fontSize: 14,
+    },
+    header: {
+        flexDirection: "column",
+        padding: 20,
+        paddingBottom: 40,
+        marginBottom: 0,
+        position: "relative",
+    },
+    headerBackgroundImage: {
+        width: 500,
+        height: 150,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        zIndex: 0,
+    },
+    headerContent: {
+        flexDirection: "row",
+        marginTop: 40,
+    },
+    headerTextContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginLeft: 0,
+    },
+    backContainer: {
+        flexDirection: "row",
+    },
+    backImage: {
+        marginTop: 20,
+        marginLeft: 20,
+        width: 13,
+        height: 24,
+    },
+    headerText: {
+        marginTop: 20,
+        marginLeft: 51,
+        fontSize: 24,
+        color: "#ffffff",
+    },
+    main: {
+        padding: 20,
+    },
+    textAutorID: {
+        paddingBottom: 20,
+        color: "#00622A",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    textTitleInput: {
+        color: "#00622A",
+        fontSize: 16,
+        fontWeight: "bold",
+    },
+    textTitleCode: {
+        paddingTop: 20,
+        color: "#00622A",
+        fontWeight: "bold",
+    },
+    buttons: {
+        borderRadius: 6,
+        backgroundColor: "#178F49",
+        width: 320,
+        height: 48,
+        textAlign: "center",
+        justifyContent: "center",
+    },
+    buttonText: {
+        color: "#fff",
+        fontSize: 15,
+        textAlign: "center",
+        fontWeight: "bold",
+    },
+    errorText: {
+        color: "red",
+        marginBottom: 20,
+    },
 });
