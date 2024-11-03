@@ -143,15 +143,6 @@ export default function CrearQuiz() {
             pathname: "confirmarQuiz",
             params: { jsonExercise: JSON.stringify(objQuiz) },
           });
-          ExerciseService.createExercise(objQuiz).then((response) => {
-            if (response.error) {
-              Alert.alert(
-                "Error",
-                "Hubo un problema al crear el quiz. Intenta nuevamente."
-              );
-            } else {
-            }
-          });
         }}
       >
         {({
