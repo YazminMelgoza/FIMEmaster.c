@@ -168,7 +168,7 @@ export default function Auth() {
 
           <Text style={styles.registerLink}>
             ¿No tienes una cuenta?
-            <Link href="/signUp/signUp">
+            <Link href="signUp">
               <Text style={styles.registerText}> Regístrate</Text>
             </Link>
           </Text>

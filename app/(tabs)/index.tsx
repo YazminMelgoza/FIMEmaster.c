@@ -1,6 +1,10 @@
 import { router, Link  } from 'expo-router';
 import React, { useState } from 'react';
+import { NativeWindStyleSheet } from "nativewind";
 
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 import {
   View,
   Text,
@@ -41,13 +45,7 @@ export default function Index()
 
   const handleCreateQuiz = () => {
     console.log('Crear test');
-    router.navigate('iniciarQuiz');
-  };
-  
-  const handleScanCode = () => {
-    console.log('Escanear código');
-    router.replace('/(creacionquiz)/qr/scan'); 
-
+    router.push({ pathname: 'iniciarQuiz', params: { id: "1" } });
   };
 
   return (

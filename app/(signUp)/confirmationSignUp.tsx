@@ -10,8 +10,8 @@ export default function ConfirmationScreen(){
 		<View style={styles.enterOtp}>
 			<Image style={[styles.statusBarLight, styles.buttonPosition]} resizeMode="cover" source={require('../../assets/images/status-bar-light2.png')}/>
 			<View style={[styles.signIn, styles.logPosition]}>
-				<Text style={[styles.cuentaRegistradaExitosamente, styles.ahoraSersTrasladadoLayout]}>Confirma tu cuenta</Text>
-				<Text style={[styles.ahoraSersTrasladado, styles.ahoraSersTrasladadoLayout]}>Hemos enviado un enlace de confirmación a tu correo electrónico, abre el enlace para empezar a usar tu cuenta</Text>
+				<Text style={[styles.cuentaRegistradaExitosamente, styles.ahoraSersTrasladadoLayout]}>Cuenta confirmada con éxito</Text>
+				<Text style={[styles.ahoraSersTrasladado, styles.ahoraSersTrasladadoLayout]}>Se ha confirmada tu correo y se ha iniciado sesión automáticamente, Bienvenido</Text>
 			</View>
 			<TouchableOpacity onPress={goToLogin}>
 				<View style={[styles.logIn, styles.logInLayout]}>

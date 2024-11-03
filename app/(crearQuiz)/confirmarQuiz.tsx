@@ -1,102 +1,120 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Tables } from "database.types";
 
-export default function confirmacioncreacion (){
+const QuizScreen = () => {
+  const router = useRouter();
+  const { jsonExercise } = useLocalSearchParams();
+  const ObjExercise = jsonExercise ? JSON.parse(jsonExercise as string) as Tables<"exercises"> : null;
+
+
   return (
     <View style={styles.container}>
-      {/* Encabezado con imagen de fondo */}
+      {/* Header */}
       <View style={styles.header}>
         <Image
-          source={require('../../assets/images/imagetextura2.png')}
+          source={require("../../assets/images/imagetextura2.png")}
           style={styles.backgroundImage}
         />
-        <TouchableOpacity style={styles.backButton}>
-          <Image source={require('../../assets/images/flechaAtras.png')} style={styles.backIcon} />
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Image source={require("../../assets/images/flechaAtras.png")} />
         </TouchableOpacity>
-        <Text style={styles.headerText}>Confirmar Quiz</Text>
+        <Text style={styles.title}>Confirmar Quiz</Text>
       </View>
 
-      {/* Fondo blanco */}
-      <ScrollView style={styles.quizListContainer}>
-        <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Image source={require('../../assets/images/user.png')} style={styles.profileImage} />
-        <Text className='text-black text-base font-semibold pt-2 '>perfil usuario</Text>
-        </View>
-        <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-green-800 text-xl font-bold pt-2 '>nombre de quiz</Text>
-        </View>
-        <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-gray-500 text-lg font-semibold  '>descripcion de quiz a resolver...</Text>
-        </View>
-        <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-green-800 text-xl font-bold pt-2 '>Categoria:</Text>
-        </View>
-        <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-gray-500 text-lg font-semibold  '>categoria de quiz a resolver...</Text>
-        </View>
-        <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 pb-6 '>
-        <Text className='text-green-800 text-xl font-bold  '>Codigo a resolver</Text>
-        </View>
-        <View className="flex flex-column px-1 h-52 gap-3 px-1 rounded-lg">
-          <View className="flex flex-column px-1 h-auto  px-1 bg-green-50 rounded-xl">
-            <Text className='text-black-800 text-base font-normal tracking-wide px-2  '>{`#include <stdio.h
-int main() 
-{ 
-int a, d, c;     
-a = 5;    
-b = 10    
-c = a + b;    
-printf("El resultado es: %d", c)     
-return 0; 
-`}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.whiteBackgroundContainer}>
+          <Image
+            source={require("../../assets/images/fondoBlanco.jpg")}
+            style={styles.whiteBackgroundImage}
+          />
 
+          {/* Profile Section */}
+          <View style={styles.profileContainer}>
+            <Image
+              source={require("../../assets/images/usuario.png")}
+              style={styles.profileImage}
+            />
+            <View style={styles.userInfo}>
+              <Text style={styles.userName}>María del Carmen</Text>
+            </View>
+          </View>
+
+          {/* Quiz Info Section */}
+          <View style={styles.infoContainer}>
+            <Text style={styles.quizTitle}>Suma de enteros</Text>
+            <Text style={styles.instructions}>Instrucciones:</Text>
+            <Text style={styles.instructionsDetails}>
+              {ObjExercise?.instructions}
             </Text>
-
+            <Text style={styles.category}>Categoría:</Text>
+            <Text style={styles.categoryUpdate}>Lógica</Text>
           </View>
 
-        </View>
-        <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 pb-6 '>
-        <Text className='text-green-800 text-xl font-bold  '>Output Esperado:</Text>
-        </View>
-        <View className="flex flex-column px-1 h-auto gap-3 px-1 rounded-lg">
-          <View className="flex flex-column px-1 h-auto  px-1 bg-green-50 rounded-xl">
-            <Text className='text-black-800 text-base font-normal tracking-wide px-2  '>El resultado es: 15</Text>
-
+          {/* Code Section */}
+          <View style={styles.codeContainer}>
+            <Text style={styles.codeHeader}>Código a resolver:</Text>
+            <View style={styles.codeBox}>
+              <Text style={styles.code}>
+                #include {"<"}stdio.h{">"}
+              </Text>
+              <Text style={styles.code}>int main()</Text>
+              <Text style={styles.code}>{"{"}</Text>
+              <Text style={styles.code}> int a, d, c;</Text>
+              <Text style={styles.code}> a = 5;</Text>
+              <Text style={styles.code}> b = 10;</Text>
+              <Text style={styles.code}> c = a + b;</Text>
+              <Text style={styles.code}>
+                {" "}
+                printf("El resultado es: %d", c);
+              </Text>
+              <Text style={styles.code}> return 0;</Text>
+              <Text style={styles.code}>{"}"}</Text>
+            </View>
           </View>
-          
-        </View>
-        <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 '>
-        <Text className='text-green-800 text-xl font-bold  '>Resuelve:</Text>
-        </View>
-        <View style={styles.answersContainer}>
+
+          {/* Output Section */}
+          <View style={styles.outputContainer}>
+            <Text style={styles.outputHeader}>Numero de preguntas:</Text>
+            <View style={styles.outputBox}>
+              <Text style={styles.output}>5</Text>
+            </View>
+          </View>
+
+          {/* Answer Section */}
+          <View style={styles.answersContainer}>
+            <Text style={styles.answersHeader}>Resuelve:</Text>
             {[1, 4, 6, 8].map((lineNumber) => (
-              <TouchableOpacity
-                key={lineNumber}
-                style={styles.answerOption}
-              >
+              <TouchableOpacity key={lineNumber} style={styles.answerOption}>
                 <View style={styles.answerBox}>
                   <Image
-                    source={require('../../assets/images/fime-logo2.png')} 
+                    source={require("../../assets/images/fime-logo2.png")}
                     style={styles.answerImage}
                   />
                   <Text style={styles.answerText}>Línea #{lineNumber}</Text>
-              
-  
-                  
-
                 </View>
               </TouchableOpacity>
             ))}
           </View>
-          <View className='h-auto w-auto flex flex-row gap-4 pb-16'>
-            <TouchableOpacity className='flex justify-center w-[45%] h-16 rounded-xl align-middle items-center bg-green-100 '> 
-            <Text className='text-green-900 text-base font-normal tracking-wide   '>Regresar</Text>
+
+          {/* Buttons */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.regresarButton}
+              onPress={() => router.back()}
+            >
+              <Text style={styles.regresarButtonText}>Regresar</Text>
             </TouchableOpacity>
-            <TouchableOpacity className='flex justify-center w-[45%] h-16 rounded-xl align-middle items-center bg-green-900 '> 
-            <Text className='text-white text-base font-normal tracking-wide   '>Finalizar</Text>
+            <TouchableOpacity style={styles.finalizarButton}>
+              <Text style={styles.finalizarButtonText}>Finalizar</Text>
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -104,99 +122,202 @@ return 0;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F9F9',
+    backgroundColor: "#fff",
   },
   header: {
-    height: 200,  // Ajustar la altura del encabezado
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    width: "100%",
+    marginBottom: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    overflow: 'hidden', // Para asegurarse de que la imagen no se salga del contenedor
-    marginBottom: 20,
-    position: 'relative',
-  },
-  backgroundImage: {
-    width: '100%',  // Hacer que la imagen de fondo se ajuste a todo el ancho
-    height: '100%',  // Ajustar la imagen a la altura del contenedor
-    position: 'absolute',
-    resizeMode: 'cover',  // Asegura que la imagen se ajuste sin deformarse
-  },
-  headerText: {
-    color: '#fff',
-    fontSize: 24,  // Tamaño del texto un poco más grande para mejor legibilidad
-    fontWeight: 'bold',
-    zIndex: 1,
-    position: 'absolute',
-    top: '50%',  // Centrar el texto verticalmente
-    textAlign: 'center',
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     left: 20,
-    top: 40,  // Ajustar para estar más alineado con el encabezado
-    zIndex: 2,
+    paddingTop: 70,
   },
-  answersContainer: {
-    margin: 20,
+  backgroundImage: {
+    width: 1000,
+    height: 250,
+    position: "absolute",
   },
-  answersHeader: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#00622A',
+  title: {
+    color: "#fff",
+    fontSize: 20,
+    fontWeight: "bold",
+    left: 65,
+    top: 40,
   },
-  answerOption: {
-    marginBottom: 10, 
-  },
-  answerBox: {
-    backgroundColor: '#f9fff9',
-    padding: 15,
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  answerImage: {
-    width: 40, 
-    height: 40,
-    resizeMode: 'contain', // Cambia a 'cover' o 'stretch' si es necesario
-    marginRight: 10,
-  },
-  answerText: {
-    fontSize: 16,
-    color: '#333',
-    flex: 1, // Permite que el texto ocupe el espacio disponible
-  },
-  backIcon: {
-    width: 24,  // Ajustar tamaño del icono
-    height: 24,
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginLeft: 20,
-  },
-  quizListContainer: {
-
+  whiteBackgroundContainer: {
     flex: 1,
     marginTop: 20,
-    backgroundColor: '#fff',
+    width: "100%",
+  },
+  whiteBackgroundImage: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,
-    paddingHorizontal: 20,
-    paddingTop: 30, 
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
   },
-  loadingText: {
-    fontSize: 18,  // Hacer el texto un poco más grande
-    color: '#00622A',
-    textAlign: 'center',  // Centrar el texto
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+  },
+  profileImage: {
+    width: 35,
+    height: 35,
+    borderRadius: 25,
+    marginRight: 15,
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  infoContainer: {
+    margin: 20,
+  },
+  quizTitle: {
+    fontSize: 21,
+    fontWeight: "bold",
+    color: "#00622A",
+  },
+  instructions: {
+    fontSize: 16,
+    marginTop: 10,
+    color: "#00622A",
+    fontWeight: "bold",
+  },
+  instructionsDetails: {
+    fontSize: 14,
+    marginTop: 5,
+    color: "#000",
+  },
+  category: {
+    fontSize: 14,
+    color: "#00622A",
+    fontWeight: "bold",
+  },
+  categoryUpdate: {
+    fontSize: 14,
+    color: "#000",
+    marginTop: 5,
+  },
+  bold: {
+    fontWeight: "bold",
+  },
+  codeContainer: {
+    margin: 20,
+  },
+  codeHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#00622A",
+  },
+  codeBox: {
+    backgroundColor: "#F9FFF9",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  code: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "bold",
+  },
+  outputContainer: {
+    margin: 20,
+  },
+  outputHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#00622A",
+  },
+  outputBox: {
+    backgroundColor: "#F9FFF9",
+    padding: 10,
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  output: {
+    fontSize: 14,
+    color: "#333",
+    fontWeight: "bold",
+  },
+  answersContainer: {
+    margin: 20,
+  },
+  answersHeader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#00622A",
+  },
+  answerOption: {
+    marginBottom: 15,
+  },
+  answerBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F9FFF9",
+    padding: 10,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  answerImage: {
+    width: 30,
+    height: 30,
+    marginRight: 10,
+  },
+  answerText: {
+    fontSize: 14,
+    color: "#333",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    margin: 20,
+  },
+  regresarButton: {
+    backgroundColor: "#F3FFF3",
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 10,
+  },
+  finalizarButton: {
+    backgroundColor: "#198155",
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 10,
+  },
+  regresarButtonText: {
+    textAlign: "center",
+    color: "#198155",
+    fontWeight: "bold",
+  },
+  finalizarButtonText: {
+    textAlign: "center",
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 
-
+export default QuizScreen;
