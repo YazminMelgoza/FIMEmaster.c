@@ -24,16 +24,14 @@ export default function VerificationScreen() {
         } finally {
             setAppIsReady(true);
         }
+      }
+      prepare();
+  }, [emailRecibido]);
+  useEffect(() => {
+    if (email) {
+        enviarEmail();
     }
-    prepare();
-}, [emailRecibido]);
-
-// Usar otro useEffect para enviar el email una vez que se haya actualizado el estado
-useEffect(() => {
-  if (email) {
-      enviarEmail();
-  }
-}, [email]);
+  }, [email]);
 
   const handleChangeText = (text: string, index: number) => {
       const newCode = [...code];
