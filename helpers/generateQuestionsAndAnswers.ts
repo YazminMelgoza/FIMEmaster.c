@@ -14,7 +14,7 @@ type AnswerPayload = {
   isCorrect: boolean;
 };
 
-type QuestionPayload = {
+export type QuestionPayload = {
   question: string;
   code: string;
   lineStart: number;
@@ -45,25 +45,25 @@ function insertIncorrectAssignmentError(
   code: string,
   error: SyntaxMistake
 ): QuestionPayload[] {
-  // Regex to match assignments outside of control statements
   const assignmentRegex =
-    /(?<!for|while|if|else|switch|case|return|==|!=|<=|>=|<|>)\s(\w+)\s*=\s*([^;]+);/g;
-  const assignments = code.matchAll(assignmentRegex);
+    /(?<!for|while|if|else|switch|case|return|==|!=|<=|>=|<|>)[\t\f\cK ]*(\w+)\s*=\s*([^;]+);/g;
+  const assignments = [...code.matchAll(assignmentRegex)];
 
-  const questions: QuestionPayload[] = [];
-  for (const assignment of assignments) {
-    const lineStart = getLineStartNumber(code, assignment[0]);
-    const lineEnd = lineStart;
-
+  let questions: QuestionPayload[] = [];
+  assignments.forEach((assignment) => {
+    let lineStart = getLineStartNumber(code, assignment[0]);
+    if (!lineStart) {
+      lineStart = 1;
+    }
     questions.push({
-      question: assignment[0],
-      code,
+      question: `¿Cuál de las siguientes asignaciones es la correcta para la variable ${assignment[1]}?`,
+      code: "",
       lineStart,
-      lineEnd,
+      lineEnd: lineStart,
       feedback: error.feedback,
       possibleAnswers: _.shuffle(error.answersGenerator(assignment)),
     });
-  }
+  });
   return questions;
 }
 
