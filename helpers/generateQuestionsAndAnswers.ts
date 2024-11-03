@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { Tables } from "database.types";
+import { getLineStartNumber } from "utils/getLineStartNumber";
 
 type SyntaxMistake = {
   generator: (code: string, error: SyntaxMistake) => QuestionPayload[];
@@ -10,7 +11,7 @@ type SyntaxMistake = {
 
 type AnswerPayload = {
   answer: string;
-  iscorrect: boolean;
+  isCorrect: boolean;
 };
 
 type QuestionPayload = {
@@ -22,7 +23,7 @@ type QuestionPayload = {
   possibleAnswers: AnswerPayload[];
 };
 
-const commonMistakes = [
+const commonMistakes: SyntaxMistake[] = [
   {
     generator: insertIncorrectAssignmentError,
     answersGenerator: generateAnswersForIncorrectAssignment,
@@ -44,24 +45,23 @@ function insertIncorrectAssignmentError(
   code: string,
   error: SyntaxMistake
 ): QuestionPayload[] {
+  // Regex to match assignments outside of control statements
   const assignmentRegex =
     /(?<!for|while|if|else|switch|case|return|==|!=|<=|>=|<|>)\s(\w+)\s*=\s*([^;]+);/g;
-  // example:
-  // match "expression = !((1 == x) && 4)"
-  // group 1: "expression"
-  // group 2: "!((1 == x) && 4)"
   const assignments = code.matchAll(assignmentRegex);
 
   const questions: QuestionPayload[] = [];
   for (const assignment of assignments) {
-    const lineStart = getLineNumber(code, assignment[0]);
+    const lineStart = getLineStartNumber(code, assignment[0]);
+    const lineEnd = lineStart;
+
     questions.push({
       question: assignment[0],
       code,
       lineStart,
-      lineEnd: lineStart,
+      lineEnd,
       feedback: error.feedback,
-      possibleAnswers: error.answersGenerator(assignment),
+      possibleAnswers: _.shuffle(error.answersGenerator(assignment)),
     });
   }
   return questions;
@@ -72,22 +72,15 @@ function generateAnswersForIncorrectAssignment(
 ): AnswerPayload[] {
   const possibleOperators = ["==", "!=", "<=", ">=", "<", ">"];
   const incorrectOperators = _.sampleSize(possibleOperators, 3);
-  return [
+
+  return _.shuffle([
     ...incorrectOperators.map((operator) => ({
       answer: `${assignment[1]} ${operator} ${assignment[2]}`,
-      iscorrect: false,
+      isCorrect: false,
     })),
     {
       answer: assignment[0],
-      iscorrect: true,
+      isCorrect: true,
     },
-  ];
-}
-
-function getLineNumber(code: string, text: string): number {
-  return code.split("\n").findIndex((line) => line.includes(text)) + 1;
-}
-
-function getLineEnd(lineStart: number, code: string): number {
-  return lineStart + code.split("\n").length - 1;
+  ]);
 }
