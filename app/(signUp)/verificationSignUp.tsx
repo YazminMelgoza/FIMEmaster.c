@@ -34,12 +34,6 @@ export default function VerificationScreen() {
   }, [emailRecibido]);
 
   useEffect(() => {
-    if (email) {
-        enviarEmail();
-    }
-  }, [email]);
-
-  useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isButtonDisabled) {
       interval = setInterval(() => {
@@ -74,7 +68,11 @@ export default function VerificationScreen() {
   const enviarEmail = async () =>
   {
     setIsButtonDisabled(true);
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+    //const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+    })
     console.log("email enviado: " + email);
   }
   const goBack = async () =>
@@ -93,7 +91,7 @@ export default function VerificationScreen() {
     const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email'});
     if (!error && data) {
       console.log("Verificación completada con éxito:", data);
-      router.replace("confirmarpassword");
+      router.replace("confirmationSignUp");
     } else {
         console.error("Error en la verificación:", error?.message);
     }

@@ -126,17 +126,19 @@ export default function CrearQuiz() {
                         createdat: new Date().toISOString(),
                     };
                     console.log(objQuiz);
+                    router.push({ pathname: 'confirmarQuiz', params: { jsonExercise: JSON.stringify(objQuiz) } });
+                    /*
                     ExerciseService.createExercise(objQuiz).then((response) => {
-                        if (response.error) {
-                            Alert.alert(
-                                "Error",
-                                "Hubo un problema al crear el quiz. Intenta nuevamente."
-                            );
-                        } else {
-                            router.replace("finalizarQuiz");
-                        }
-                    });
-
+                      if (response.error) {
+                        Alert.alert(
+                          "Error",
+                          "Hubo un problema al crear el quiz. Intenta nuevamente."
+                        );
+                      } else {
+                        router.replace("finalizarQuiz");
+                      }
+                    });*/
+                    
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (

@@ -41,6 +41,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingSignUp, setLoadingSignUp] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const navigation = useNavigation();
@@ -53,6 +54,7 @@ export default function SignUp() {
     router.replace('/signUp/confirmation'); // Reemplaza la ruta actual
   };
   */
+ 
   async function signUpWithEmail(
     email: string,
     password: string,
@@ -60,7 +62,7 @@ export default function SignUp() {
     last_Name: string,
     middle_Name: string
   ) {
-    setLoading(true);
+    setLoadingSignUp(true);
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -76,10 +78,9 @@ export default function SignUp() {
     if (error) {
       console.error("Error en la creación del usuario:", error.message);
     } else {
-      router.replace("/signUp/confirmation");
+      router.push(`verificationSignUp?emailRecibido=${email}`);
     }
-
-    setLoading(false);
+    setLoadingSignUp(false);
   }
   return (
     <Formik
@@ -219,8 +220,9 @@ export default function SignUp() {
           <TouchableOpacity
             style={styles.loginButton}
             onPress={() => handleSubmit()}
+            disabled={loadingSignUp}
           >
-            <Text style={styles.loginButtonText}>Crear una cuenta</Text>
+            <Text style={styles.loginButtonText}>{loadingSignUp ? "Cargando..." : "Crear una cuenta"} </Text>
           </TouchableOpacity>
 
           <Text style={styles.registerLink}>
