@@ -1,6 +1,8 @@
 import { supabase } from "../lib/supabase";
 import { Tables } from "database.types";
 import { PostgrestError } from "@supabase/supabase-js";
+import { QuestionPayload } from "helpers/generateQuestionsAndAnswers";
+import { AnswerService } from "./answer";
 
 export class QuestionService {
   // Función para insertar una nueva pregunta
@@ -29,6 +31,52 @@ export class QuestionService {
     return { error: null };
   }
 
+  static async createQuestionWithAnswers(
+    questions: QuestionPayload[],
+    exerciseId: number
+  ): Promise<{ error: PostgrestError | null }> {
+    for (const question of questions) {
+      console.log(exerciseId);
+      const { data, error } = await supabase
+        .from("questions")
+        .insert([
+          {
+            exerciseid: exerciseId,
+            question: question.question,
+            linestart: question.lineStart,
+            lineend: question.lineEnd,
+            feedback: question.feedback,
+            correctcount: 0,
+            incorrectcount: 0,
+            correctanswerid: null,
+          },
+        ])
+        .select();
+
+      if (error || !data) {
+        console.error("Error al crear la pregunta:", error);
+        return { error };
+      }
+
+      const questionId = data[0].questionid;
+
+      const answersWithQuestionId = question.possibleAnswers.map((answer) => ({
+        questionid: questionId,
+        answer: answer.answer,
+        iscorrect: answer.isCorrect,
+      }));
+
+      const { error: answersError } = await AnswerService.createAnswers(
+        answersWithQuestionId
+      );
+
+      if (answersError) {
+        console.error("Error al crear las respuestas:", answersError);
+        return { error: answersError };
+      }
+    }
+    return { error: null };
+  }
   // Función para eliminar una pregunta por ID
   static async deleteQuestionById(
     questionId: number
@@ -85,9 +133,7 @@ export class QuestionService {
   }
 
   // Función para obtener una pregunta por ID
-  static async getQuestionById(
-    questionId: number
-  ): Promise<{
+  static async getQuestionById(questionId: number): Promise<{
     question: Tables<"questions"> | null;
     error: PostgrestError | null;
   }> {
@@ -106,9 +152,7 @@ export class QuestionService {
   }
 
   // Función para obtener todas las preguntas por ID de ejercicio
-  static async getAllQuestionsByExerciseId(
-    exerciseId: number
-  ): Promise<{
+  static async getAllQuestionsByExerciseId(exerciseId: number): Promise<{
     questions: Tables<"questions">[] | null;
     error: PostgrestError | null;
   }> {
