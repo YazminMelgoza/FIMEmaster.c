@@ -97,7 +97,6 @@ export class ExerciseService {
     exercise: Tables<"exercises"> | null;
     error: PostgrestError | null;
   }> {
-    console.log("Entra a servicio de get exercise");
     const { data, error } = await supabase
       .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
       .select("*")

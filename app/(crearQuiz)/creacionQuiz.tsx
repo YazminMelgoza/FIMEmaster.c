@@ -139,15 +139,9 @@ export default function CrearQuiz() {
             createdat: new Date().toISOString(),
           };
           console.log(objQuiz);
-          ExerciseService.createExercise(objQuiz).then((response) => {
-            if (response.error) {
-              Alert.alert(
-                "Error",
-                "Hubo un problema al crear el quiz. Intenta nuevamente."
-              );
-            } else {
-              router.replace("confirmarQuiz");
-            }
+          router.push({
+            pathname: "confirmarQuiz",
+            params: { jsonExercise: JSON.stringify(objQuiz) },
           });
         }}
       >
