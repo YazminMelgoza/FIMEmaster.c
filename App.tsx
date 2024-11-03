@@ -7,14 +7,6 @@ import { Session } from '@supabase/supabase-js';
 import Entypo from '@expo/vector-icons/Entypo';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
-import { NativeWindStyleSheet } from 'nativewind';
-
-
-
-
-NativeWindStyleSheet.setOutput({
-  default: 'native',
-});
 
 SplashScreen.preventAutoHideAsync();
 

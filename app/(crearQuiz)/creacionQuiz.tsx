@@ -27,7 +27,7 @@ export default function CrearQuiz() {
     const [solutionCodeText, setSolutionCodeText] = useState('');
     const [authorId, setAuthorId] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');
-    
+
     const categories = [
         { label: 'Bucles', value: '1' },
         { label: 'Condicionales', value: '2' },
@@ -43,8 +43,8 @@ export default function CrearQuiz() {
                 const id = data.user.id
                 setAuthorId(data.user.id); // Obtiene el ID del usuario)
 
-                const { user, error: userError} = await UserService.getUserProfileById(id);
-                if(user) {
+                const { user, error: userError } = await UserService.getUserProfileById(id);
+                if (user) {
                     setFirstname(user.firstname || '');
                     setMiddlename(user.middlename || '');
                     setLastname(user.lastname || '');
@@ -54,41 +54,41 @@ export default function CrearQuiz() {
             }
         };
 
-    fetchUser();
-  }, []);
+        fetchUser();
+    }, []);
 
-  const handleFilePicker = async (
-    setFieldValue: (field: string, value: any) => void,
-    field: string
-  ) => {
-    try {
-      const result = await DocumentPicker.getDocumentAsync({
-        type: "text/plain", // Asegúrate de que solo seleccionas archivos de texto
-        copyToCacheDirectory: true, // Esto asegura que el archivo se copie al caché
-      });
+    const handleFilePicker = async (
+        setFieldValue: (field: string, value: any) => void,
+        field: string
+    ) => {
+        try {
+            const result = await DocumentPicker.getDocumentAsync({
+                type: "text/plain", // Asegúrate de que solo seleccionas archivos de texto
+                copyToCacheDirectory: true, // Esto asegura que el archivo se copie al caché
+            });
 
-      if (!result.canceled) {
-        var uri2 = "";
-        result.assets.forEach((asset) => {
-          console.log(asset.uri); // URI de cada archivo
-          uri2 = asset.uri;
-          console.log(asset.name); // Nombre de cada archivo
-        });
-        const uri = uri2;
-        const fileContent = await FileSystem.readAsStringAsync(uri);
+            if (!result.canceled) {
+                var uri2 = "";
+                result.assets.forEach((asset) => {
+                    console.log(asset.uri); // URI de cada archivo
+                    uri2 = asset.uri;
+                    console.log(asset.name); // Nombre de cada archivo
+                });
+                const uri = uri2;
+                const fileContent = await FileSystem.readAsStringAsync(uri);
 
-        setFieldValue(field, fileContent);
-        setFieldValue("wrongcode", fileContent); // Se asigna el valor al campo wrongcode
-        //Se asigna el valor del código cargado
-        setSolutionCodeText(fileContent);
-        setWrongCodeText(fileContent);
-      } else {
-        Alert.alert("Cancelado", "No se seleccionó ningún archivo.");
-      }
-    } catch (err) {
-      Alert.alert("Error", "Hubo un problema al seleccionar el archivo.");
-    }
-  };
+                setFieldValue(field, fileContent);
+                setFieldValue("wrongcode", fileContent); // Se asigna el valor al campo wrongcode
+                //Se asigna el valor del código cargado
+                setSolutionCodeText(fileContent);
+                setWrongCodeText(fileContent);
+            } else {
+                Alert.alert("Cancelado", "No se seleccionó ningún archivo.");
+            }
+        } catch (err) {
+            Alert.alert("Error", "Hubo un problema al seleccionar el archivo.");
+        }
+    };
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required('El título es obligatorio'),
@@ -98,7 +98,7 @@ export default function CrearQuiz() {
         solutioncode: Yup.string().required('El código de solución es obligatorio'),
         wrongcode: Yup.string().required('El código incorrecto es obligatorio'),
     });
-    
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Formik
@@ -115,8 +115,8 @@ export default function CrearQuiz() {
                 validationSchema={validationSchema}
                 onSubmit={async (values) => {
                     const objQuiz: Tables<"exercises"> = {
-                        exerciseid: 0, 
-                        authorId: authorId, 
+                        exerciseid: 0,
+                        authorId: authorId,
                         instructions: values.instructions,
                         categoryid: Number(values.categoryid),
                         wrongcode: values.wrongcode,
@@ -127,16 +127,16 @@ export default function CrearQuiz() {
                     };
                     console.log(objQuiz);
                     ExerciseService.createExercise(objQuiz).then((response) => {
-                      if (response.error) {
-                        Alert.alert(
-                          "Error",
-                          "Hubo un problema al crear el quiz. Intenta nuevamente."
-                        );
-                      } else {
-                        router.replace("finalizarQuiz");
-                      }
+                        if (response.error) {
+                            Alert.alert(
+                                "Error",
+                                "Hubo un problema al crear el quiz. Intenta nuevamente."
+                            );
+                        } else {
+                            router.replace("finalizarQuiz");
+                        }
                     });
-                    
+
                 }}
             >
                 {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
@@ -153,78 +153,80 @@ export default function CrearQuiz() {
                                             onPress={() => router.back()}>
                                             <Image
                                                 source={require('../../assets/images/back-icon.png')}
-                                                style={styles.backImage}/>
+                                                style={styles.backImage} />
                                         </TouchableOpacity>
                                     </View>
                                     <Text style={styles.headerText}>Crea un nuevo quiz</Text>
                                 </View>
                             </View>
-                        </View>                    
-                        <View style={styles.main}>
-                            <Text style={styles.textAutorID}>Autor: {firstname + ' ' + lastname + ' ' + middlename}</Text>
-                            <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
-                            <TextInput
-                                style={styles.input}
-                                onChangeText={handleChange('title')}
-                                onBlur={handleBlur('title')}
-                                value={values.title}
-                                placeholder='Ingresa el nombre del ejercicio'
-                            />
-                            {errors.title && touched.title && <Text style={styles.errorText}>{errors.title}</Text>}
-                            <Text style={styles.textTitleInput}>Instrucciones:</Text>
-                            <TextInput
-                                style={styles.input}
-                                onChangeText={handleChange('instructions')}
-                                onBlur={handleBlur('instructions')}
-                                value={values.instructions}
-                                placeholder='Ingresa las instrucciones'
-                            />
-                            {errors.instructions && touched.instructions && <Text style={styles.errorText}>{errors.instructions}</Text>}
-                            <Text style={styles.textTitleInput}>Categoría:</Text>
-                            <View style={styles.pickerContainer}>
-                                <Picker
-                                    style={styles.pickerText}
-                                    selectedValue={selectedCategory}
-                                    onValueChange={(itemValue) => {
-                                        setSelectedCategory(itemValue);
-                                        handleChange('categoryid')(itemValue); // Actualiza el valor en Formik
+                        </View>
+                        <View className='w-full h-full bg-[#3aa66a] flex items-center'>
+                            <View className='p-5 w-[90%] bg-white rounded-xl'>
+                                <Text style={styles.textAutorID}>Autor: {firstname + ' ' + lastname + ' ' + middlename}</Text>
+                                <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onChangeText={handleChange('title')}
+                                    onBlur={handleBlur('title')}
+                                    value={values.title}
+                                    placeholder='Ingresa el nombre del ejercicio'
+                                />
+                                {errors.title && touched.title && <Text style={styles.errorText}>{errors.title}</Text>}
+                                <Text style={styles.textTitleInput}>Instrucciones:</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    onChangeText={handleChange('instructions')}
+                                    onBlur={handleBlur('instructions')}
+                                    value={values.instructions}
+                                    placeholder='Ingresa las instrucciones'
+                                />
+                                {errors.instructions && touched.instructions && <Text style={styles.errorText}>{errors.instructions}</Text>}
+                                <Text style={styles.textTitleInput}>Categoría:</Text>
+                                <View style={styles.pickerContainer}>
+                                    <Picker
+                                        style={styles.pickerText}
+                                        selectedValue={selectedCategory}
+                                        onValueChange={(itemValue) => {
+                                            setSelectedCategory(itemValue);
+                                            handleChange('categoryid')(itemValue); // Actualiza el valor en Formik
                                         }}
                                     >
-                                    {categories.map((category) => (
-                                    <Picker.Item key={category.value} label={category.label} value={category.value} style={styles.pickerItem} />
-                                ))}
-                            </Picker>
+                                        {categories.map((category) => (
+                                            <Picker.Item key={category.value} label={category.label} value={category.value} style={styles.pickerItem} />
+                                        ))}
+                                    </Picker>
+                                </View>
+                                {errors.categoryid && touched.categoryid && <Text style={styles.errorText}>{errors.categoryid}</Text>}
+                                <Text style={styles.textTitleInput}>Cantidad de preguntas:</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    keyboardType="numeric"
+                                    onChangeText={(value) => setFieldValue('questionsnumber', value)}
+                                    onBlur={handleBlur('questionsnumber')}
+                                    value={values.questionsnumber ? values.questionsnumber.toString() : ''}
+                                    placeholder='Ingresa la cantidad de preguntas'
+                                />
+                                {errors.questionsnumber && touched.questionsnumber && <Text style={styles.errorText}>{errors.questionsnumber}</Text>}
+                                <TouchableOpacity
+                                    style={styles.buttons}
+                                    onPress={() => handleFilePicker(setFieldValue, 'solutioncode')}
+                                >
+                                    <Text style={styles.buttonText}>Cargar Ejercicio</Text>
+                                </TouchableOpacity>
+                                <Text style={styles.textTitleCode}>Solution Code:</Text>
+                                {errors.solutioncode && touched.solutioncode && <Text style={styles.errorText}>{errors.solutioncode}</Text>}
+                                <Text>{solutionCodeText}</Text>
+                                <Text style={styles.textTitleCode}>Wrong Code:</Text>
+                                <Text>{wrongCodeText}</Text>
+                                {errors.wrongcode && touched.wrongcode && <Text style={styles.errorText}>{errors.wrongcode}</Text>}
+                                <TouchableOpacity
+                                    style={styles.buttons}
+                                    onPress={() => handleSubmit()}
+                                >
+                                    <Text style={styles.buttonText}>Crear Quiz</Text>
+                                </TouchableOpacity>
                             </View>
-                            {errors.categoryid && touched.categoryid && <Text style={styles.errorText}>{errors.categoryid}</Text>}
-                            <Text style={styles.textTitleInput}>Cantidad de preguntas:</Text>
-                            <TextInput
-                                style={styles.input}
-                                keyboardType="numeric"
-                                onChangeText={(value) => setFieldValue('questionsnumber', value)} 
-                                onBlur={handleBlur('questionsnumber')}
-                                value={values.questionsnumber ? values.questionsnumber.toString() : ''} 
-                                placeholder='Ingresa la cantidad de preguntas'
-                            />
-                            {errors.questionsnumber && touched.questionsnumber && <Text style={styles.errorText}>{errors.questionsnumber}</Text>}
-                            <TouchableOpacity
-                                style={styles.buttons}
-                                onPress={() => handleFilePicker(setFieldValue, 'solutioncode')}
-                            >
-                                <Text style={styles.buttonText}>Cargar Ejercicio</Text>
-                            </TouchableOpacity>
-                            <Text style={styles.textTitleCode}>Solution Code:</Text>
-                            {errors.solutioncode && touched.solutioncode && <Text style={styles.errorText}>{errors.solutioncode}</Text>}
-                            <Text>{solutionCodeText}</Text>
-                            <Text style={styles.textTitleCode}>Wrong Code:</Text>
-                            <Text>{wrongCodeText}</Text>
-                            {errors.wrongcode && touched.wrongcode && <Text style={styles.errorText}>{errors.wrongcode}</Text>}
-                            <TouchableOpacity
-                                style={styles.buttons}
-                                onPress={() => handleSubmit()}
-                            >
-                                <Text style={styles.buttonText}>Crear Quiz</Text>
-                            </TouchableOpacity>
-                        </View> 
+                        </View>
                     </View>
                 )}
             </Formik>
@@ -261,11 +263,11 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     header: {
-        flexDirection: 'column', 
+        flexDirection: 'column',
         padding: 20,
         paddingBottom: 40,
         marginBottom: 0,
-        position: 'relative', 
+        position: 'relative',
     },
     headerBackgroundImage: {
         width: 500,
@@ -277,12 +279,12 @@ const styles = StyleSheet.create({
     },
     headerContent: {
         flexDirection: 'row',
-        marginTop: 40, 
+        marginTop: 40,
     },
     headerTextContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginLeft: 0, 
+        marginLeft: 0,
     },
     backContainer: {
         flexDirection: 'row',
@@ -300,7 +302,7 @@ const styles = StyleSheet.create({
         color: '#ffffff',
     },
     main: {
-        padding: 20, 
+        padding: 20,
     },
     textAutorID: {
         paddingBottom: 20,
