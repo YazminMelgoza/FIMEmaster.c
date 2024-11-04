@@ -23,7 +23,7 @@ const getColor = (categoryid: number | null): string => {
     case 3:
       return '#2196F3';
     default:
-      return '#888'; 
+      return '#FF7575'
   }
 };
 
@@ -65,11 +65,11 @@ export default function About() {
       }
     };
     fetchData();
-  }, [searchQuery]);
+  }, [searchQuery]); // Se vuelve a ejecutar cuando cambia searchQuery
 
   const handleCreateQuiz = (id: number) => {
     console.log('Crear test');
-    router.navigate(`infoQuiz/${id}`);
+    router.push(`/infoQuiz?id=${id}`); // Navega a la pantalla de infoQuiz pasando el ID
   };
 
   return (
@@ -86,7 +86,7 @@ export default function About() {
               placeholder="Buscar"
               placeholderTextColor="#888"
               value={searchQuery}
-              onChangeText={setSearchQuery}
+              onChangeText={setSearchQuery}  // Actualiza searchQuery cuando cambia el texto
             />
             <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
           </View>
