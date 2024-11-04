@@ -2,26 +2,28 @@ import { supabase } from "../lib/supabase";
 import { Tables } from "database.types";
 import { PostgrestError } from "@supabase/supabase-js";
 
+type AnswerPayload = {
+  answer: string;
+  iscorrect: boolean;
+  questionid: number;
+};
 export class AnswerService {
   // Método para crear una nueva respuesta
-  static async createAnswer(
-    answer: Tables<"answers">
-  ): Promise<{ error: PostgrestError | null }> {
-    const { data, error } = await supabase.from("answers").insert([
-      {
-        questionid: answer.questionid,
-        answer: answer.answer,
-        iscorrect: answer.iscorrect,
-      },
-    ]);
+  static async createAnswers(
+    answers: AnswerPayload[]
+  ): Promise<{ data: Tables<"answers">[]; error: PostgrestError | null }> {
+    const { data, error } = await supabase
+      .from("answers")
+      .insert(answers)
+      .select();
 
     if (error) {
       console.error("Error al insertar la respuesta:", error);
-      return { error };
+      return { data: [], error };
     }
 
     console.log("Respuesta creada:", data);
-    return { error: null };
+    return { data, error: null };
   }
 
   // Método para eliminar una respuesta por ID
@@ -82,9 +84,7 @@ export class AnswerService {
   }
 
   // Método para obtener una respuesta por ID
-  static async getAnswerById(
-    answerId: number
-  ): Promise<{
+  static async getAnswerById(answerId: number): Promise<{
     answer: Tables<"answers"> | null;
     error: PostgrestError | null;
   }> {

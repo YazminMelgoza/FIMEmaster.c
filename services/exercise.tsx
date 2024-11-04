@@ -2,30 +2,63 @@
 import { Tables } from "database.types";
 import { supabase } from "../lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
+import {
+  generateQuestionsAndAnswers,
+} from "helpers/generateQuestionsAndAnswers";
+import {QuestionPayload, AnswerPayload} from "../app/types/questionPayload";
+import { QuestionService, QuestionWithAnswers } from "./question";
 
+export type ExerciseDetails = Tables<"exercises"> & {
+  questions: QuestionWithAnswers[];
+};
 export class ExerciseService {
   // Método para insertar un nuevo quiz
   public static async createExercise(
-    quiz: Tables<"exercises">
-  ): Promise<{ error: PostgrestError | null }> {
-    const { data, error } = await supabase.from("exercises").insert([{
-      authorId: quiz.authorId,
-      title: quiz.title,
-      instructions: quiz.instructions,
-      categoryid: quiz.categoryid,
-      questionsnumber: quiz.questionsnumber,
-      wrongcode: quiz.wrongcode,
-      solutioncode: quiz.solutioncode,
-      createdat: quiz.createdat,
-    }]);
+    quiz: Tables<"exercises">,
+    questionsAndAnswers: QuestionPayload[]
+  ): Promise<{ data: ExerciseDetails | null; error: PostgrestError | null }> {
+    //const questionsAndAnswers = generateQuestionsAndAnswers(quiz);
+    console.log("Preguntas y respuestas generadas:", questionsAndAnswers);
+
+    const { data, error } = await supabase
+      .from("exercises")
+      .insert([
+        {
+          authorId: quiz.authorId,
+          title: quiz.title,
+          instructions: quiz.instructions,
+          categoryid: quiz.categoryid,
+          questionsnumber: quiz.questionsnumber,
+          wrongcode: quiz.wrongcode,
+          solutioncode: quiz.solutioncode,
+          createdat: new Date().toISOString(),
+        },
+      ])
+      .select();
 
     if (error) {
       console.error("Error al insertar el quiz:", error);
-      return { error };
+      return { data: null, error };
     }
 
-    console.log("Ejercicio creado:", data);
-    return { error: null };
+    const { data: questionsWithAnswers, error: questionError } =
+      await QuestionService.createQuestionWithAnswers(
+        questionsAndAnswers,
+        data[0].exerciseid
+    );
+
+    if (questionError) {
+      console.error("Error al insertar las preguntas:", questionError);
+      return { data: null, error: questionError };
+    }
+    console.log("Ejercicio creado creado:", data);
+    return {
+      data: {
+        ...data[0],
+        questions: questionsWithAnswers || [],
+      },
+      error: null,
+    };
   }
 
   // Método para eliminar un quiz por id
@@ -74,7 +107,6 @@ export class ExerciseService {
     exercise: Tables<"exercises"> | null;
     error: PostgrestError | null;
   }> {
-    console.log("Entra a servicio de get exercise");
     const { data, error } = await supabase
       .from("exercises")
       .select("*")
@@ -90,9 +122,10 @@ export class ExerciseService {
   }
 
   // Método para obtener exercises por authorId
-  public static async getExercisesByAuthorId(
-    authorId: string
-  ): Promise<{ exercises: Tables<"exercises">[]; error: PostgrestError | null }> {
+  public static async getExercisesByAuthorId(authorId: string): Promise<{
+    exercises: Tables<"exercises">[];
+    error: PostgrestError | null;
+  }> {
     const { data, error } = await supabase
       .from("exercises")
       .select("*")
@@ -117,14 +150,16 @@ export class ExerciseService {
       .limit(10); 
 
     if (error) {
-      console.error('Error fetching exercises:', error);
+      console.error("Error fetching exercises:", error);
       return { exercises: [], error };
     }
 
     return { exercises: data as Tables<"exercises">[], error: null };
   }
-
-  public static async getCurrentMonthQuizzesCount(): Promise<{ count: number; error: PostgrestError | null }> {
+  public static async getCurrentMonthQuizzesCount(): Promise<{
+    count: number;
+    error: PostgrestError | null;
+  }> {
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth() + 1; // Los meses en JavaScript son 0-indexados

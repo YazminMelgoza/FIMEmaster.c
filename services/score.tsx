@@ -22,6 +22,45 @@ export class ScoreService {
     console.log("Score creado correctamente");
     return { error: null };
   }
+// Método para actualizar o insertar el score en la tabla scores
+async upsertScore(
+  userId: string,
+  newScore: number
+): Promise<{ error: PostgrestError | null }> {
+  // Intentar obtener el score actual del usuario
+  const { data: existingScore, error: fetchError } = await supabase
+    .from("scores")
+    .select("*")
+    .eq("userid", userId)
+    .single();
+
+  if (fetchError && fetchError.code !== "PGRST116") { // Error distinto a "no existe registro"
+    console.error("Error al obtener el score:", fetchError);
+    return { error: fetchError };
+  }
+
+  let error: PostgrestError | null = null;
+
+  if (existingScore) {
+    // Si existe, actualiza el score
+    const accumulatedScore = existingScore.score + newScore;
+    const { error: updateError } = await supabase
+      .from("scores")
+      .update({ score: accumulatedScore})
+      .eq("userid", userId);
+
+    error = updateError;
+  } else {
+    // Si no existe, inserta un nuevo registro
+    const { error: insertError } = await supabase
+      .from("scores")
+      .insert([{ userid: userId, score: newScore }]);
+
+    error = insertError;
+  }
+
+  return { error };
+}
 
   // Función para eliminar un score por scoreId
   static async deleteScoreByScoreId(

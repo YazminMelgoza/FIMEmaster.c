@@ -56,18 +56,14 @@ const EscanearCodigo: React.FC = () => {
 
   return (
     <View style={styles.escanearCodigo}>
-      <Image
-        style={styles.statusBarLight}
-        resizeMode="cover"
-        source={require('../../assets/images/status-bar-light2.png')}
-      />
+      
       <Image
         style={styles.imageIcon}
         resizeMode="cover"
         source={require('../../assets/images/relieve.png')}
       />
       <View style={styles.escanearCodigoChild} />
-      <Pressable style={styles.vector} onPress={() => router.replace('../index')}>
+      <Pressable style={styles.vector} onPress={() => router.back()}>
         <Image
           style={styles.icon}
           resizeMode="cover"

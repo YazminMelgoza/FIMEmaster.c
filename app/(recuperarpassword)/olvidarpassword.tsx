@@ -14,7 +14,7 @@ export default function ForgotPasswordScreen() {
   {
     if(email != "")
     {
-      router.push(`codigopassword?emailRecibido=${email}`);
+      router.push(`PantallaCodigoVerificacion?emailRecibido=${email}`);
     }
     /*
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
@@ -31,6 +31,10 @@ export default function ForgotPasswordScreen() {
     } else {
         console.error("Error en la verificación:", error?.message);
     }
+  }
+  const goSignUp = async () =>
+  {
+    router.replace("signUp");
   }
   
 
@@ -56,14 +60,6 @@ export default function ForgotPasswordScreen() {
         onChangeText={setEmail}
         autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="codigo"
-        keyboardType="default"
-        value={token}
-        onChangeText={setToken}
-        autoCapitalize="none"
-      />
 
       <TouchableOpacity style={styles.button}  onPress={() =>
                 enviarEmail()
@@ -71,7 +67,9 @@ export default function ForgotPasswordScreen() {
         <Text style={styles.buttonText}>Enviar código</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={() =>
+                goSignUp()
+                }>
         <Text style={styles.registerText}>
           ¿No tienes una cuenta? <Text style={styles.registerLink}>Regístrate</Text>
         </Text>

@@ -6,9 +6,6 @@ import { QuestionService } from "../../services/question";
 import { AnswerService } from "../../services/answer"; // Import AnswerService
 import { Tables } from "database.types";
 import ToastManager, { Toast } from 'toastify-react-native';
-import { supabase } from "../../lib/supabase";
-import { AttemptService } from "../../services/attempt";
-import { ScoreService } from "../../services/score";
 
 const QuizScreen = () => {
   const { id } = useLocalSearchParams(); // Recibe el id del quiz desde los parámetros
@@ -19,11 +16,6 @@ const QuizScreen = () => {
   const [questions, setQuestions] = useState<Tables<"questions">[]>([]); 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); 
   const [answers, setAnswers] = useState<Tables<"answers">[]>([]); // State to store answers
-  const [score, setScore] = useState(0); // Estado para almacenar la puntuación
-  const [attemptedAt] = useState(new Date()); // Fecha/hora del intento
-
-  const attemptService = new AttemptService(); // Instancia del servicio
-  const scoreService = new ScoreService();
 
   useEffect(() => {
     if (id) {
@@ -66,16 +58,10 @@ const QuizScreen = () => {
   };
 
   const handleOptionSelect = (option: string) => {
-    if (!selectedOption) { // Check if an option has already been selected
-      setSelectedOption(option);
-      const selectedAnswer = answers.find(answer => answer.answer === option);
-      if (selectedAnswer) {
-        const isCorrect = selectedAnswer.iscorrect;
-        setFeedback(selectedAnswer.iscorrect ? '¡Correcto!' : 'Las líneas de código terminan con ;');
-        if (isCorrect) {
-          setScore(score + 5); // Incrementa la puntuación si la respuesta es correcta
-        }
-      }
+    setSelectedOption(option);
+    const selectedAnswer = answers.find(answer => answer.answer === option);
+    if (selectedAnswer) {
+      setFeedback(selectedAnswer.iscorrect ? '¡Correcto!' : 'Las líneas de código terminan con ;');
     }
   };
 
@@ -84,7 +70,7 @@ const QuizScreen = () => {
     setFeedback('');
   };
 
-  const handleContinue = async () => {
+  const handleContinue = () => {
     setFeedback('');
     setSelectedOption(null);
     // Avanzar a la siguiente pregunta si hay más
@@ -93,57 +79,11 @@ const QuizScreen = () => {
       setCurrentQuestionIndex(nextIndex);
       loadAnswersForQuestion(questions[nextIndex].questionid); // Load answers for the next question
     } else {
-      await createAttempt(); // Llama a createAttempt al finalizar el quiz
       // Mostrar mensaje de finalización o navegar
       Toast.success("¡Quiz completado!");
       router.replace('terminarQuiz');
     }
   };
-
-  const createAttempt = async () => {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) {
-      Toast.error("Error al obtener la información del usuario.");
-      console.error("Error al obtener el usuario:", userError);
-      return;
-    }
-    const userId = userData?.user?.id;
-  
-    if (!userId) {
-      Toast.error("No se pudo identificar al usuario.");
-      return;
-    }
-  
-    const newAttempt: Tables<"attempts"> = {
-      exerciseid: Number(id),
-      score: score,
-      attemptedat: attemptedAt.toISOString(),
-      userid: userId,
-      attemptid: Math.floor(Math.random() * 1000000), // Genera un ID de intento (o utiliza un UUID)
-      totalerrorcount: questions.length - score,
-      errorcountbytype: JSON.stringify({}), // Ajusta este campo según el tipo de error, si es necesario
-    };
-  
-    const { error } = await attemptService.createAttempt(newAttempt);
-    if (error) {
-      Toast.error("Hubo un error al registrar el intento.");
-      console.error("Error al crear intento:", error);
-    } else {
-      Toast.success("Intento registrado correctamente.");
-
-      // Llamar a upsertScore para actualizar o insertar el score en la tabla scores
-    const { error: scoreError } = await scoreService.upsertScore(userId, score);
-    if (scoreError) {
-      Toast.error("Hubo un error al actualizar el score.");
-      console.error("Error al actualizar score:", scoreError);
-    } else {
-      Toast.success("Score actualizado correctamente.");
-    }
-
-    }
-  };
-
-
 
   const currentQuestion = questions[currentQuestionIndex];
 
@@ -200,7 +140,6 @@ const QuizScreen = () => {
                     selectedOption !== null && !answer.iscorrect && selectedOption === answer.answer && styles.incorrectOption
                   ]}
                   onPress={() => handleOptionSelect(answer.answer)}
-                  disabled={!!selectedOption} // Disable the button if an option is already selected
                 >
                   <Text style={styles.optionText}>{answer.answer}</Text>
                 </TouchableOpacity>
