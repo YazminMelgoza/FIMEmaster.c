@@ -22,21 +22,28 @@ import { Picker } from "@react-native-picker/picker";
 import { Tables } from "database.types";
 import { ExerciseService } from "../../services/exercise";
 import { generateQuestionsAndAnswers } from "helpers/generateQuestionsAndAnswers";
+import {QuestionPayload, AnswerPayload} from "../types/questionPayload";
+
+import ConfirmarQuizScreen from './confirmarQuiz';
+
 
 export default function CrearQuiz() {
-    const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [username, setUsername] = useState("");
-    const [website, setWebsite] = useState("");
-    const [avatarUrl, setAvatarUrl] = useState("");
+    const router                        = useRouter();
+    const [loading, setLoading]         = useState(true);
+    const [loadedQuiz, setLoadedQuiz]   = useState(false);
+    
+
     const [firstname, setFirstname] = useState("");
     const [middlename, setMiddlename] = useState("");
     const [lastname, setLastname] = useState("");
+    const [resultQuestion, setResultQuestion] = useState<QuestionPayload[]>([]);
+
     //Varibles para guardar el código
     const [wrongCodeText, setWrongCodeText] = useState("");
     const [solutionCodeText, setSolutionCodeText] = useState("");
     const [authorId, setAuthorId] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
+    const [objExercise, setObjExercise] = useState<Tables<"exercises"> | null>(null);
 
     const categories = [
         { label: "Bucles", value: "1" },
@@ -51,7 +58,8 @@ export default function CrearQuiz() {
             const { data, error } = await supabase.auth.getUser();
             if (data.user) {
                 const id = data.user.id;
-                setAuthorId(data.user.id); // Obtiene el ID del usuario)
+                setAuthorId(data.user.id); 
+                updateExerciseState({ authorId: data.user.id }); 
 
                 const { user, error: userError } = await UserService.getUserProfileById(
                     id
@@ -89,11 +97,33 @@ export default function CrearQuiz() {
                 const uri = uri2;
                 const fileContent = await FileSystem.readAsStringAsync(uri);
 
+                
+                //******** */
+                const preguntas = await generateQuestionsAndAnswers(
+                  objExercise as Tables<"exercises">
+                );
+                setResultQuestion(preguntas); 
+                let wrongcodeAux = wrongCodeText;
+                let lines = wrongcodeAux.split("\n");
+                for (const question of preguntas)
+                {
+                  const { lineStart, lineEnd } = question;
+                  // Asegurarse de que los índices están dentro del rango del array y son válidos
+                  if (lineStart >= 1 && lineEnd <= lines.length && lineStart <= lineEnd) {
+                    // Elimina las líneas desde lineStart hasta lineEnd (ajustado para índice de array)
+                    lines.splice(lineStart - 1, lineEnd - lineStart + 1, ""); // Reemplaza el rango con un espacio vacío
+                  }
+                }
+                wrongcodeAux = lines.join("\n");
+                /*** SE ASIGNAN VALORES ***/
                 setFieldValue(field, fileContent);
-                setFieldValue("wrongcode", fileContent); // Se asigna el valor al campo wrongcode
+                setFieldValue("wrongcode", wrongcodeAux); 
                 //Se asigna el valor del código cargado
                 setSolutionCodeText(fileContent);
-                setWrongCodeText(fileContent);
+                setWrongCodeText(wrongcodeAux);
+                //Se asigna el valor del código cargado al quiz
+                updateExerciseState({ solutioncode: fileContent });
+                updateExerciseState({ wrongcode: wrongcodeAux });
             } else {
                 Alert.alert("Cancelado", "No se seleccionó ningún archivo.");
             }
@@ -101,6 +131,12 @@ export default function CrearQuiz() {
             Alert.alert("Error", "Hubo un problema al seleccionar el archivo.");
         }
     };
+    function updateExerciseState (ejercicio: Partial<Tables<"exercises">>) {
+      setObjExercise((prevExercise) => ({
+          ...prevExercise!,
+          ...ejercicio,
+      }));
+    }
 
     const validationSchema = Yup.object().shape({
         title: Yup.string().required("El título es obligatorio"),
@@ -112,39 +148,60 @@ export default function CrearQuiz() {
         solutioncode: Yup.string().required("El código de solución es obligatorio"),
         wrongcode: Yup.string().required("El código incorrecto es obligatorio"),
     });
+  
+  if(loadedQuiz)
+  {
+    return <ConfirmarQuizScreen 
+    QuestionPayload={resultQuestion} 
+    infoEjercicio={objExercise as Tables<"exercises"> } 
+    authorName={firstname + " " + lastname }
+    setLoadedQuiz={setLoadedQuiz}/>;
+    
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Formik
         initialValues={{
-          exerciseid: "0",
-          authorId: "",
-          instructions: "",
-          categoryid: "",
-          wrongcode: "",
-          solutioncode: "",
-          title: "",
-          questionsnumber: "",
+          exerciseid: objExercise?.exerciseid || "0",
+          authorId: objExercise?.authorId || "",
+          instructions: objExercise?.instructions || "",
+          categoryid: objExercise?.categoryid || "",
+          wrongcode: objExercise?.wrongcode || "",
+          solutioncode: objExercise?.solutioncode || "",
+          title: objExercise?.title || "",
+          questionsnumber: objExercise?.questionsnumber || "",
         }}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
-          const objQuiz = {
-            authorId: authorId,
-            instructions: values.instructions,
-            categoryid: Number(values.categoryid),
-            wrongcode: values.wrongcode,
-            solutioncode: values.solutioncode,
-            title: values.title,
-            questionsnumber: Number(values.questionsnumber),
-            createdat: new Date().toISOString(),
-          };
-          const result = generateQuestionsAndAnswers(
-            objQuiz as Tables<"exercises">
+          /*
+          const result = await generateQuestionsAndAnswers(
+            objExercise as Tables<"exercises">
           );
-          router.push({
-            pathname: "confirmarQuiz",
-            params: { jsonExercise: JSON.stringify(result) },
-          });
+          let wrongcodeAux = wrongCodeText;
+          let lines = wrongcodeAux.split("\n");
+          for (const question of result)
+          {
+            const { lineStart, lineEnd } = question;
+
+            // Asegurarse de que los índices están dentro del rango del array y son válidos
+            if (lineStart >= 1 && lineEnd <= lines.length && lineStart <= lineEnd) {
+              // Elimina las líneas desde lineStart hasta lineEnd (ajustado para índice de array)
+              lines.splice(lineStart - 1, lineEnd - lineStart + 1, ""); // Reemplaza el rango con un espacio vacío
+            }
+          }
+          wrongcodeAux = lines.join("\n");
+          setWrongCodeText(wrongcodeAux);
+          setObjExercise((prevExercise) => ({
+              ...prevExercise!,
+              wrongcode: wrongcodeAux,
+          }));*/
+          //console.log("Wrong Code: ", objExercise?.wrongcode);
+          
+          //console.log("Resultado: " + result[0].question);
+          //setResultQuestion(result); 
+          setLoadedQuiz(true);
+
         }}
       >
         {({
@@ -183,7 +240,12 @@ export default function CrearQuiz() {
               <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
               <TextInput
                 style={styles.input}
-                onChangeText={handleChange("title")}
+                onChangeText={(text) => {
+                  handleChange("title")(text); 
+                  updateExerciseState({ title: text }); 
+                }}
+              
+               
                 onBlur={handleBlur("title")}
                 value={values.title}
                 placeholder="Ingresa el nombre del ejercicio"
@@ -194,7 +256,12 @@ export default function CrearQuiz() {
               <Text style={styles.textTitleInput}>Instrucciones:</Text>
               <TextInput
                 style={styles.input}
-                onChangeText={handleChange("instructions")}
+                onChangeText={
+                  (text) => {
+                    handleChange("instructions")(text);
+                    updateExerciseState({ instructions: text });
+                  }
+                }
                 onBlur={handleBlur("instructions")}
                 value={values.instructions}
                 placeholder="Ingresa las instrucciones"
@@ -209,6 +276,7 @@ export default function CrearQuiz() {
                   selectedValue={selectedCategory}
                   onValueChange={(itemValue) => {
                     setSelectedCategory(itemValue);
+                    updateExerciseState({ categoryid: Number(itemValue)});
                     handleChange("categoryid")(itemValue); // Actualiza el valor en Formik
                   }}
                 >
@@ -229,8 +297,10 @@ export default function CrearQuiz() {
               <TextInput
                 style={styles.input}
                 keyboardType="numeric"
-                onChangeText={(value) =>
-                  setFieldValue("questionsnumber", value)
+                onChangeText={(value) =>{
+                  updateExerciseState({ questionsnumber: Number(value)});
+                  setFieldValue("questionsnumber", value);
+                  }
                 }
                 onBlur={handleBlur("questionsnumber")}
                 value={

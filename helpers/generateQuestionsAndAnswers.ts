@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { Tables } from "database.types";
 import { getLineStartNumber } from "utils/getLineStartNumber";
+import {QuestionPayload, AnswerPayload} from "../app/types/questionPayload";
 
 type SyntaxMistake = {
   generator: (code: string, error: SyntaxMistake) => QuestionPayload[];
@@ -8,7 +9,7 @@ type SyntaxMistake = {
   feedback: string;
   mistakeName: string;
 };
-
+/*
 type AnswerPayload = {
   answer: string;
   isCorrect: boolean;
@@ -21,7 +22,7 @@ export type QuestionPayload = {
   lineEnd: number;
   feedback: string;
   possibleAnswers: AnswerPayload[];
-};
+};*/
 
 const commonMistakes: SyntaxMistake[] = [
   {
@@ -37,7 +38,7 @@ export function generateQuestionsAndAnswers(
   exercise: Tables<"exercises">
 ): QuestionPayload[] {
   return commonMistakes.flatMap((mistake) =>
-    mistake.generator(exercise.wrongcode, mistake)
+    mistake.generator(exercise.solutioncode, mistake)
   );
 }
 

@@ -1,7 +1,7 @@
 import { supabase } from "../lib/supabase";
 import { Tables } from "database.types";
 import { PostgrestError } from "@supabase/supabase-js";
-import { QuestionPayload } from "helpers/generateQuestionsAndAnswers";
+import {QuestionPayload, AnswerPayload} from "../app/types/questionPayload";
 import { AnswerService } from "./answer";
 
 export type QuestionWithAnswers = Tables<"questions"> & {
