@@ -1,13 +1,59 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Tables } from "database.types";
+import { UserService } from "../../services/user";
+import { supabase } from "../../lib/supabase";
 
 const QuizScreen = () => {
   const router = useRouter();
-  const { jsonExercise } = useLocalSearchParams();
+  // Variables para obtener la información del quiz y las preguntas creadas
+  const { jsonExercise, jsonQuiz } = useLocalSearchParams();
   const ObjExercise = jsonExercise ? JSON.parse(jsonExercise as string) as Tables<"exercises"> : null;
+  const ObjQuiz = jsonQuiz ? JSON.parse(jsonQuiz as string) : null;
+  // Variables para obtener el nombre del usuario
+  const [authorId, setAuthorId] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [middlename, setMiddlename] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [categoryName, setCategoryName] = useState("");
 
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data.user) {
+        const id = data.user.id;
+        setAuthorId(data.user.id); // Obtiene el ID del usuario)
+
+        const { user, error: userError } = await UserService.getUserProfileById(
+          id
+        );
+        if (user) {
+          setFirstname(user.firstname || "");
+          setMiddlename(user.middlename || "");
+          setLastname(user.lastname || "");
+        }
+      } else {
+        console.error("Error al obtener el usuario:", error);
+      }
+    };
+
+    const fetchCategoryName = async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("name")
+        .eq("categoryid", ObjQuiz.categoryid);
+
+      if (data && data.length > 0) {
+        setCategoryName(data[0].name);
+      } else if (error) {
+        console.error("Error al obtener la categoría:", error);
+      }
+    };
+
+    fetchCategoryName();
+    fetchUser();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -40,19 +86,19 @@ const QuizScreen = () => {
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>María del Carmen</Text>
+              <Text style={styles.userName}>{firstname + " " + lastname + " " + middlename}</Text>
             </View>
           </View>
 
           {/* Quiz Info Section */}
           <View style={styles.infoContainer}>
-            <Text style={styles.quizTitle}>Suma de enteros</Text>
+            <Text style={styles.quizTitle}>{ObjQuiz.title}</Text>
             <Text style={styles.instructions}>Instrucciones:</Text>
             <Text style={styles.instructionsDetails}>
-              {ObjExercise?.instructions}
+              {ObjQuiz?.instructions}
             </Text>
             <Text style={styles.category}>Categoría:</Text>
-            <Text style={styles.categoryUpdate}>Lógica</Text>
+            <Text style={styles.categoryUpdate}>{categoryName}</Text>
           </View>
 
           {/* Code Section */}
@@ -60,20 +106,8 @@ const QuizScreen = () => {
             <Text style={styles.codeHeader}>Código a resolver:</Text>
             <View style={styles.codeBox}>
               <Text style={styles.code}>
-                #include {"<"}stdio.h{">"}
+                {ObjQuiz.wrongcode}
               </Text>
-              <Text style={styles.code}>int main()</Text>
-              <Text style={styles.code}>{"{"}</Text>
-              <Text style={styles.code}> int a, d, c;</Text>
-              <Text style={styles.code}> a = 5;</Text>
-              <Text style={styles.code}> b = 10;</Text>
-              <Text style={styles.code}> c = a + b;</Text>
-              <Text style={styles.code}>
-                {" "}
-                printf("El resultado es: %d", c);
-              </Text>
-              <Text style={styles.code}> return 0;</Text>
-              <Text style={styles.code}>{"}"}</Text>
             </View>
           </View>
 
@@ -81,7 +115,7 @@ const QuizScreen = () => {
           <View style={styles.outputContainer}>
             <Text style={styles.outputHeader}>Numero de preguntas:</Text>
             <View style={styles.outputBox}>
-              <Text style={styles.output}>5</Text>
+              <Text style={styles.output}>{ObjQuiz.questionsnumber}</Text>
             </View>
           </View>
 
