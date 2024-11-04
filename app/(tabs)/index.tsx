@@ -1,10 +1,9 @@
-import { router, Link  } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Link } from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import { NativeWindStyleSheet } from "nativewind";
-
-NativeWindStyleSheet.setOutput({
-  default: "native",
-});
+import { Tables } from "database.types";
+import { supabase } from "../../lib/supabase";
+import ToastManager, { Toast } from 'toastify-react-native';
 import {
   View,
   Text,
@@ -14,43 +13,85 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { AttemptService } from 'services/attempt';
 
-export default function Index() 
-{
-  const [quizzes, setQuizzes] = useState([
-    {
-      title: 'Programa Arrays',
-      description: 'Estructura de Datos',
-      icon: 'bar-chart',
-      color: '#4CAF50',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa Arrays',
-      description: 'Estructura de Datos',
-      icon: 'reorder',
-      color: '#2196F3',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa calculadora',
-      description: 'Lógica matemática',
-      icon: 'bar-chart',
-      color: '#9C27B0',
-      textColor: '#2D2D2D',
-    },
-  ]);
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 
-  const [selectedTab, setSelectedTab] = useState('home');
 
-  const handleCreateQuiz = () => {
-    console.log('Crear test');
-    router.push({ pathname: 'iniciarQuiz', params: { id: "1" } });
+export default function Index() {
+  const formatDate = (dateString:Date) => {
+    const date = new Date(dateString);
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const year = date.getUTCFullYear();
+    return `${day}/${month}/${year}`;
   };
+  const [attempts, setAttempts] = useState<any[]>([]);
+  const [exerciseTitles, setExerciseTitles] = useState<{ [key: number]: string | null }>({});
+  const [userId, setUserId] = useState<string>("");
 
-  return (
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data?.user) {
+        setUserId(data.user.id);
+        fetchAttempts(data.user.id);
+      } else {
+        console.error("Error fetching user:", error);
+        Toast.error("Usuario no encontrado.");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const fetchAttempts = async (userId: string) => {
+    const { data, error } = await AttemptService.getLastFourAttemptsByUserId(userId);
     
+    if (error) {
+      console.error("Error fetching attempts:", error.message);
+      Toast.error("Error cargando quiz recientes.");
+    } else if (!data || data.length === 0) {
+      Toast.warn("No attempts found.");
+    } else {
+      setAttempts(data);
+      Toast.success("Attempts loaded.");
+
+      // Fetch exercise titles for each attempt
+      data.forEach(async (attempt) => {
+        console.log("Attempted at:", new Date(attempt.attemptedat).toUTCString());
+
+        const title = await fetchExerciseTitle(attempt.exerciseid);
+        setExerciseTitles(prevTitles => ({
+          ...prevTitles,
+          [attempt.exerciseid]: title,
+        }));
+      });
+    }
+  };
+  const fetchExerciseTitle = async (exerciseId : number) => {
+    const { data, error } = await supabase
+      .from('exercises')
+      .select('title')
+      .eq('exerciseid', exerciseId)
+      .single();
+  
+    if (error) {
+      console.error("Error fetching exercise title:", error.message);
+      return null;
+    }
+    return data.title;
+  };
+  
+
+  const handleCreateQuiz = (quizId: number) => {
+    console.log("Create quiz with ID:", quizId);
+    router.push(`iniciarQuiz?id=${quizId}`);
+  };
+  return (
     <View style={styles.container}>
+      <ToastManager />
       <View style={styles.header}>
         <Image
           source={require('../../assets/images/imagetextura2.png')}
@@ -96,70 +137,43 @@ export default function Index()
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
             <Text style={styles.quizListTitle}>Quiz Recientes</Text>
-            <Link asChild href="historialQuiz" >
+            <Link asChild href="historialQuiz">
               <TouchableOpacity style={styles.quizListSeeAll}>
                 <Text style={styles.quizListSeeAllText}>ver todos</Text>
               </TouchableOpacity>
             </Link>
           </View>
 
-          {quizzes.map((quiz, index) => (
+          {attempts.map((attempt) => (
             <TouchableOpacity
-              key={index}
-              style={[styles.quizItem, { backgroundColor: '#fff', borderColor: quiz.color }]}
-              onPress={handleCreateQuiz}
+              key={attempt.attemptid}
+              style={[styles.quizItem, { backgroundColor: '#fff' }]}
+              onPress={() => handleCreateQuiz(attempt.exerciseid)}
             >
               <View style={styles.quizItemIcon}>
-                <Icon name={quiz.icon} size={30} color={quiz.color} />
+                <Text style={styles.quizItemScoreLabel}>Puntaje</Text>
+                <Text style={styles.quizItemScore}>{attempt.score ?? 'N/A'}</Text>
               </View>
               <View style={styles.quizItemDetails}>
-                <Text style={[styles.quizItemTitle, { color: quiz.textColor }]}>
-                  {quiz.title}
+                <Text style={styles.quizItemTitle}>
+                  {exerciseTitles[attempt.exerciseid] || `Intento ${attempt.attemptid}`}
                 </Text>
                 <Text style={styles.quizItemDescription}>
-                  {quiz.description}
+                  Fecha: {formatDate(attempt.attemptedat)}
                 </Text>
               </View>
-              <Icon name="arrow-forward-ios" size={20} color={quiz.color} />
+              <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
             </TouchableOpacity>
           ))}
+
+
+
         </View>
       </ScrollView>
-
-      {/*<View style={styles.footer}>
-        <TouchableOpacity onPress={() => setSelectedTab('home')}>
-          <Icon
-            name="home"
-            size={30}
-            color={selectedTab === 'home' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('search')}>
-          <Icon
-            name="search"
-            size={30}
-            color={selectedTab === 'search' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('stats')}>
-          <Icon
-            name="bar-chart"
-            size={30}
-            color={selectedTab === 'stats' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('account')}>
-          <Icon
-            name="account-circle"
-            size={30}
-            color={selectedTab === 'account' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-      </View>
-      */}
     </View>
   );
-};
+}
+
 
 const styles = StyleSheet.create({
   container: {
@@ -321,6 +335,16 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: '#E0E0E0',
   },
+  quizItemScoreLabel: {
+    fontSize: 12,
+    color: '#4CAF50',
+  },
+  quizItemScore: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  
+  
 });
-
 
