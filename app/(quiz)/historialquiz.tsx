@@ -96,7 +96,7 @@ export default function Index() {
 
   const handleLoadMore = () => {
     if (attempts.length < totalAttempts) {
-      setLimit(prevLimit => prevLimit + (limit === 6 ? 14 : 10)); // Aumenta 14 si el límite actual es 6, y 10 en adelante
+      setLimit(prevLimit => prevLimit + (limit === 6 ? 14 : 10));
     }
   };
 
@@ -122,7 +122,7 @@ export default function Index() {
             </View>
             <Text style={styles.headerName}>Historial de quiz contestados</Text>
           </View>
-          <Image source={require('../../assets/images/user.png')} style={styles.profileImage} />
+         
         </View>
       </View>
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
@@ -161,7 +161,6 @@ export default function Index() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -212,12 +211,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 5,
     marginLeft: 10,
-  },
-  profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginLeft: 20,
   },
   sunImage: {
     width: 20,
