@@ -3,9 +3,9 @@ import { Tables } from "database.types";
 import { supabase } from "../lib/supabase";
 import { PostgrestError } from "@supabase/supabase-js";
 import {
-  QuestionPayload,
   generateQuestionsAndAnswers,
 } from "helpers/generateQuestionsAndAnswers";
+import {QuestionPayload, AnswerPayload} from "../app/types/questionPayload";
 import { QuestionService, QuestionWithAnswers } from "./question";
 
 export type ExerciseDetails = Tables<"exercises"> & {
@@ -14,9 +14,10 @@ export type ExerciseDetails = Tables<"exercises"> & {
 export class ExerciseService {
   // Método para insertar un nuevo quiz
   public static async createExercise(
-    quiz: Tables<"exercises">
+    quiz: Tables<"exercises">,
+    questionsAndAnswers: QuestionPayload[]
   ): Promise<{ data: ExerciseDetails | null; error: PostgrestError | null }> {
-    const questionsAndAnswers = generateQuestionsAndAnswers(quiz);
+    //const questionsAndAnswers = generateQuestionsAndAnswers(quiz);
     console.log("Preguntas y respuestas generadas:", questionsAndAnswers);
 
     const { data, error } = await supabase
@@ -30,7 +31,7 @@ export class ExerciseService {
           questionsnumber: quiz.questionsnumber,
           wrongcode: quiz.wrongcode,
           solutioncode: quiz.solutioncode,
-          createdat: quiz.createdat,
+          createdat: new Date().toISOString(),
         },
       ])
       .select();
@@ -44,7 +45,7 @@ export class ExerciseService {
       await QuestionService.createQuestionWithAnswers(
         questionsAndAnswers,
         data[0].exerciseid
-      );
+    );
 
     if (questionError) {
       console.error("Error al insertar las preguntas:", questionError);
