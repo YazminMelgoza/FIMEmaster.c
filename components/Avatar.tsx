@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert, Image, Button } from 'react-native'
+import { StyleSheet, View, Alert, Image, Button, TouchableOpacity, ActivityIndicator } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 
 interface Props {
@@ -90,27 +90,29 @@ export default function Avatar({ url, size = 150, onUpload }: Props) {
 
   return (
     <View>
-      {avatarUrl ? (
-        <Image
-          source={{ uri: avatarUrl }}
-          accessibilityLabel="Avatar"
-          style={[avatarSize, styles.avatar, styles.image]}
-        />
-      ) : (
-        <Image
-          source={require('../assets/images/user.png')}
-          style={[avatarSize, styles.placeholderImage]}
-          accessibilityLabel="Default Avatar"
-        />
+      <TouchableOpacity 
+      onPress={uploadAvatar}
+      disabled={uploading}>
+        {avatarUrl ? (
+          <Image
+            source={{ uri: avatarUrl }}
+            accessibilityLabel="Avatar"
+            style={[avatarSize, styles.avatar, styles.image]}
+          />
+        ) : (
+          <Image
+            source={require('../assets/images/user.png')}
+            style={[avatarSize, styles.placeholderImage]}
+            accessibilityLabel="Default Avatar"
+          />
 
-      )}
-      <View >
-        <Button 
-          title={uploading ? 'Uploading ...' : ''}
-          onPress={uploadAvatar}
-          disabled={uploading}
-        />
-      </View>
+        )}
+        {uploading &&
+        <ActivityIndicator size="large" color="#0000ff" /> // Spinner de carga
+        
+
+        }
+      </TouchableOpacity>
     </View>
   )
 }

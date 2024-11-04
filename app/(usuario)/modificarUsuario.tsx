@@ -60,6 +60,12 @@ export default function Account() {
             setLoading(false);
         }
     };
+    function updateUserState(user: Partial<Tables<"users">>) {
+        setUser((prevUser) => ({
+            ...prevUser!,
+            ...user,
+        }));
+    }
     //Función para update el estado del objeto user
     if (loading) {
         return <View style={styles.container}>
@@ -67,12 +73,7 @@ export default function Account() {
         </View>;
     }
 
-    function updateUserState(user: Partial<Tables<"users">>) {
-        setUser((prevUser) => ({
-            ...prevUser!,
-            ...user,
-        }));
-    }
+    
     return (
         <View className="bg-[#3aa66a] h-full w-full flex flex-col">
             <View className="w-full h-auto pl-8 pt-10">

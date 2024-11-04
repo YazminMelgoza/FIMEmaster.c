@@ -23,7 +23,7 @@ import { UserService } from "services/user";
 import { ExerciseService } from "services/exercise";
 
 export default function Index() {
-
+  
 
 
   const chartConfig = {
@@ -51,6 +51,7 @@ export default function Index() {
   };
   const [selectedTab, setSelectedTab] = useState("home");
   const [loading, setLoading] = useState(true);
+  const [loadingChart, setLoadingChart] = useState(true);
   const [profile, setProfile] = useState<Tables<"users"> | null>(null);
 
   // Obtenemos la sesión de los parámetros de la ruta
@@ -88,6 +89,7 @@ export default function Index() {
           setUserScore(score); // Actualiza el estado con el score obtenido
         } else {
           // Maneja el error si es necesario
+          setUserScore(0);
           console.error(error);
         }
       }
@@ -106,6 +108,7 @@ export default function Index() {
           setUserRank(rank); // Actualiza el estado con el score obtenido
         } else {
           // Maneja el error si es necesario
+          setUserRank(0);
           console.error(error);
         }
       }
@@ -122,6 +125,7 @@ export default function Index() {
         if (!error) {
           setExercises(exercises?.length); // Actualiza el estado con los ejercicios obtenidos
         } else {
+          setExercises(0);
           console.error("Error al obtener los ejercicios del usuario:", error);
         }
       }
@@ -139,6 +143,7 @@ export default function Index() {
           setUserCountAttempt(count); // Actualiza el estado con el conteo obtenido
         } else {
           // Maneja el error si es necesario
+          setUserCountAttempt(0);
           console.error(error);
         }
       }
@@ -155,6 +160,7 @@ export default function Index() {
         if (!error) {
           setQuizNumberMonth(count); // Actualiza el estado con el conteo obtenido
         } else {
+          setQuizNumberMonth(0);
           // Maneja el error si es necesario
           console.error(error);
         }
@@ -172,16 +178,22 @@ export default function Index() {
 
   const [barData, setBarData] = useState<BarChartData | null>(null);
 
+  
+  //Checar
+  /*
   useEffect(() => {
     const fetchChartData = async () => {
       if (session?.user?.id) {
         const chartData = await UserService.getBarChartData(session.user.id);
         setBarData(chartData);
+        console.log(barData?.barColors + " / " + barData?.labels + " / " + barData?.legend + " / " + barData?.data[0]);
       }
+      setLoadingChart(false);
     };
     fetchChartData();
   }, [session?.user?.id]);
-
+  */
+  
   const progressData = {
     labels: ["Programs"],
     data: [
@@ -192,17 +204,30 @@ export default function Index() {
   };
 
 
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }: Partial<Tables<"users">>) {
-    setLoading(true);
-    if (!session?.user) throw new Error("No user on the session!");
-    if (!profile) throw new Error("No profile found!");
-    const error = await UserService.updateUserProfileById(profile);
-    if (error) Toast.error(error.message);
-    setLoading(false);
+  //Función para hacer el update
+  const updateProfile = async (updatedUser: Tables<"users">) => {
+    try {
+      setLoading(true);
+      if (!updatedUser.id) throw new Error("No user on the session!");
+
+      const error = await UserService.updateUserProfileById({
+          ...updatedUser,
+      });
+
+      if (error) throw error;
+      Toast.success("Foto de perfil actualizada con éxito");
+    } catch (error) {
+      Toast.error("No se logró actualizar la foto de perfil...");
+        
+    } finally {
+        setLoading(false);
+    }
+  };
+  function updateUserState(user: Partial<Tables<"users">>) {
+    setProfile((prevUser) => ({
+        ...prevUser!,
+        ...user,
+    }));
   }
 
   const handleCreateQuiz = () => {
@@ -239,22 +264,10 @@ export default function Index() {
             <Avatar
               size={100}
               url={profile?.avatar_url || ""}
-              onUpload={(url: string) => {
-                if (profile) {
-                  setProfile((prevProfile) => {
-                    if (!prevProfile) return prevProfile;
-                    return {
-                      ...prevProfile,
-                      avatar_url: url,
-                    };
-                  });
-                  updateProfile({
-                    username: profile.username,
-                    website: profile.website,
-                    avatar_url: url,
-                  });
-                }
-              }}
+              onUpload={(url) => {
+                updateUserState({ avatar_url: url });
+                updateProfile(profile!);
+            }}
             />
           </View>
 
@@ -377,20 +390,28 @@ export default function Index() {
             </View>
             <View className=" w-auto h-auto pt-4">
               <View className=" flex align-middle items-center border-2 rounded-3xl border-green-300">
-                <StackedBarChart
-                  data={barData || { labels: [], legend: [], data: [], barColors: [] }}
-                  width={300}
-                  height={220}
-                  yAxisLabel=""
-                  yAxisSuffix="%"
-                  style={styles.bargraph}
-                  yAxisInterval={1}
-                  fromZero={true}
-                  chartConfig={chartConfigBar}
-                  hideLegend={true}
-                  segments={3}
-                  yLabelsOffset={-10}
-                />
+              
+                {
+                  !loadingChart ? (
+                    <StackedBarChart
+                      data={barData || { labels: [], legend: [], data: [], barColors: [] }}
+                      width={300}
+                      height={220}
+                      yAxisLabel=""
+                      yAxisSuffix="%"
+                      style={styles.bargraph}
+                      yAxisInterval={1}
+                      fromZero={true}
+                      chartConfig={chartConfigBar}
+                      hideLegend={true}
+                      segments={3}
+                      yLabelsOffset={-10}
+                    />
+                  ) : (
+                    <Text>No disponible</Text>
+                  )
+                }
+                
               </View>
             </View>
           </View>
