@@ -1,4 +1,3 @@
-// AttemptService.ts
 import { supabase } from "../lib/supabase";
 import { Tables } from "database.types";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -14,6 +13,9 @@ export class AttemptService {
         score: attempt.score,
         attemptedat: attempt.attemptedat,
         userid: attempt.userid,
+        attemptid:attempt.attemptid,
+        totalerrorcount:attempt.totalerrorcount,
+        errorcountbytype:attempt.errorcountbytype,
       },
     ]);
 
@@ -75,7 +77,36 @@ export class AttemptService {
 
     return { data, error };
   }
-
+  static async getAllAttemptsByUserId(
+    userId: string
+  ): Promise<{
+    data: Tables<"attempts">[] | null;
+    error: PostgrestError | null;
+  }> {
+    const { data, error } = await supabase
+      .from("attempts")
+      .select("*")
+      .eq("userid", userId); // Fetching attempts by userId
+  
+    return { data, error };
+  }
+  static async getLastFourAttemptsByUserId(
+    userId: string
+  ): Promise<{
+    data: Tables<"attempts">[] | null;
+    error: PostgrestError | null;
+  }> {
+    const { data, error } = await supabase
+      .from("attempts")
+      .select("*")
+      .eq("userid", userId) // Fetching attempts by userId
+      .order("attemptedat", { ascending: false }) // Assuming there's a created_at field to order by
+      .limit(4); // Limiting the results to the last 4 attempts
+  
+    return { data, error };
+  }
+  
+  
   static async getAttemptsLastMonth(userId: string): Promise<{ attempts: any[] | null; error: PostgrestError | null }> {
   const oneMonthAgo = new Date();
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1); // Resta un mes a la fecha actual
@@ -96,5 +127,22 @@ export class AttemptService {
 
   console.log('Intentos del usuario del último mes obtenidos:', attempts);
   return { attempts, error: null };
+}
+// Método para obtener intentos con límite
+static async getAttemptsWithLimit(
+  userId: string,
+  limit: number
+): Promise<{
+  data: Tables<"attempts">[] | null;
+  error: PostgrestError | null;
+}> {
+  const { data, error } = await supabase
+    .from("attempts")
+    .select("*")
+    .eq("userid", userId)
+    .order("attemptedat", { ascending: false })
+    .limit(limit);
+
+  return { data, error };
 }
 }
