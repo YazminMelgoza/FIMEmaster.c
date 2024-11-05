@@ -69,7 +69,7 @@ export default function About() {
 
   const handleCreateQuiz = (id: number) => {
     console.log('Crear test');
-    router.push(`/infoQuiz?id=${id}`); // Navega a la pantalla de infoQuiz pasando el ID
+    router.push(`iniciarQuiz?id=${id}`); // Navega a la pantalla de infoQuiz pasando el ID
   };
 
   return (

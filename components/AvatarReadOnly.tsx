@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert, Image, Button, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { StyleSheet, View, Alert, Image, Button, TouchableOpacity, ActivityIndicator, Modal } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 
 interface Props {
@@ -10,10 +10,11 @@ interface Props {
   showUploadButton?: boolean; // Nueva propiedad para controlar el botón de subida
 }
 
-export default function Avatar({ url, size = 150, onUpload, showUploadButton = true }: Props) {
+export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadButton = true }: Props) {
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const avatarSize = { height: size, width: size };
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     if (url) downloadImage(url);
@@ -87,11 +88,22 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
       setUploading(false);
     }
   }
+  // Función para abrir el modal con la imagen ampliada
+  const handleImagePress = () => {
+    if (avatarUrl) {
+      setShowImageModal(true); // Mostrar la imagen en grande
+    }
+  };
+
+  // Función para cerrar el modal
+  const closeModal = () => {
+    setShowImageModal(false);
+  };
 
   return (
     <View>
       <TouchableOpacity 
-      onPress={uploadAvatar}
+      onPress={handleImagePress}
       disabled={uploading}>
         {avatarUrl ? (
           <Image
@@ -113,6 +125,27 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
 
         }
       </TouchableOpacity>
+      {/* Modal para mostrar la imagen en grande */}
+      {avatarUrl && (
+        <Modal
+        visible={showImageModal}
+        animationType="fade"
+        transparent={true}
+        onRequestClose={closeModal}>
+        <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
+          <View style={styles.modalClose} >
+            <Image
+              source={{ uri: avatarUrl }} // Asegúrate de pasar undefined si avatarUrl es null
+              style={styles.modalImage}
+              accessibilityLabel="Imagen ampliada"
+            />
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      )
+      }
+      
     </View>
   );
 }
@@ -136,5 +169,22 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderColor: 'rgb(200, 200, 200)',
     borderRadius: 5,
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  modalClose: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  modalImage: {
+    width: 300, // Tamaño de la imagen ampliada
+    height: 300, // Tamaño de la imagen ampliada
+    borderRadius: 10,
+    resizeMode: 'contain',
   },
 });

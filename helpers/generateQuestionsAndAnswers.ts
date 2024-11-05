@@ -35,10 +35,10 @@ const commonMistakes: SyntaxMistake[] = [
 ];
 
 export function generateQuestionsAndAnswers(
-  exercise: Tables<"exercises">
+  solutionCode: string
 ): QuestionPayload[] {
   return commonMistakes.flatMap((mistake) =>
-    mistake.generator(exercise.solutioncode, mistake)
+    mistake.generator(solutionCode, mistake)
   );
 }
 

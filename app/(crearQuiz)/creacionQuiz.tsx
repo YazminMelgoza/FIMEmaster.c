@@ -21,10 +21,11 @@ import { User } from "@supabase/supabase-js";
 import { Picker } from "@react-native-picker/picker";
 import { Tables } from "database.types";
 import { ExerciseService } from "../../services/exercise";
+import {CategoryService} from "../../services/categories";
 import { generateQuestionsAndAnswers } from "helpers/generateQuestionsAndAnswers";
 import {QuestionPayload, AnswerPayload} from "../types/questionPayload";
-
 import ConfirmarQuizScreen from './confirmarQuiz';
+import LoadingScreen from "../../components/loadingScreen";
 
 
 export default function CrearQuiz() {
@@ -44,6 +45,7 @@ export default function CrearQuiz() {
     const [authorId, setAuthorId] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("");
     const [objExercise, setObjExercise] = useState<Tables<"exercises"> | null>(null);
+    const [categoriesO, setCategories] = useState<Tables<"categories">[] | null>(null);
 
     const categories = [
         { label: "Bucles", value: "1" },
@@ -54,27 +56,34 @@ export default function CrearQuiz() {
     ];
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const { data, error } = await supabase.auth.getUser();
-            if (data.user) {
-                const id = data.user.id;
-                setAuthorId(data.user.id); 
-                updateExerciseState({ authorId: data.user.id }); 
+      const fetchData = async () => {
 
-                const { user, error: userError } = await UserService.getUserProfileById(
-                    id
-                );
-                if (user) {
-                    setFirstname(user.firstname || "");
-                    setMiddlename(user.middlename || "");
-                    setLastname(user.lastname || "");
-                }
-            } else {
-                console.error("Error al obtener el usuario:", error);
+        const { data: authData, error: authError } = await supabase.auth.getUser();
+        if (authData.user) {
+            const id = authData.user.id;
+            setAuthorId(authData.user.id); 
+            updateExerciseState({ authorId: authData.user.id }); 
+
+            const { user, error: userError } = await UserService.getUserProfileById(
+                id
+            );
+            if (user) {
+                setFirstname(user.firstname || "");
+                setMiddlename(user.middlename || "");
+                setLastname(user.lastname || "");
             }
-        };
-
-        fetchUser();
+        } else {
+            console.error("Error al obtener el usuario:", authError);
+        }
+        const { data: categoryData, error: categoryError } = await CategoryService.getAllCategories();
+        if (categoryData) {
+          setCategories(categoryData);
+        } else {
+          console.error("Error al obtener categorías:", categoryError);
+        }
+        setLoading(false);
+      };
+      fetchData();
     }, []);
 
     const handleFilePicker = async (
@@ -100,10 +109,11 @@ export default function CrearQuiz() {
                 
                 //******** */
                 const preguntas = await generateQuestionsAndAnswers(
-                  objExercise as Tables<"exercises">
+                  fileContent
                 );
+                
                 setResultQuestion(preguntas); 
-                let wrongcodeAux = wrongCodeText;
+                let wrongcodeAux = fileContent;
                 let lines = wrongcodeAux.split("\n");
                 for (const question of preguntas)
                 {
@@ -115,12 +125,14 @@ export default function CrearQuiz() {
                   }
                 }
                 wrongcodeAux = lines.join("\n");
+                
                 /*** SE ASIGNAN VALORES ***/
                 setFieldValue(field, fileContent);
                 setFieldValue("wrongcode", wrongcodeAux); 
                 //Se asigna el valor del código cargado
                 setSolutionCodeText(fileContent);
                 setWrongCodeText(wrongcodeAux);
+                console.log(fileContent);
                 //Se asigna el valor del código cargado al quiz
                 updateExerciseState({ solutioncode: fileContent });
                 updateExerciseState({ wrongcode: wrongcodeAux });
@@ -148,6 +160,11 @@ export default function CrearQuiz() {
         solutioncode: Yup.string().required("El código de solución es obligatorio"),
         wrongcode: Yup.string().required("El código incorrecto es obligatorio"),
     });
+  if(loading)
+  {
+    
+    return <LoadingScreen />;
+  }
   
   if(loadedQuiz)
   {
@@ -280,11 +297,11 @@ export default function CrearQuiz() {
                     handleChange("categoryid")(itemValue); // Actualiza el valor en Formik
                   }}
                 >
-                  {categories.map((category) => (
+                  {categoriesO && categoriesO.map((category) => (
                     <Picker.Item
-                      key={category.value}
-                      label={category.label}
-                      value={category.value}
+                      key={category.categoryid.toString()}
+                      label={category.name}
+                      value={category.categoryid.toString()}
                       style={styles.pickerItem}
                     />
                   ))}

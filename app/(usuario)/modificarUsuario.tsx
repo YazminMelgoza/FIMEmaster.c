@@ -1,4 +1,4 @@
-import { StyleSheet, View, Alert, Text, Pressable, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Alert, Text, Pressable, TouchableOpacity, Image } from "react-native";
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabase";
 import { Button, Input } from "@rneui/themed";
@@ -60,6 +60,12 @@ export default function Account() {
             setLoading(false);
         }
     };
+    function updateUserState(user: Partial<Tables<"users">>) {
+        setUser((prevUser) => ({
+            ...prevUser!,
+            ...user,
+        }));
+    }
     //Función para update el estado del objeto user
     if (loading) {
         return <View style={styles.container}>
@@ -67,24 +73,22 @@ export default function Account() {
         </View>;
     }
 
-    function updateUserState(user: Partial<Tables<"users">>) {
-        setUser((prevUser) => ({
-            ...prevUser!,
-            ...user,
-        }));
-    }
+    
     return (
         <View className="bg-[#3aa66a] h-full w-full flex flex-col">
+            <Image
+                source={require('../../assets/images/imagetextura2.png')}
+                style={styles.headerBackgroundImage}
+            />
             <View className="w-full h-auto pl-8 pt-10">
             <TouchableOpacity onPress={() => router.back()}>
-            <FontAwesome name="chevron-left" size={35} color="white" onPress={()=> router.back()} />
+                <FontAwesome name="chevron-left" size={35} color="white" onPress={()=> router.back()} />
             </TouchableOpacity>
 
             </View>
             <View className="w-full h-auto flex relative justify-center align-bottom items-center ">
-
                 <Avatar
-                    size={90}
+                    size={100}
                     url={user?.avatar_url || ""}
                     onUpload={(url) => updateUserState({ avatar_url: url })}
                 />
@@ -127,7 +131,7 @@ export default function Account() {
                 <View className="w-full h-auto flex">
 
                     <Button
-                        title={loading ? "Loading..." : "Update"}
+                        title={loading ? "Cargando..." : "Actualizar"}
                         onPress={() => updateProfile(user!)}
                         disabled={loading}
                         buttonStyle={[styles.button, { backgroundColor: '#3aa66a' }]}
@@ -136,7 +140,7 @@ export default function Account() {
                 <View className="w-full h-auto flex">
 
                     <Button
-                        title="Sign Out"
+                        title="Cerrar sesión"
                         onPress={() =>
                             supabase.auth
                                 .signOut()
@@ -153,6 +157,16 @@ export default function Account() {
     );
 }
 const styles = StyleSheet.create({
+    headerBackgroundImage: {
+        width: 1000,
+        height: 250,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        zIndex: 0,
+      },
 
     container: {
         flex: 1,
