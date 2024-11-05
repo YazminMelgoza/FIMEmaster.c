@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AttemptService } from 'services/attempt';
 import { UserService } from "services/user";
 import Avatar from '../../components/Avatar';
+import AvatarReadOnly from '../../components/AvatarReadOnly';
 
 NativeWindStyleSheet.setOutput({
   default: "native",
@@ -47,14 +48,14 @@ export default function Index() {
           console.error("Error al obtener el perfil del usuario:", profileError);
           Toast.error("Error al obtener el perfil del usuario.");
         } else {
-          const nameParts = [user.firstname, user.lastname, user.middlename].filter(Boolean);
+          const nameParts = [user.firstname, user.lastname].filter(Boolean);
           const fullName = nameParts.join(" ") || "Usuario";
           setFullName(fullName);
           if (user.avatar_url) {
             setAvatarUrl(user.avatar_url);
             console.log("Avatar URL:", user.avatar_url); // Verifica la URL aquí
           }
-          Toast.success("Nombre del usuario y avatar cargados.");
+          //Toast.success("Nombre del usuario y avatar cargados.");
         }
 
         fetchAttempts(userId);
@@ -75,7 +76,7 @@ export default function Index() {
       Toast.warn("No attempts found.");
     } else {
       setAttempts(data);
-      Toast.success("Attempts loaded.");
+      //Toast.success("Attempts loaded.");
       data.forEach(async (attempt) => {
         console.log("Attempted at:", new Date(attempt.attemptedat).toUTCString());
         const title = await fetchExerciseTitle(attempt.exerciseid);
@@ -127,8 +128,8 @@ export default function Index() {
 
           {/* Mostrar solo la imagen del avatar */}
           {avatarUrl && (
- <Avatar url={avatarUrl} size={40} showUploadButton={false} onUpload={() => {}} />
-)}
+            <AvatarReadOnly url={avatarUrl} size={50} showUploadButton={false} onUpload={() => {}} /> )
+          }
         </View>
       </View>
 

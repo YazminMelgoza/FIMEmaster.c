@@ -48,9 +48,7 @@ export default function ConfirmacionCreacionQuiz() {
             <View className="w-full" style={styles.header}>
                 <Image source={require('../../assets/images/imagetextura2.png')} style={styles.backgroundImage} />
                 <View className="w-full h-auto flex justify-center items-start pt-6 pl-6">
-                <TouchableOpacity onPress={() => router.back()}>
-                    <FontAwesome name="chevron-left" size={35} color="white" onPress={() => router.back()} />
-                </TouchableOpacity>
+                
                 </View>
             </View>
             <View className="bg-white w-full rounded-t-3xl justify-start w-" style={styles.container}>
@@ -58,13 +56,10 @@ export default function ConfirmacionCreacionQuiz() {
                     <ConfirmacionOsoSVG />
                     <Text className="text-2xl font-bold text-[#3aa66a] ">Se ha creado tu quiz con éxito!</Text>
                 </View>
-
-
-
                 <Button
-                    title="Visualizar Quiz"
+                    title="Volver a inicio"
                     onPress={() =>
-                        console.log("Hello World") //Aqui agregar logica de return
+                        router.navigate("/")
                     }
                     buttonStyle={[styles.button, { backgroundColor: '#3aa66a' }]}
                 />

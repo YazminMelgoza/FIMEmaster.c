@@ -21,6 +21,9 @@ import {
 import { Tables } from "database.types";
 import { UserService } from "services/user";
 import { ExerciseService } from "services/exercise";
+import AvatarReadOnly from "components/AvatarReadOnly";
+//import CircularProgress from "../../components/ProgressElipse";
+import LoadingScreen from "../../components/loadingScreen";
 
 export default function Index() {
   
@@ -175,24 +178,56 @@ export default function Index() {
     data: number[][];
     barColors: string[];
   };
-
+  
   const [barData, setBarData] = useState<BarChartData | null>(null);
+  // Función que valida y formatea los datos del gráfico
+  const formatBarData = (data: BarChartData | null) => {
+    if (!data) {
+      // Si no hay datos, retorna un objeto con valores por defecto
+      return {
+        labels: [],
+        legend: [],
+        data: [[]],
+        barColors: [],
+      };
+    }
+
+    const { labels, legend, data: chartData, barColors } = data;
+
+    // Validar que todos los arreglos tengan la misma longitud
+    const length = labels.length;
+
+    if (
+      length === legend.length &&
+      length === chartData.length &&
+      length === barColors.length
+    ) {
+      return data;
+    } else {
+      // Si hay discrepancia, devuelve un objeto por defecto
+      return {
+        labels: [],
+        legend: [],
+        data: [[]],
+        barColors: [],
+      };
+    }
+  };
 
   
   //Checar
-  /*
   useEffect(() => {
     const fetchChartData = async () => {
       if (session?.user?.id) {
         const chartData = await UserService.getBarChartData(session.user.id);
-        setBarData(chartData);
-        console.log(barData?.barColors + " / " + barData?.labels + " / " + barData?.legend + " / " + barData?.data[0]);
+        setBarData(formatBarData(chartData));
+        //console.log(barData?.barColors + " / " + barData?.labels + " / " + barData?.legend + " / " + barData?.data[0]);
       }
       setLoadingChart(false);
     };
     fetchChartData();
   }, [session?.user?.id]);
-  */
+  
   
   const progressData = {
     labels: ["Programs"],
@@ -241,15 +276,20 @@ export default function Index() {
 
   };*/
 
-  if (!profile) {
-    return <Text>Cargando...</Text>;
+  if (!profile || loadingChart) {
+    return <LoadingScreen />;
   }
   return (
     <View style={styles.container}>
+      
       <ScrollView
         className=" h-full flex flex-col"
         contentContainerStyle={styles.whiteBackgroundContainer}
       >
+        <Image
+          source={require('../../assets/images/imagetextura2.png')}
+          style={styles.headerBackgroundImage}
+        />
         <View style={styles.buttonsContainer}>
           <View className="h-32 flex flex-col items-end justify-center w-full">
 
@@ -261,7 +301,7 @@ export default function Index() {
 
         <View className="flex relative w-full bg-white h-auto flex-col  items-center">
           <View className=" absolute  self-center h-20 -top-20 ">
-            <Avatar
+            <AvatarReadOnly
               size={100}
               url={profile?.avatar_url || ""}
               onUpload={(url) => {
@@ -391,26 +431,25 @@ export default function Index() {
             <View className=" w-auto h-auto pt-4">
               <View className=" flex align-middle items-center border-2 rounded-3xl border-green-300">
               
-                {
-                  !loadingChart ? (
-                    <StackedBarChart
-                      data={barData || { labels: [], legend: [], data: [], barColors: [] }}
-                      width={300}
-                      height={220}
-                      yAxisLabel=""
-                      yAxisSuffix="%"
-                      style={styles.bargraph}
-                      yAxisInterval={1}
-                      fromZero={true}
-                      chartConfig={chartConfigBar}
-                      hideLegend={true}
-                      segments={3}
-                      yLabelsOffset={-10}
-                    />
-                  ) : (
-                    <Text>No disponible</Text>
-                  )
-                }
+                {/* Verificamos si los datos están vacíos */}
+                {barData && barData.data && barData.data.length > 0 && barData.labels.length > 0 ? (
+                <StackedBarChart
+                  data={barData} // Ahora barData ya está validado y formateado
+                  width={300}
+                  height={220}
+                  yAxisLabel=""
+                  yAxisSuffix="%"
+                  style={styles.bargraph}
+                  yAxisInterval={1}
+                  fromZero={true}
+                  chartConfig={chartConfigBar}
+                  hideLegend={true}
+                  segments={3}
+                  yLabelsOffset={-10}
+                />
+              ) : (
+                <Text>No hay gráficas disponibles</Text> // Mostrar mensaje si no hay datos
+              )}
                 
               </View>
             </View>

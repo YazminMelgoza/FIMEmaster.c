@@ -19,6 +19,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
   const router = useRouter();
   const [previewQuiz, setPreviewQuiz]  = useState(false);
   const [previewQuestion, setPreviewQuestion] = useState<QuestionPayload>();
+  const [isCreating, setIsCreating] = useState(false);
   //Función para prevenir el ir para atrás
   useEffect(() => {
     const handleBackPress = () => {
@@ -33,6 +34,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
 
   async function handleCreateExercise()
   {
+    setIsCreating(true);
     try
     {
       const { data, error } = await ExerciseService.createExercise(infoEjercicio,QuestionPayload);
@@ -44,13 +46,16 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
       }
       // Si no hay errores, puedes procesar los datos
       console.log("Ejercicio creado exitosamente:", data);
-      Toast.success("Ejercicio creado exitosamente");
-      router.navigate("/");
+      //Toast.success("Ejercicio creado exitosamente");
+      router.replace("quizCreadoConExito");
 
     }catch(err) 
     {
       console.error("Error inesperado:", err);
       Toast.warn("Ocurrió un error inesperado. Revisa la consola para más detalles.");
+    }finally {
+      // Cuando termine la acción, desactivar el estado de carga
+      setIsCreating(false);
     }
 
    
@@ -166,13 +171,19 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
             <TouchableOpacity
               style={styles.regresarButton}
               onPress={() => setLoadedQuiz(false) }
+              disabled={isCreating}
             >
               <Text style={styles.regresarButtonText}>Regresar</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.finalizarButton}
              onPress={handleCreateExercise}
+             disabled={isCreating}
              >
-              <Text style={styles.finalizarButtonText}>Finalizar</Text>
+              {isCreating ? (
+                <Text style={styles.finalizarButtonText}>Creando...</Text>
+              ) : (
+                <Text style={styles.finalizarButtonText}>Finalizar</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
