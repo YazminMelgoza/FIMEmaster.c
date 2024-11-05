@@ -1,10 +1,8 @@
-import { router, Link  } from 'expo-router';
-import React, { useState } from 'react';
+import { router, Link } from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import { NativeWindStyleSheet } from "nativewind";
-
-NativeWindStyleSheet.setOutput({
-  default: "native",
-});
+import { supabase } from "../../lib/supabase";
+import ToastManager, { Toast } from 'toastify-react-native';
 import {
   View,
   Text,
@@ -14,43 +12,102 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { AttemptService } from 'services/attempt';
+import { UserService } from "services/user";
+import Avatar from '../../components/Avatar';
 
-export default function Index() 
-{
-  const [quizzes, setQuizzes] = useState([
-    {
-      title: 'Programa Arrays',
-      description: 'Estructura de Datos',
-      icon: 'bar-chart',
-      color: '#4CAF50',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa Arrays',
-      description: 'Estructura de Datos',
-      icon: 'reorder',
-      color: '#2196F3',
-      textColor: '#2D2D2D',
-    },
-    {
-      title: 'Programa calculadora',
-      description: 'Lógica matemática',
-      icon: 'bar-chart',
-      color: '#9C27B0',
-      textColor: '#2D2D2D',
-    },
-  ]);
+NativeWindStyleSheet.setOutput({
+  default: "native",
+});
 
-  const [selectedTab, setSelectedTab] = useState('home');
+export default function Index() {
+  const formatDate = (dateString: Date) => {
+    const date = new Date(dateString);
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
-  const handleCreateQuiz = () => {
-    console.log('Crear test');
-    router.push({ pathname: 'iniciarQuiz', params: { id: "1" } });
+  const [attempts, setAttempts] = useState<any[]>([]);
+  const [exerciseTitles, setExerciseTitles] = useState<{ [key: number]: string | null }>({});
+  const [userId, setUserId] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("Usuario");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (data?.user) {
+        const userId = data.user.id;
+        setUserId(userId);
+
+        const { user, error: profileError } = await UserService.getUserProfileById(userId);
+        if (profileError || !user) {
+          console.error("Error al obtener el perfil del usuario:", profileError);
+          Toast.error("Error al obtener el perfil del usuario.");
+        } else {
+          const nameParts = [user.firstname, user.lastname, user.middlename].filter(Boolean);
+          const fullName = nameParts.join(" ") || "Usuario";
+          setFullName(fullName);
+          if (user.avatar_url) {
+            setAvatarUrl(user.avatar_url);
+            console.log("Avatar URL:", user.avatar_url); // Verifica la URL aquí
+          }
+          Toast.success("Nombre del usuario y avatar cargados.");
+        }
+
+        fetchAttempts(userId);
+      } else {
+        console.error("Error fetching user:", error);
+        Toast.error("Usuario no encontrado.");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const fetchAttempts = async (userId: string) => {
+    const { data, error } = await AttemptService.getLastFourAttemptsByUserId(userId);
+    if (error) {
+      console.error("Error fetching attempts:", error.message);
+      Toast.error("Error cargando quiz recientes.");
+    } else if (!data || data.length === 0) {
+      Toast.warn("No attempts found.");
+    } else {
+      setAttempts(data);
+      Toast.success("Attempts loaded.");
+      data.forEach(async (attempt) => {
+        console.log("Attempted at:", new Date(attempt.attemptedat).toUTCString());
+        const title = await fetchExerciseTitle(attempt.exerciseid);
+        setExerciseTitles(prevTitles => ({
+          ...prevTitles,
+          [attempt.exerciseid]: title,
+        }));
+      });
+    }
+  };
+
+  const fetchExerciseTitle = async (exerciseId: number) => {
+    const { data, error } = await supabase
+      .from('exercises')
+      .select('title')
+      .eq('exerciseid', exerciseId)
+      .single();
+    if (error) {
+      console.error("Error fetching exercise title:", error.message);
+      return null;
+    }
+    return data.title;
+  };
+
+  const handleCreateQuiz = (quizId: number) => {
+    console.log("Create quiz with ID:", quizId);
+    router.push(`iniciarQuiz?id=${quizId}`);
   };
 
   return (
-    
     <View style={styles.container}>
+      <ToastManager />
       <View style={styles.header}>
         <Image
           source={require('../../assets/images/imagetextura2.png')}
@@ -65,102 +122,72 @@ export default function Index()
               />
               <Text style={styles.headerText}>BUENOS DÍAS</Text>
             </View>
-            <Text style={styles.headerName}>Yazmin Melgoza</Text>
+            <Text style={styles.headerName}>{fullName}</Text>
           </View>
-          <Image source={require('../../assets/images/user.png')} style={styles.profileImage} />
+
+          {/* Mostrar solo la imagen del avatar */}
+          {avatarUrl && (
+ <Avatar url={avatarUrl} size={40} showUploadButton={false} onUpload={() => {}} />
+)}
         </View>
       </View>
-      
 
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.buttonsContainer}>
-            <Link asChild href="scan" >
-                <TouchableOpacity style={styles.button}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Icon name="qr-code" size={50} color="#3BA76B" />
-                    <Text style={styles.buttonText}>Escanear Código</Text>
-                    </View>
-                </TouchableOpacity>
-            </Link>
-            <Link asChild href="creacionQuiz" >
-                <TouchableOpacity style={styles.button} >
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Icon name="code" size={50} color="#3BA76B" />
-                    <Text style={styles.buttonText}> Crear test</Text>
-                    </View>
-                </TouchableOpacity>
-            </Link>
-          
+          <Link asChild href="scan">
+            <TouchableOpacity style={styles.button}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="qr-code" size={50} color="#3BA76B" />
+                <Text style={styles.buttonText}>Escanear Código</Text>
+              </View>
+            </TouchableOpacity>
+          </Link>
+          <Link asChild href="creacionQuiz">
+            <TouchableOpacity style={styles.button}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon name="code" size={50} color="#3BA76B" />
+                <Text style={styles.buttonText}> Crear test</Text>
+              </View>
+            </TouchableOpacity>
+          </Link>
         </View>
 
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
             <Text style={styles.quizListTitle}>Quiz Recientes</Text>
-            <Link asChild href="historialQuiz" >
+            <Link asChild href="historialquiz">
               <TouchableOpacity style={styles.quizListSeeAll}>
                 <Text style={styles.quizListSeeAllText}>ver todos</Text>
               </TouchableOpacity>
             </Link>
           </View>
 
-          {quizzes.map((quiz, index) => (
+          {attempts.map((attempt) => (
             <TouchableOpacity
-              key={index}
-              style={[styles.quizItem, { backgroundColor: '#fff', borderColor: quiz.color }]}
-              onPress={handleCreateQuiz}
+              key={attempt.attemptid}
+              style={[styles.quizItem, { backgroundColor: '#fff' }]}
+              onPress={() => handleCreateQuiz(attempt.exerciseid)}
             >
               <View style={styles.quizItemIcon}>
-                <Icon name={quiz.icon} size={30} color={quiz.color} />
+                <Text style={styles.quizItemScoreLabel}>Puntaje</Text>
+                <Text style={styles.quizItemScore}>{attempt.score ?? 'N/A'}</Text>
               </View>
               <View style={styles.quizItemDetails}>
-                <Text style={[styles.quizItemTitle, { color: quiz.textColor }]}>
-                  {quiz.title}
+                <Text style={styles.quizItemTitle}>
+                  {exerciseTitles[attempt.exerciseid] || `Intento ${attempt.attemptid}`}
                 </Text>
                 <Text style={styles.quizItemDescription}>
-                  {quiz.description}
+                  Fecha: {formatDate(attempt.attemptedat)}
                 </Text>
               </View>
-              <Icon name="arrow-forward-ios" size={20} color={quiz.color} />
+              <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
             </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
-
-      {/*<View style={styles.footer}>
-        <TouchableOpacity onPress={() => setSelectedTab('home')}>
-          <Icon
-            name="home"
-            size={30}
-            color={selectedTab === 'home' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('search')}>
-          <Icon
-            name="search"
-            size={30}
-            color={selectedTab === 'search' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('stats')}>
-          <Icon
-            name="bar-chart"
-            size={30}
-            color={selectedTab === 'stats' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('account')}>
-          <Icon
-            name="account-circle"
-            size={30}
-            color={selectedTab === 'account' ? '#4CAF50' : '#bbb'}
-          />
-        </TouchableOpacity>
-      </View>
-      */}
     </View>
   );
-};
-
+}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -204,6 +231,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     marginBottom: 0,
+  },
+  avatarImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginTop: 10,
+    overflow: 'hidden',
   },
   headerName: {
     color: '#fff',
@@ -321,6 +355,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: '#E0E0E0',
   },
+  quizItemScoreLabel: {
+    fontSize: 12,
+    color: '#4CAF50',
+  },
+  quizItemScore: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  
+  
 });
-
-

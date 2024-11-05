@@ -66,9 +66,9 @@ export class ExerciseService {
     quizId: number
   ): Promise<{ error: PostgrestError | null }> {
     const { error } = await supabase
-      .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
+      .from("exercises")
       .delete()
-      .eq("exerciseid", quizId); // Filtra por quizId
+      .eq("exerciseid", quizId);
 
     if (error) {
       console.error("Error al eliminar el quiz:", error);
@@ -84,7 +84,7 @@ export class ExerciseService {
     updatedQuiz: Tables<"exercises">
   ): Promise<{ error: PostgrestError | null }> {
     const { error } = await supabase
-      .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
+      .from("exercises")
       .update({
         authorId: updatedQuiz.authorId,
         instructions: updatedQuiz.instructions,
@@ -108,7 +108,7 @@ export class ExerciseService {
     error: PostgrestError | null;
   }> {
     const { data, error } = await supabase
-      .from("exercises") // Cambia 'exercises' al nombre de tu tabla si es diferente
+      .from("exercises")
       .select("*")
       .eq("exerciseid", quizId)
       .single();
@@ -138,17 +138,16 @@ export class ExerciseService {
 
     return { exercises: data as Tables<"exercises">[], error: null };
   }
-  //Método para obtener exercises por title
-  public static async getExercisesByTitle(searchQuery: string): Promise<{
-    exercises: Tables<"exercises">[];
-    error: PostgrestError | null;
-  }> {
+
+  // Método para obtener exercises por title
+  public static async getExercisesByTitle(
+    searchQuery: string
+  ): Promise<{ exercises: Tables<"exercises">[]; error: PostgrestError | null }> {
     const { data, error } = await supabase
-      .from("exercises")
-      .select(
-        "exerciseid, instructions, categoryid, wrongcode, solutioncode, authorId, title, questionsnumber, createdat"
-      )
-      .ilike("title", `%${searchQuery}%`);
+      .from('exercises') 
+      .select('exerciseid, instructions, categoryid, wrongcode, solutioncode, authorId, title, questionsnumber, createdat') 
+      .ilike('title', `%${searchQuery}%`)
+      .limit(10); 
 
     if (error) {
       console.error("Error fetching exercises:", error);
@@ -168,9 +167,8 @@ export class ExerciseService {
     const { data, error } = await supabase
       .from("exercises")
       .select("exerciseid", { count: "exact" }) // Contar los quizzes
-      .gte("createdat", `${year}-${month.toString().padStart(2, "0")}-01`) // Fecha de inicio del mes
-      .lt("createdat", `${year}-${(month + 1).toString().padStart(2, "0")}-01`); // Fecha de inicio del siguiente mes
-    console.log(data?.length);
+      .gte("createdat", `${year}-${month.toString().padStart(2, '0')}-01`) // Fecha de inicio del mes
+      .lt("createdat", `${year}-${(month + 1).toString().padStart(2, '0')}-01`); // Fecha de inicio del siguiente mes
 
     if (error) {
       console.error("Error al obtener la cantidad de quizzes:", error);
@@ -178,4 +176,5 @@ export class ExerciseService {
     }
     return { count: data?.length || 0, error: null };
   }
+
 }
