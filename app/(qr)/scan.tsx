@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Text, View, Pressable, ToastAndroid } from 'react-native';
+import { Image, StyleSheet, Text, View, Pressable, TextInput, ToastAndroid } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 import { router } from 'expo-router';
-import { Tables } from "database.types";
-import { ExerciseService } from "../../services/exercise";
-import { supabase } from "../../lib/supabase";
+import { ExerciseService } from 'services/exercise';
+
 const EscanearCodigo: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
-  const [scanning, setScanning] = useState('Escaneando...');
+  const [manualCode, setManualCode] = useState('');
+  const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
 
   useEffect(() => {
     (async () => {
@@ -20,43 +20,66 @@ const EscanearCodigo: React.FC = () => {
 
   const decodeBase64 = (data: string) => {
     try {
-      const decodedData = atob(data);
-      return decodedData;
+      return atob(data);
     } catch (error) {
-      console.error("Error decodificando Base64: ", error);
+      console.error("Error decoding Base64:", error);
       return null;
     }
   };
 
   const handleCreateQuiz = (quizId: number) => {
-    console.log("Crear test con ID:", quizId);
-    router.push(`iniciarQuiz?id=${quizId}`);
+    console.log("Creating quiz with ID:", quizId);
+    router.replace(`iniciarQuiz?id=${quizId}`);
   };
 
-  const handleBarCodeScanned = ({ type, data }: { type: string; data: string }) => {
+  const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
     setScanned(true);
+    await processCode(data);
+  };
+
+  const processCode = async (data: string) => {
     const decodedData = decodeBase64(data);
     if (decodedData) {
-      const numberValue = parseInt(decodedData, 10);
-      setScanning('Escaneado!');
-      handleCreateQuiz(numberValue); // Navega al quiz usando el ID escaneado
-      ToastAndroid.show(`Código escaneado: ${numberValue}`, ToastAndroid.LONG);
+      const quizId = parseInt(decodedData, 10);
+      await fetchExerciseById(quizId);
     } else {
-      setScanning('Error al decodificar el código.');
-      ToastAndroid.show('Error al decodificar el código.', ToastAndroid.LONG);
+      ToastAndroid.show('Error decoding code.', ToastAndroid.LONG);
+    }
+  };
+
+  const handleManualCodeSubmit = async () => {
+    if (manualCode) {
+      await processCode(manualCode);
+      setManualCode('');
+    } else {
+      ToastAndroid.show('Please enter a valid code.', ToastAndroid.SHORT);
+    }
+  };
+
+  const fetchExerciseById = async (quizId: number) => {
+    const { exercise, error } = await ExerciseService.getExerciseById(quizId);
+
+    if (error) {
+      console.error("Error fetching exercise by ID:", error);
+      ToastAndroid.show('Exercise not found.', ToastAndroid.LONG);
+    } else if (exercise) {
+      console.log("Exercise found:", exercise);
+      handleCreateQuiz(quizId); // Navigate to quiz if found
+      ToastAndroid.show(`Exercise found: ${exercise.title}`, ToastAndroid.LONG);
+    } else {
+      ToastAndroid.show('No exercise found with this ID.', ToastAndroid.LONG);
     }
   };
 
   if (hasPermission === null) {
-    return <Text>Solicitando permiso de cámara...</Text>;
+    return <Text>Requesting camera permission...</Text>;
   }
   if (!hasPermission) {
-    return <Text>No se concedió acceso a la cámara</Text>;
+    return <Text>Camera access not granted</Text>;
   }
 
   return (
     <View style={styles.escanearCodigo}>
-      
       <Image
         style={styles.imageIcon}
         resizeMode="cover"
@@ -71,17 +94,29 @@ const EscanearCodigo: React.FC = () => {
         />
       </Pressable>
       <Text style={styles.fotografaElCdigo}>Fotografía el código QR</Text>
-      <Text style={styles.escaneando}>{scanning}</Text>
+
       <View style={styles.roundedRectangle}>
-        <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-          style={StyleSheet.absoluteFillObject}
-        />
-        {scanned && (
-          <Text onPress={() => { setScanned(false); setScanning('Escaneando...'); }} style={styles.button}>
-            Escanear de nuevo
-          </Text>
+        {!isInputFocused && (
+          <BarCodeScanner
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={StyleSheet.absoluteFillObject}
+          />
         )}
+      </View>
+
+      <View style={styles.manualCodeContainer}>
+        <Text style={styles.manualCodeText}>Ingrese el código manualmente:</Text>
+        <TextInput
+          placeholder="Ingrese el código del quiz aquí"
+          value={manualCode}
+          onChangeText={setManualCode}
+          onFocus={() => setIsInputFocused(true)} // Set focus state to true on focus
+          onBlur={() => setIsInputFocused(false)} // Set focus state to false on blur
+          style={styles.manualInput}
+        />
+        <Pressable style={styles.submitButton} onPress={handleManualCodeSubmit}>
+          <Text style={styles.submitButtonText}>Enviar Código</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -92,12 +127,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-  },
-  statusBarLight: {
-    height: 42,
-    width: '100%',
-    position: 'absolute',
-    top: 0,
   },
   imageIcon: {
     width: '110%',
@@ -136,13 +165,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '70%',
   },
-  escaneando: {
-    fontSize: 18,
-    color: '#a7a7a7',
-    position: 'absolute',
-    bottom: 100,
-    textAlign: 'center',
-  },
   roundedRectangle: {
     width: '85%',
     height: '55%',
@@ -153,12 +175,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  button: {
-    fontSize: 20,
-    color: 'blue',
+  manualInput: {
+    width: '80%',
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  submitButton: {
+    backgroundColor: '#34C759',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  manualCodeContainer: {
+    alignItems: 'center',
     marginTop: 20,
+    position: 'absolute',
+    bottom: 30,
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  manualCodeText: {
+    fontSize: 16,
+    color: '#000',
+    marginBottom: 10,
   },
 });
 
 export default EscanearCodigo;
-

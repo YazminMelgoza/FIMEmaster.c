@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Clipboard } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -16,8 +16,7 @@ const QuizScreen = () => {
   const { id } = useLocalSearchParams();
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
   const [author, setAuthor] = useState<Tables<"users"> | null>(null);
-  // Define la URL predeterminada
-  
+  // Define la URL predeterminada  
 
   useEffect(() => {
     if (id) {
@@ -51,6 +50,7 @@ const QuizScreen = () => {
     }
     setLoading(false); 
   };
+  
   const encodeBase64 = (data: string) => {
     try {
       const decodedData = btoa(data);
@@ -60,6 +60,12 @@ const QuizScreen = () => {
       return null;
     }
   };
+
+  // Function to copy Base64 code to clipboard
+  const copyToClipboard = async (base64Data: string) => {
+    await Clipboard.setString(base64Data);
+    Toast.success('Código copiado al portapapeles');
+  };
   if(loading)
   {
     return( 
@@ -67,7 +73,7 @@ const QuizScreen = () => {
         <CircularProgress/>
       </View>);
   }
-
+  const base64Code = encodeBase64(Array.isArray(id) ? id.join(',') : id) || "";
   return (
     <View style={styles.container}>
       <ToastManager />
@@ -114,19 +120,35 @@ const QuizScreen = () => {
               </Text>
             </View>
           )}
-          { quiz?
+          {quiz && (
+            <View style={styles.infoContainer}>
+              <Text style={styles.quizTitle}>{quiz.title}</Text>
+              <Text style={styles.instructions}>Instrucciones:</Text>
+              <Text style={styles.instructionsDetails}>{quiz.instructions}</Text>
+              <Text style={styles.category}>Categoría:</Text>
+              <Text style={styles.bold}>{quiz.categoryid}</Text>
+              <Text style={styles.completed}>
+                Completado: <Text style={styles.bold}>{quiz.questionsnumber}</Text>
+              </Text>
+            </View>
+          )}
+          {quiz ? (
             <View style={styles.qrContainer}>
               <View style={styles.qrCodeWrapper}>
                 <Text style={styles.qrCodeText}>Código QR</Text>
-                <QRCode value={encodeBase64(Array.isArray(id) ? id.join(',') : id) || ""} size={270} />
+                <QRCode value={base64Code} size={270} />
+                <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(base64Code)}>
+                  <Text style={styles.copyButtonText}>Copiar Código QR</Text>
+                </TouchableOpacity>
               </View>
-            </View> : 
+            </View>
+          ) : (
             <View style={styles.qrContainer}>
               <View style={styles.qrCodeWrapper}>
                 <Text style={styles.qrCodeText}>Código QR No disponible</Text>
               </View>
             </View>
-          }
+          )}
           
         </View>
       </ScrollView>
@@ -301,6 +323,18 @@ const styles = StyleSheet.create({
      fontWeight: 'bold',
      marginBottom: 20,
    },
+   copyButton: {
+    backgroundColor: '#34C759',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginTop: 10,
+  },
+  copyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
 
 export default QuizScreen;
