@@ -312,7 +312,7 @@ export default function Index() {
           </View>
 
           <Text className="pt-5 pb-5 text-center text-[#2c2c32] text-2xl font-medium font-['sans-serif'] leading-9">
-            {profile.username || "Estudiante ITS"}
+            {profile.firstname || "Estudiante ITS"}
           </Text>
           <View className="w-[90%] pl-3 h-36 bg-[#3aa66a] flex flex-row rounded-3xl">
             <View className="w-1/6 flex justify-center items-center h-auto pl-4">

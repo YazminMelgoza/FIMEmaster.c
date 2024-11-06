@@ -21,7 +21,7 @@ const QuizScreen = () => {
   const [answers, setAnswers] = useState<Tables<"answers">[]>([]); // State to store answers
   const [score, setScore] = useState(0); // Estado para almacenar la puntuación
   const [attemptedAt] = useState(new Date()); // Fecha/hora del intento
-
+  const [errorCount, setErrorCount] = useState(0); // Estado para contar errores
   const attemptService = new AttemptService(); // Instancia del servicio
   const scoreService = new ScoreService();
 
@@ -66,14 +66,19 @@ const QuizScreen = () => {
   };
 
   const handleOptionSelect = (option: string) => {
-    if (!selectedOption) { // Check if an option has already been selected
+    if (!selectedOption) {
       setSelectedOption(option);
       const selectedAnswer = answers.find(answer => answer.answer === option);
+      
       if (selectedAnswer) {
         const isCorrect = selectedAnswer.iscorrect;
-        setFeedback(selectedAnswer.iscorrect ? '¡Correcto!' : 'Las líneas de código terminan con ;');
+        
         if (isCorrect) {
-          setScore(score + 5); // Incrementa la puntuación si la respuesta es correcta
+          setFeedback('¡Correcto!');
+          setScore(score + 5); // Incrementa el puntaje si la respuesta es correcta
+        } else {
+          setFeedback(currentQuestion.feedback || "Respuesta incorrecta"); // Muestra el feedback de la pregunta
+          setErrorCount(errorCount + 1); // Incrementa el contador de errores
         }
       }
     }
@@ -120,7 +125,7 @@ const QuizScreen = () => {
       attemptedat: attemptedAt.toISOString(),
       userid: userId,
       attemptid: Math.floor(Math.random() * 1000000), // Genera un ID de intento (o utiliza un UUID)
-      totalerrorcount: questions.length - score,
+      totalerrorcount: errorCount, // Almacena el número total de errores
       errorcountbytype: JSON.stringify({}), // Ajusta este campo según el tipo de error, si es necesario
     };
   
@@ -130,16 +135,14 @@ const QuizScreen = () => {
       console.error("Error al crear intento:", error);
     } else {
       Toast.success("Intento registrado correctamente.");
-
-      // Llamar a upsertScore para actualizar o insertar el score en la tabla scores
-    const { error: scoreError } = await scoreService.upsertScore(userId, score);
-    if (scoreError) {
-      Toast.error("Hubo un error al actualizar el score.");
-      console.error("Error al actualizar score:", scoreError);
-    } else {
-      Toast.success("Score actualizado correctamente.");
-    }
-
+  
+      const { error: scoreError } = await scoreService.upsertScore(userId, score);
+      if (scoreError) {
+        Toast.error("Hubo un error al actualizar el score.");
+        console.error("Error al actualizar score:", scoreError);
+      } else {
+        Toast.success("Score actualizado correctamente.");
+      }
     }
   };
 
