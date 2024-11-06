@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ExerciseService } from "../../services/exercise";
@@ -22,6 +22,8 @@ const QuizScreen = () => {
   const [score, setScore] = useState(0); // Estado para almacenar la puntuación
   const [attemptedAt] = useState(new Date()); // Fecha/hora del intento
   const [errorCount, setErrorCount] = useState(0); // Estado para contar errores
+
+  const scrollViewRef = useRef<ScrollView>(null); // Referencia para el ScrollView
   const attemptService = new AttemptService(); // Instancia del servicio
   const scoreService = new ScoreService();
 
@@ -48,7 +50,6 @@ const QuizScreen = () => {
     } else {
       setQuestions(questions);
       Toast.success("Preguntas cargadas");
-      console.log(questions);
       loadAnswersForQuestion(questions[0].questionid); // Load answers for the first question
     }
   };
@@ -61,7 +62,6 @@ const QuizScreen = () => {
       setAnswers([]);
     } else {
       setAnswers(answers || []);
-      console.log(`Respuestas para la pregunta ${questionId}:`, answers);
     }
   };
 
@@ -81,6 +81,11 @@ const QuizScreen = () => {
           setErrorCount(errorCount + 1); // Incrementa el contador de errores
         }
       }
+
+      // Desplazarse al final de la pantalla después de seleccionar una respuesta
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 500); // Ajusta el tiempo si es necesario para garantizar la visibilidad del feedback
     }
   };
 
@@ -146,8 +151,6 @@ const QuizScreen = () => {
     }
   };
 
-
-
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
@@ -167,7 +170,7 @@ const QuizScreen = () => {
         </TouchableOpacity>
         <Text style={styles.title}>Resolver Quiz</Text>
       </View>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} ref={scrollViewRef}>
         {/* White Background Container */}
         <View style={styles.whiteBackgroundContainer}>
           <Image
@@ -436,12 +439,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#00622A', 
     marginVertical: 10,
+    paddingLeft: 27,
   },
   optionButton: {
     backgroundColor: '#F9FFF9',
     padding: 15,
     borderRadius: 10,
     marginVertical: 5,
+    paddingLeft: 15,
+    marginHorizontal: 20,
   },
   selectedOption: {
     backgroundColor: '#99C97C',
@@ -454,6 +460,7 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     color: '#',
+    textAlign: 'left',
   },
   feedbackContainer: {
     marginTop: 10,
@@ -461,13 +468,16 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   feedbackLabel: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#00622A',
     fontWeight: 'bold',
+    paddingLeft: 22,
   },
   feedback: {
     fontSize: 16,
     color: '#000',
+    paddingLeft: 15,
+    paddingTop:20,
   },
   correctContainer: {
     backgroundColor: '#CFFAC8',
