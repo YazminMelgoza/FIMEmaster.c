@@ -9,7 +9,7 @@ const EscanearCodigo: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [manualCode, setManualCode] = useState('');
-  const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
+  const [isInputFocused, setIsInputFocused] = useState(false); 
 
   useEffect(() => {
     (async () => {
@@ -43,7 +43,7 @@ const EscanearCodigo: React.FC = () => {
       const quizId = parseInt(decodedData, 10);
       await fetchExerciseById(quizId);
     } else {
-      ToastAndroid.show('Error decoding code.', ToastAndroid.LONG);
+      ToastAndroid.show('Error al descifrar el código.', ToastAndroid.LONG);
     }
   };
 
@@ -52,7 +52,7 @@ const EscanearCodigo: React.FC = () => {
       await processCode(manualCode);
       setManualCode('');
     } else {
-      ToastAndroid.show('Please enter a valid code.', ToastAndroid.SHORT);
+      ToastAndroid.show('Por favor ingrese un código válido.', ToastAndroid.SHORT);
     }
   };
 
@@ -61,21 +61,21 @@ const EscanearCodigo: React.FC = () => {
 
     if (error) {
       console.error("Error fetching exercise by ID:", error);
-      ToastAndroid.show('Exercise not found.', ToastAndroid.LONG);
+      ToastAndroid.show('Error con el ID del quiz.', ToastAndroid.LONG);
     } else if (exercise) {
       console.log("Exercise found:", exercise);
       handleCreateQuiz(quizId); // Navigate to quiz if found
-      ToastAndroid.show(`Exercise found: ${exercise.title}`, ToastAndroid.LONG);
+      ToastAndroid.show(`Ejercicio encontrado: ${exercise.title}`, ToastAndroid.LONG);
     } else {
-      ToastAndroid.show('No exercise found with this ID.', ToastAndroid.LONG);
+      ToastAndroid.show('Ningún quiz encontrado con el ID proporcionado.', ToastAndroid.LONG);
     }
   };
 
   if (hasPermission === null) {
-    return <Text>Requesting camera permission...</Text>;
+    return <Text>Pidiendo permisos para acceder a la cámara...</Text>;
   }
   if (!hasPermission) {
-    return <Text>Camera access not granted</Text>;
+    return <Text>Acceso a la cámara denegado</Text>;
   }
 
   return (
