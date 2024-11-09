@@ -250,7 +250,7 @@ export default function CrearQuiz() {
                 </View>
               </View>
             </View>
-            <View style={styles.main}>
+            <View style={styles.whiteBackgroundContainer}>
               <Text style={styles.textAutorID}>
                 Autor: {firstname + " " + lastname + " " + middlename}
               </Text>
@@ -364,6 +364,21 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         backgroundColor: "#fff",
+        borderTopLeftRadius: 200,
+        borderTopRightRadius: 200,
+    },
+    whiteBackgroundContainer: {
+      flexGrow: 1,
+      backgroundColor: '#fff',
+      borderTopLeftRadius: 50,
+      borderTopRightRadius: 50,
+      padding: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 3,
+      zIndex: 1,
     },
     input: {
         height: 40,
@@ -397,7 +412,7 @@ const styles = StyleSheet.create({
     },
     headerBackgroundImage: {
         width: 500,
-        height: 150,
+        height: 250,
         position: "absolute",
         top: 0,
         left: 0,
@@ -426,9 +441,6 @@ const styles = StyleSheet.create({
         marginLeft: 51,
         fontSize: 24,
         color: "#ffffff",
-    },
-    main: {
-        padding: 20,
     },
     textAutorID: {
         paddingBottom: 20,
