@@ -51,7 +51,7 @@ export default function VerificationScreen() {
   const enviarEmail = async () =>
   {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-    console.log("email enviado: " + email);
+    console.log("Email enviado: " + email);
   }
 
   const confirmarToken = async (tokenFun: string, emailFun: string) =>

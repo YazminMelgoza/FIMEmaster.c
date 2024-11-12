@@ -71,7 +71,7 @@ export default function Index() {
     const { data, error } = await AttemptService.getLastFourAttemptsByUserId(userId);
     if (error) {
       console.error("Error fetching attempts:", error.message);
-      Toast.error("Error cargando quiz recientes.");
+      Toast.error("Error cargando quizzes recientes.");
     } else if (!data || data.length === 0) {
       Toast.warn("No attempts found.");
     } else {
@@ -139,7 +139,7 @@ export default function Index() {
             <TouchableOpacity style={styles.button}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon name="qr-code" size={50} color="#3BA76B" />
-                <Text style={styles.buttonText}>Escanear Código</Text>
+                <Text style={styles.buttonText}>Escanear código</Text>
               </View>
             </TouchableOpacity>
           </Link>
@@ -155,10 +155,10 @@ export default function Index() {
 
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
-            <Text style={styles.quizListTitle}>Quiz Recientes</Text>
+            <Text style={styles.quizListTitle}>Quizzes recientes</Text>
             <Link asChild href="historialquiz">
               <TouchableOpacity style={styles.quizListSeeAll}>
-                <Text style={styles.quizListSeeAllText}>ver todos</Text>
+                <Text style={styles.quizListSeeAllText}>Ver todos</Text>
               </TouchableOpacity>
             </Link>
           </View>

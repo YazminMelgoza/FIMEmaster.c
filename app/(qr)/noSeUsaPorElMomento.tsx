@@ -15,7 +15,7 @@ const OtroPrograma = () => {
             <Text style={[styles.descripcionProgramaContainer, styles.deSeptDeTypo1]}>
                 <Text style={styles.descripcionProgramaContainer1}>
                     <Text style={styles.blankLine}>{' '}</Text>
-                    <Text style={styles.descripcionPrograma}>Descripción del Programa</Text>
+                    <Text style={styles.descripcionPrograma}>Descripción del programa</Text>
                 </Text>
             </Text>
             <Image style={styles.greetingsIcon} resizeMode="cover" source={require('../../assets/images/avatar.png')} />

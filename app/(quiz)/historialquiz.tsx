@@ -128,7 +128,7 @@ export default function Index() {
       <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
-            <Text style={styles.quizListTitle}>Historial de Quiz</Text>
+            <Text style={styles.quizListTitle}>Historial del quiz</Text>
           </View>
 
           {attempts.map((attempt) => (

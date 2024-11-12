@@ -41,7 +41,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
       // Manejo de errores
       if (error) {
         console.error("Error al crear el ejercicio:", error.message);
-        Toast.warn('Hubo un error al crear el ejercicio. Revisa la consola para más detalles.');
+        Toast.warn('Se produjo un error al crear el ejercicio. Consulta la consola para más detalles.');
         return;
       }
       // Si no hay errores, puedes procesar los datos
@@ -52,7 +52,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
     }catch(err) 
     {
       console.error("Error inesperado:", err);
-      Toast.warn("Ocurrió un error inesperado. Revisa la consola para más detalles.");
+      Toast.warn("Se produjo un error inesperado. Consulta la consola para más detalles.");
     }finally {
       // Cuando termine la acción, desactivar el estado de carga
       setIsCreating(false);
@@ -86,7 +86,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
         >
           <Image source={require("../../assets/images/flechaAtras.png")} />
         </TouchableOpacity>
-        <Text style={styles.title}>Confirmar Quiz</Text>
+        <Text style={styles.title}>Confirmar quiz</Text>
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -131,7 +131,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
 
           {/* Output Section */}
           <View style={styles.outputContainer}>
-            <Text style={styles.outputHeader}>Numero de preguntas:</Text>
+            <Text style={styles.outputHeader}>Número de preguntas:</Text>
             <View style={styles.outputBox}>
               <Text style={styles.output}>{QuestionPayload.length }</Text>
             </View>
@@ -161,7 +161,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
                   </TouchableOpacity>
                 ))
             ) : (
-                <Text style={styles.answerText} >No hay preguntas disponibles.</Text>
+                <Text style={styles.answerText} >No se encontraron preguntas disponibles.</Text>
             )}
 
           </View>

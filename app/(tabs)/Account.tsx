@@ -353,7 +353,7 @@ export default function Index() {
                 <View className="w-[247px] text-center">
                   <View className="flex w-full flex-row items-center justify-center h-auto">
                     <Text className="text-[#0b082a] text-xl font-medium font-['sans-serif'] leading-7">
-                      Haz programado {""}
+                      ¡Haz programado {""}
                     </Text>
                     <Text className="text-[#3aa66a] text-xl font-medium font-['sans-serif'] leading-7">
                       {userCountAttempt !== null ? userCountAttempt : "0"}
@@ -412,7 +412,7 @@ export default function Index() {
                   </View>
                   <View className=" flex flex-row h-auto w-full">
                     <Text className="text-[#0b082a] text-xs font-normal font-['sans-serif'] leading-tight">
-                      Quizzes Creados
+                      Quizzes creados
                     </Text>
                   </View>
                 </View>

@@ -49,7 +49,7 @@ export default function ForgotPasswordScreen() {
       <Text style={styles.title}>Olvidé mi contraseña</Text>
 
       <Text style={styles.instructions}>
-        Ingresa tu correo para que te enviemos un código con el que podrás recuperar tu contraseña
+      Ingresa tu correo para enviarte un enlace que te permitirá recuperar tu contraseña
       </Text>
 
       <TextInput

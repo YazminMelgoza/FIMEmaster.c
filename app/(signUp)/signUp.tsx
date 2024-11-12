@@ -228,7 +228,7 @@ export default function SignUp() {
           <Text style={styles.registerLink}>
             ¿Ya tienes una cuenta?
             <Link href="/">
-              <Text style={styles.registerLinkSpan}> Inicia Sesión</Text>
+              <Text style={styles.registerLinkSpan}> Inicia sesión</Text>
             </Link>
           </Text>
         </View>

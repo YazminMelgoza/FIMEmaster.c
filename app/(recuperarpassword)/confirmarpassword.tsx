@@ -71,7 +71,7 @@ export default function SigInScreen() {
             </View>
 
             <TouchableOpacity style={styles.buttonContainer} onPress={() => confirmarPassword()}>
-                <Text style={styles.buttonText}>Cambiar tu contraseña</Text>
+                <Text style={styles.buttonText}>Cambiar contraseña</Text>
             </TouchableOpacity>
         </View>
     );

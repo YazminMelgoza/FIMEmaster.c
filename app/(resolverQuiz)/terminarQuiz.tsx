@@ -19,7 +19,7 @@ export default function TerminarQuizScreen() {
                             style={styles.buttonImage}
                         />
                     </TouchableOpacity>
-                    <Text style={styles.textTop}>Quiz Finalizado</Text>
+                    <Text style={styles.textTop}>Quiz finalizado</Text>
                 </View>
             </View>
             <View style={styles.column}>  

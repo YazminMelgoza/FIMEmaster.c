@@ -138,14 +138,14 @@ const QuizScreen = () => {
                 <Text style={styles.qrCodeText}>Código QR</Text>
                 <QRCode value={base64Code} size={270} />
                 <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(base64Code)}>
-                  <Text style={styles.copyButtonText}>Copiar Código QR</Text>
+                  <Text style={styles.copyButtonText}>Copiar código QR</Text>
                 </TouchableOpacity>
               </View>
             </View>
           ) : (
             <View style={styles.qrContainer}>
               <View style={styles.qrCodeWrapper}>
-                <Text style={styles.qrCodeText}>Código QR No disponible</Text>
+                <Text style={styles.qrCodeText}>Código QR no disponible</Text>
               </View>
             </View>
           )}

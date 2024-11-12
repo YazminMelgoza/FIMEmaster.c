@@ -54,7 +54,7 @@ export default function ConfirmacionCreacionQuiz() {
             <View className="bg-white w-full rounded-t-3xl justify-start w-" style={styles.container}>
                 <View className=" flex justify-center items-center pb-4 pt-36">
                     <ConfirmacionOsoSVG />
-                    <Text className="text-2xl font-bold text-[#3aa66a] ">Se ha creado tu quiz con éxito!</Text>
+                    <Text className="text-2xl font-bold text-[#3aa66a] ">¡Se ha creado tu quiz con éxito!</Text>
                 </View>
                 <Button
                     title="Volver a inicio"

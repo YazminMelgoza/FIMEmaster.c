@@ -61,7 +61,7 @@ const DashboardScreen = () => {
       {/* Stats Section */}
       <View style={styles.statsSection}>
         <Text style={styles.sectionTitle}>
-          Haz programado 24 códigos este mes!
+          ¡Haz programado 24 códigos este mes!
         </Text>
         <View style={styles.progressContainer}>
           {/* Gráfico circular */}
@@ -84,7 +84,7 @@ const DashboardScreen = () => {
         {/* Rectángulos para "5 Quizzes Creados" y "21 Programados" */}
         <View style={styles.statsRow}>
           <View style={styles.statBoxGreen}>
-            <Text style={styles.statBoxText}>5 Quizzes Creados</Text>
+            <Text style={styles.statBoxText}>5 Quizzes creados</Text>
           </View>
           <View style={styles.statBoxWhite}>
             <Text style={styles.statBoxText}>21 Programados</Text>
@@ -94,7 +94,7 @@ const DashboardScreen = () => {
 
       {/* Categories Section */}
       <View style={styles.categoriesSection}>
-        <Text style={styles.sectionTitle}>Categorías Top!</Text>
+        <Text style={styles.sectionTitle}>Categorías top!</Text>
         <BarChart
           data={barData}
           width={screenWidth * 0.8}
