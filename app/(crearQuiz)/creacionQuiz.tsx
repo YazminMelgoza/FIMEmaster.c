@@ -26,6 +26,7 @@ import { generateQuestionsAndAnswers } from "helpers/generateQuestionsAndAnswers
 import {QuestionPayload, AnswerPayload} from "../types/questionPayload";
 import ConfirmarQuizScreen from './confirmarQuiz';
 import LoadingScreen from "../../components/loadingScreen";
+import LoadingIcon from "../../components/loadingIcon";
 
 
 export default function CrearQuiz() {
@@ -92,7 +93,7 @@ export default function CrearQuiz() {
     ) => {
         try {
             const result = await DocumentPicker.getDocumentAsync({
-                type: "text/plain", // Asegúrate de que solo seleccionas archivos de texto
+                type: ["text/plain", "text/x-csrc"], // Asegúrate de que solo seleccionas archivos de texto
                 copyToCacheDirectory: true, // Esto asegura que el archivo se copie al caché
             });
 
@@ -160,11 +161,12 @@ export default function CrearQuiz() {
         solutioncode: Yup.string().required("El código de solución es obligatorio"),
         wrongcode: Yup.string().required("El código incorrecto es obligatorio"),
     });
+  /*
   if(loading)
   {
     
     return <LoadingScreen />;
-  }
+  }*/
   
   if(loadedQuiz)
   {
@@ -191,34 +193,7 @@ export default function CrearQuiz() {
         }}
         validationSchema={validationSchema}
         onSubmit={async (values) => {
-          /*
-          const result = await generateQuestionsAndAnswers(
-            objExercise as Tables<"exercises">
-          );
-          let wrongcodeAux = wrongCodeText;
-          let lines = wrongcodeAux.split("\n");
-          for (const question of result)
-          {
-            const { lineStart, lineEnd } = question;
-
-            // Asegurarse de que los índices están dentro del rango del array y son válidos
-            if (lineStart >= 1 && lineEnd <= lines.length && lineStart <= lineEnd) {
-              // Elimina las líneas desde lineStart hasta lineEnd (ajustado para índice de array)
-              lines.splice(lineStart - 1, lineEnd - lineStart + 1, ""); // Reemplaza el rango con un espacio vacío
-            }
-          }
-          wrongcodeAux = lines.join("\n");
-          setWrongCodeText(wrongcodeAux);
-          setObjExercise((prevExercise) => ({
-              ...prevExercise!,
-              wrongcode: wrongcodeAux,
-          }));*/
-          //console.log("Wrong Code: ", objExercise?.wrongcode);
-          
-          //console.log("Resultado: " + result[0].question);
-          //setResultQuestion(result); 
           setLoadedQuiz(true);
-
         }}
       >
         {({
@@ -251,107 +226,114 @@ export default function CrearQuiz() {
               </View>
             </View>
             <View style={styles.main}>
-              <Text style={styles.textAutorID}>
-                Autor: {firstname + " " + lastname + " " + middlename}
-              </Text>
-              <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={(text) => {
-                  handleChange("title")(text); 
-                  updateExerciseState({ title: text }); 
-                }}
-              
-               
-                onBlur={handleBlur("title")}
-                value={values.title}
-                placeholder="Ingresa el nombre del ejercicio"
-              />
-              {errors.title && touched.title && (
-                <Text style={styles.errorText}>{errors.title}</Text>
-              )}
-              <Text style={styles.textTitleInput}>Instrucciones:</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={
-                  (text) => {
-                    handleChange("instructions")(text);
-                    updateExerciseState({ instructions: text });
-                  }
-                }
-                onBlur={handleBlur("instructions")}
-                value={values.instructions}
-                placeholder="Ingresa las instrucciones"
-              />
-              {errors.instructions && touched.instructions && (
-                <Text style={styles.errorText}>{errors.instructions}</Text>
-              )}
-              <Text style={styles.textTitleInput}>Categoría:</Text>
-              <View style={styles.pickerContainer}>
-                <Picker
-                  style={styles.pickerText}
-                  selectedValue={selectedCategory}
-                  onValueChange={(itemValue) => {
-                    setSelectedCategory(itemValue);
-                    updateExerciseState({ categoryid: Number(itemValue)});
-                    handleChange("categoryid")(itemValue); // Actualiza el valor en Formik
+              {loading ? (
+                <LoadingIcon/>
+              ) : 
+              (
+              <View>
+                <Text style={styles.textAutorID}>
+                  Autor: {firstname + " " + lastname + " " + middlename}
+                </Text>
+                <Text style={styles.textTitleInput}>Nombre del ejercicio:</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={(text) => {
+                    handleChange("title")(text); 
+                    updateExerciseState({ title: text }); 
                   }}
-                >
-                  {categoriesO && categoriesO.map((category) => (
-                    <Picker.Item
-                      key={category.categoryid.toString()}
-                      label={category.name}
-                      value={category.categoryid.toString()}
-                      style={styles.pickerItem}
-                    />
-                  ))}
-                </Picker>
-              </View>
-              {errors.categoryid && touched.categoryid && (
-                <Text style={styles.errorText}>{errors.categoryid}</Text>
-              )}
-              <Text style={styles.textTitleInput}>Cantidad de preguntas:</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                onChangeText={(value) =>{
-                  updateExerciseState({ questionsnumber: Number(value)});
-                  setFieldValue("questionsnumber", value);
+                
+                
+                  onBlur={handleBlur("title")}
+                  value={values.title}
+                  placeholder="Ingresa el nombre del ejercicio"
+                />
+                {errors.title && touched.title && (
+                  <Text style={styles.errorText}>{errors.title}</Text>
+                )}
+                <Text style={styles.textTitleInput}>Instrucciones:</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={
+                    (text) => {
+                      handleChange("instructions")(text);
+                      updateExerciseState({ instructions: text });
+                    }
                   }
-                }
-                onBlur={handleBlur("questionsnumber")}
-                value={
-                  values.questionsnumber
-                    ? values.questionsnumber.toString()
-                    : ""
-                }
-                placeholder="Ingresa la cantidad de preguntas"
-              />
-              {errors.questionsnumber && touched.questionsnumber && (
-                <Text style={styles.errorText}>{errors.questionsnumber}</Text>
-              )}
-              <TouchableOpacity
-                style={styles.buttons}
-                onPress={() => handleFilePicker(setFieldValue, "solutioncode")}
-              >
-                <Text style={styles.buttonText}>Cargar Ejercicio</Text>
-              </TouchableOpacity>
-              <Text style={styles.textTitleCode}>Solution Code:</Text>
-              {errors.solutioncode && touched.solutioncode && (
-                <Text style={styles.errorText}>{errors.solutioncode}</Text>
-              )}
-              <Text>{solutionCodeText}</Text>
-              <Text style={styles.textTitleCode}>Wrong Code:</Text>
-              <Text>{wrongCodeText}</Text>
-              {errors.wrongcode && touched.wrongcode && (
-                <Text style={styles.errorText}>{errors.wrongcode}</Text>
-              )}
-              <TouchableOpacity
-                style={styles.buttons}
-                onPress={() => handleSubmit()}
-              >
-                <Text style={styles.buttonText}>Crear Quiz</Text>
-              </TouchableOpacity>
+                  onBlur={handleBlur("instructions")}
+                  value={values.instructions}
+                  placeholder="Ingresa las instrucciones"
+                />
+                {errors.instructions && touched.instructions && (
+                  <Text style={styles.errorText}>{errors.instructions}</Text>
+                )}
+                <Text style={styles.textTitleInput}>Categoría:</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    style={styles.pickerText}
+                    selectedValue={selectedCategory}
+                    onValueChange={(itemValue) => {
+                      setSelectedCategory(itemValue);
+                      updateExerciseState({ categoryid: Number(itemValue)});
+                      handleChange("categoryid")(itemValue); // Actualiza el valor en Formik
+                    }}
+                  >
+                    {categoriesO && categoriesO.map((category) => (
+                      <Picker.Item
+                        key={category.categoryid.toString()}
+                        label={category.name}
+                        value={category.categoryid.toString()}
+                        style={styles.pickerItem}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+                {errors.categoryid && touched.categoryid && (
+                  <Text style={styles.errorText}>{errors.categoryid}</Text>
+                )}
+                <Text style={styles.textTitleInput}>Cantidad de preguntas:</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="numeric"
+                  onChangeText={(value) =>{
+                    updateExerciseState({ questionsnumber: Number(value)});
+                    setFieldValue("questionsnumber", value);
+                    }
+                  }
+                  onBlur={handleBlur("questionsnumber")}
+                  value={
+                    values.questionsnumber
+                      ? values.questionsnumber.toString()
+                      : ""
+                  }
+                  placeholder="Ingresa la cantidad de preguntas"
+                />
+                {errors.questionsnumber && touched.questionsnumber && (
+                  <Text style={styles.errorText}>{errors.questionsnumber}</Text>
+                )}
+                <TouchableOpacity
+                  style={styles.buttons}
+                  onPress={() => handleFilePicker(setFieldValue, "solutioncode")}
+                >
+                  <Text style={styles.buttonText}>Cargar Ejercicio</Text>
+                </TouchableOpacity>
+                <Text style={styles.textTitleCode}>Código cargado:</Text>
+                {errors.solutioncode && touched.solutioncode && (
+                  <Text style={styles.errorText}>{errors.solutioncode}</Text>
+                )}
+                <Text>{solutionCodeText}</Text>
+                <Text style={styles.textTitleCode}>Código a resolver:</Text>
+                <Text>{wrongCodeText}</Text>
+                {errors.wrongcode && touched.wrongcode && (
+                  <Text style={styles.errorText}>{errors.wrongcode}</Text>
+                )}
+                <TouchableOpacity
+                  style={styles.buttons}
+                  onPress={() => handleSubmit()}
+                >
+                  <Text style={styles.buttonText}>Crear Quiz</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             </View>
           </View>
         )}

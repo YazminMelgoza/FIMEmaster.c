@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Clipboard } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -8,6 +8,11 @@ import { UserService } from 'services/user';
 import { Tables } from "database.types";
 import ToastManager, { Toast } from 'toastify-react-native';
 import {CircularProgress} from "../../components/ProgressElipse";
+import AvatarReadOnly from '../../components/AvatarReadOnly';
+import LoadingIcon from "../../components/loadingIcon";
+import {CategoryService} from "../../services/categories";
+import * as Clipboard from 'expo-clipboard';
+
 
 
 const QuizScreen = () => {
@@ -16,6 +21,7 @@ const QuizScreen = () => {
   const { id } = useLocalSearchParams();
   const [quiz, setQuiz] = useState<Tables<"exercises"> | null>(null);
   const [author, setAuthor] = useState<Tables<"users"> | null>(null);
+  const [category, setCategory] = useState<Tables<"categories"> | null>(null);
   // Define la URL predeterminada  
 
   useEffect(() => {
@@ -35,6 +41,7 @@ const QuizScreen = () => {
     } else {
       setQuiz(exercise); 
       const { user, error: errorUser } = await UserService.getUserProfileById(exercise.authorId);
+      const { data: categoryData, error: categoryError } = await CategoryService.getCategoryById(exercise.categoryid || 1);
       if(errorUser)
       {
 
@@ -45,7 +52,11 @@ const QuizScreen = () => {
       {
         setAuthor(user);
       }
-      Toast.success("Quiz cargado");
+      if(categoryData)
+      {
+        setCategory(categoryData);
+      }
+      //Toast.success("Quiz cargado");
       console.log(exercise);
     }
     setLoading(false); 
@@ -63,16 +74,17 @@ const QuizScreen = () => {
 
   // Function to copy Base64 code to clipboard
   const copyToClipboard = async (base64Data: string) => {
-    await Clipboard.setString(base64Data);
+    await Clipboard.setStringAsync(base64Data);  // Usa setStringAsync en lugar de setString
     Toast.success('Código copiado al portapapeles');
   };
+  /*
   if(loading)
   {
     return( 
       <View style={styles.container}>
         <CircularProgress/>
       </View>);
-  }
+  }*/
   const base64Code = encodeBase64(Array.isArray(id) ? id.join(',') : id) || "";
   return (
     <View style={styles.container}>
@@ -86,70 +98,63 @@ const QuizScreen = () => {
       </View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.whiteBackgroundContainer}>
-          <Image source={require('../../assets/images/fondoBlanco.jpg')} style={styles.whiteBackgroundImage} />
-          <View style={styles.profileContainer}>
-            <Image 
-              source={{ uri: author?.avatar_url || 'require("../../assets/images/usuario.png")' }}
-              style={styles.profileImage} 
-              onError={() => console.log('Error al cargar la imagen')}
-            />
-            <View style={styles.userInfo}>
-              <Text style={styles.userName}>
-                {author?.firstname || "No Definido"} {author?.lastname}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.startButtons}>
-            <TouchableOpacity
-              style={styles.startButton}
-              onPress={() => router.push(`/resolverQuiz?id=${id}`)} // Pass the quiz ID to resolverQuiz
-            >
-              <Icon name="play-circle" size={100} color="#0A8754" />
-              <Text style={styles.startText}>Empezar + 10pts</Text>
-            </TouchableOpacity>
-          </View>
-          {quiz && (
-            <View style={styles.infoContainer}>
-              <Text style={styles.quizTitle}>{quiz.title}</Text>
-              <Text style={styles.instructions}>Instrucciones:</Text>
-              <Text style={styles.instructionsDetails}>{quiz.instructions}</Text>
-              <Text style={styles.category}>Categoría:</Text>
-              <Text style={styles.bold}>{quiz.categoryid}</Text>
-              <Text style={styles.completed}>
-                Completado: <Text style={styles.bold}>{quiz.questionsnumber}</Text>
-              </Text>
-            </View>
-          )}
-          {quiz && (
-            <View style={styles.infoContainer}>
-              <Text style={styles.quizTitle}>{quiz.title}</Text>
-              <Text style={styles.instructions}>Instrucciones:</Text>
-              <Text style={styles.instructionsDetails}>{quiz.instructions}</Text>
-              <Text style={styles.category}>Categoría:</Text>
-              <Text style={styles.bold}>{quiz.categoryid}</Text>
-              <Text style={styles.completed}>
-                Completado: <Text style={styles.bold}>{quiz.questionsnumber}</Text>
-              </Text>
-            </View>
-          )}
-          {quiz ? (
-            <View style={styles.qrContainer}>
-              <View style={styles.qrCodeWrapper}>
-                <Text style={styles.qrCodeText}>Código QR</Text>
-                <QRCode value={base64Code} size={270} />
-                <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(base64Code)}>
-                  <Text style={styles.copyButtonText}>Copiar Código QR</Text>
-                </TouchableOpacity>
+        <Image source={require('../../assets/images/fondoBlanco.jpg')} style={styles.whiteBackgroundImage} />
+        {loading ? (
+                <LoadingIcon/>
+              ) : 
+              (
+          <View>
+            
+            <View style={styles.profileContainer}>
+              {author?.avatar_url && (
+                <AvatarReadOnly url={author?.avatar_url || 'require("../../assets/images/usuario.png")'  } size={40} showUploadButton={false} onUpload={() => {}} /> )
+              }
+              <View style={styles.userInfo}>
+                <Text style={styles.userName}>
+                  {author?.firstname || "No Definido"} {author?.lastname}
+                </Text>
               </View>
             </View>
-          ) : (
-            <View style={styles.qrContainer}>
-              <View style={styles.qrCodeWrapper}>
-                <Text style={styles.qrCodeText}>Código QR No disponible</Text>
-              </View>
+            <View style={styles.startButtons}>
+              <TouchableOpacity
+                style={styles.startButton}
+                onPress={() => router.push(`/resolverQuiz?id=${id}`)} // Pass the quiz ID to resolverQuiz
+              >
+                <Icon name="play-circle" size={100} color="#0A8754" />
+                <Text style={styles.startText}>Empezar + 10pts</Text>
+              </TouchableOpacity>
             </View>
+            {quiz && (
+              <View style={styles.infoContainer}>
+                <Text style={styles.quizTitle}>{quiz.title}</Text>
+                <Text style={styles.instructions}>Instrucciones:</Text>
+                <Text style={styles.instructionsDetails}>{quiz.instructions}</Text>
+                <Text style={styles.category}>Categoría:</Text>
+                <Text style={styles.bold}>{category?.name}</Text>
+                <Text style={styles.completed}>
+                  Cantidad de preguntas: <Text style={styles.bold}>{quiz.questionsnumber}</Text>
+                </Text>
+              </View>
+            )}
+            {quiz ? (
+              <View style={styles.qrContainer}>
+                <View style={styles.qrCodeWrapper}>
+                  <Text style={styles.qrCodeText}>Código QR</Text>
+                  <QRCode value={base64Code} size={270} />
+                  <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(base64Code)}>
+                    <Text style={styles.copyButtonText}>Copiar Código QR</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.qrContainer}>
+                <View style={styles.qrCodeWrapper}>
+                  <Text style={styles.qrCodeText}>Código QR No disponible</Text>
+                </View>
+              </View>
+            )}
+          </View>
           )}
-          
         </View>
       </ScrollView>
     </View>
@@ -224,6 +229,7 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     flex: 1,
+    marginLeft: 10,
   },
   userName: {
     fontSize: 16,

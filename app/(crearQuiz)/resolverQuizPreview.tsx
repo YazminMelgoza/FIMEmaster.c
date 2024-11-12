@@ -161,6 +161,21 @@ export default function QuizScreen ({infoQuestion,codeToSolve,setPreviewQuiz}:pr
     }
     */
   };
+  const CodeWithLineNumbers = ({ code }: { code: string }) => {
+    // Dividimos el código en líneas
+    const lines = code.split("\n");
+  
+    return (
+      <ScrollView style={styles.codeBox}>
+        {lines.map((line, index) => (
+          <View style={styles.lineContainer} key={index}>
+            <Text >{index + 1} </Text> 
+            <Text style={styles.codeLine}>{line}</Text> 
+          </View>
+        ))}
+      </ScrollView>
+    );
+  };
 
 
 
@@ -201,34 +216,31 @@ export default function QuizScreen ({infoQuestion,codeToSolve,setPreviewQuiz}:pr
                 ) : (
                   <Text>No hay preguntas disponibles para este quiz.</Text>
                 )}
+                
                 <Text style={styles.codeHeader}>Código a resolver:</Text>
-                <View style={styles.codeBox}>
-                  <Text style={styles.code}>
-                    {codeToSolve}
-                  </Text>
-                  {
-                    /*
-                  infoQuestion.code.split('\n').map((line, index) => (
-                    <Text key={index} style={styles.code}>{line}</Text>
-                  ))*/
-                  }
-                </View>
+                <CodeWithLineNumbers code={codeToSolve || ''} />
+
               </View>
-              <Text style={styles.question}>Selecciona la respuesta</Text>
-              {infoQuestion?.possibleAnswers.map((answer, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.optionButton,
-                    selectedOption?.answer === answer.answer && styles.selectedOption,
-                    selectedOption?.answer !== null && !answer.isCorrect && selectedOption?.answer === answer.answer && styles.incorrectOption
-                  ]}
-                  onPress={() => handleOptionSelect(answer)}
-                  disabled={!!selectedOption} 
-                >
-                  <Text style={styles.optionText}>{answer.answer}</Text>
-                </TouchableOpacity>
-              ))}
+              <View style={styles.codeContainer}>
+                <Text style={styles.question}>Línea a resolver</Text>
+                <Text>{infoQuestion?.lineStart || ''}</Text>
+                
+                <Text style={styles.question}>Selecciona la respuesta</Text>
+                {infoQuestion?.possibleAnswers.map((answer, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.optionButton,
+                      selectedOption?.answer === answer.answer && styles.selectedOption,
+                      selectedOption?.answer !== null && !answer.isCorrect && selectedOption?.answer === answer.answer && styles.incorrectOption
+                    ]}
+                    onPress={() => handleOptionSelect(answer)}
+                    disabled={!!selectedOption} 
+                  >
+                    <Text style={styles.optionText}>{answer.answer}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
               {selectedOption && (
                 <View style={styles.feedbackContainer}>
                   <Text style={styles.feedbackLabel}>Retroalimentación:</Text>
@@ -269,22 +281,15 @@ export default function QuizScreen ({infoQuestion,codeToSolve,setPreviewQuiz}:pr
   );
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const styles = StyleSheet.create({
+  lineContainer: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  codeLine: {
+    fontSize: 14,
+    fontFamily: 'monospace',
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -358,7 +363,6 @@ const styles = StyleSheet.create({
   },
   code: {
     fontSize: 16,
-    fontFamily: 'monospace',
     color: '#333',
   },
   outputContainer: {
@@ -548,8 +552,7 @@ const styles = StyleSheet.create({
   incorrectFeedback: {
     color: '#2D2D2D', // Estilo para el feedback incorrecto
     fontWeight:'bold',
-  },
-
+  }
 });
 
 

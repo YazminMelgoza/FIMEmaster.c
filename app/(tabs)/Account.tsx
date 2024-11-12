@@ -24,11 +24,11 @@ import { ExerciseService } from "services/exercise";
 import AvatarReadOnly from "components/AvatarReadOnly";
 //import CircularProgress from "../../components/ProgressElipse";
 import LoadingScreen from "../../components/loadingScreen";
+import { fonts } from "@rneui/themed/dist/config";
+import LoadingIcon from "../../components/loadingIcon";
 
 export default function Index() {
   
-
-
   const chartConfig = {
     backgroundGradientFrom: "#e6e6fa",
     backgroundGradientTo: "#e6e6fa",
@@ -50,9 +50,9 @@ export default function Index() {
     // Nuevos parámetros
     getPropsForVerticalLabels: (dx = 10) => 10,
     yAxisMaxValue: 100, // Establecer el valor máximo en 100
-    fromZero: true, // Asegúrate de que comience desde 0
+    fromZero: true,
+    fontfamily: "Rubik"
   };
-  const [selectedTab, setSelectedTab] = useState("home");
   const [loading, setLoading] = useState(true);
   const [loadingChart, setLoadingChart] = useState(true);
   const [profile, setProfile] = useState<Tables<"users"> | null>(null);
@@ -233,10 +233,10 @@ export default function Index() {
     labels: ["Programs"],
     data: [
       userCountAttempt !== null && QuizNumberMonth !== null
-        ? userCountAttempt / QuizNumberMonth
+        ? userCountAttempt / (QuizNumberMonth !== 0 ? QuizNumberMonth : 1)
         : 0,
     ], // Progreso (37/50 programas)
-  };
+};
 
 
   //Función para hacer el update
@@ -275,10 +275,10 @@ export default function Index() {
     router.replace('/(creacionquiz)/qr/scan'); 
 
   };*/
-
+  /*
   if (!profile || loadingChart) {
     return <LoadingScreen />;
-  }
+  }*/
   return (
     <View style={styles.container}>
       
@@ -298,8 +298,14 @@ export default function Index() {
             </Link>
           </View>
         </View>
+        {(loading || loadingChart || !profile)? (
+                <LoadingIcon/>
+              ) : 
+              (
 
+              
         <View className="flex relative w-full bg-white h-auto flex-col  items-center">
+          <>
           <View className=" absolute  self-center h-20 -top-20 ">
             <AvatarReadOnly
               size={100}
@@ -363,7 +369,7 @@ export default function Index() {
 
                     </Text>
                     <Text className="text-[#3aa66a] text-xl font-medium font-['sans-serif'] leading-7">
-                      codigos{" "}
+                      códigos{" "}
                     </Text>
                     <Text className="text-[#0b082a] text-xl font-medium font-['sans-serif'] leading-7">
                       este mes!
@@ -428,14 +434,17 @@ export default function Index() {
                 </View>
               </View>
             </View>
-            <View className=" w-auto h-auto pt-4">
-              <View className=" flex align-middle items-center border-2 rounded-3xl border-green-300">
+            <View className=" w-fill h-auto pt-4">
+            <View className="flex flex-row w-full justify-start pl-4 pb-2 items-start">
+              <Text className="font-semibold text-xl ">Aciertos por categoría</Text>
+            </View>
+              <View className=" flex flex-col align-middle items-center border-2 rounded-3xl  border-green-300">
               
                 {/* Verificamos si los datos están vacíos */}
                 {barData && barData.data && barData.data.length > 0 && barData.labels.length > 0 ? (
                 <StackedBarChart
                   data={barData} // Ahora barData ya está validado y formateado
-                  width={300}
+                  width={380}
                   height={220}
                   yAxisLabel=""
                   yAxisSuffix="%"
@@ -454,8 +463,9 @@ export default function Index() {
               </View>
             </View>
           </View>
+          </>
         </View>
-
+        )}
 
       </ScrollView>
     </View>
@@ -469,6 +479,7 @@ const styles = StyleSheet.create({
   },
   bargraph: {
     borderRadius: 20,
+    backgroundColor: "white"
   },
   backButton: {
     position: "absolute",

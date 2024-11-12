@@ -11,6 +11,7 @@ import {
   Dimensions,
 } from "react-native";
 import { ProgressChart, BarChart } from "react-native-chart-kit";
+import LoadingIcon from "../../components/loadingIcon";
 
 const screenWidth = Dimensions.get("window").width;
 

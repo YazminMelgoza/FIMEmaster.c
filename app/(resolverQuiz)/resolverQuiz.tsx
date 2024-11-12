@@ -9,8 +9,10 @@ import ToastManager, { Toast } from 'toastify-react-native';
 import { supabase } from "../../lib/supabase";
 import { AttemptService } from "../../services/attempt";
 import { ScoreService } from "../../services/score";
+import LoadingIcon from "../../components/loadingIcon";
 
 const QuizScreen = () => {
+  const [loading, setLoading] = useState(true); 
   const { id } = useLocalSearchParams(); // Recibe el id del quiz desde los parámetros
   const router = useRouter();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -41,7 +43,7 @@ const QuizScreen = () => {
       return;
     }
     setQuiz(exercise);
-    Toast.success("Quiz cargado");
+    //Toast.success("Quiz cargado");
 
     const { questions, error: questionError } = await QuestionService.getAllQuestionsByExerciseId(quizId);
     if (questionError || !questions) {
@@ -49,9 +51,10 @@ const QuizScreen = () => {
       console.error('Error al obtener preguntas:', questionError);
     } else {
       setQuestions(questions);
-      Toast.success("Preguntas cargadas");
+      //Toast.success("Preguntas cargadas");
       loadAnswersForQuestion(questions[0].questionid); // Load answers for the first question
     }
+    setLoading(false);
   };
 
   const loadAnswersForQuestion = async (questionId: number) => {
@@ -95,6 +98,7 @@ const QuizScreen = () => {
   };
 
   const handleContinue = async () => {
+    setLoading(true);
     setFeedback('');
     setSelectedOption(null);
     // Avanzar a la siguiente pregunta si hay más
@@ -105,9 +109,10 @@ const QuizScreen = () => {
     } else {
       await createAttempt(); // Llama a createAttempt al finalizar el quiz
       // Mostrar mensaje de finalización o navegar
-      Toast.success("¡Quiz completado!");
+      //Toast.success("¡Quiz completado!");
       router.replace('terminarQuiz');
     }
+    setLoading(false);
   };
 
   const createAttempt = async () => {
@@ -139,16 +144,31 @@ const QuizScreen = () => {
       Toast.error("Hubo un error al registrar el intento.");
       console.error("Error al crear intento:", error);
     } else {
-      Toast.success("Intento registrado correctamente.");
+      //Toast.success("Intento registrado correctamente.");
   
       const { error: scoreError } = await scoreService.upsertScore(userId, score);
       if (scoreError) {
         Toast.error("Hubo un error al actualizar el score.");
         console.error("Error al actualizar score:", scoreError);
       } else {
-        Toast.success("Score actualizado correctamente.");
+        //Toast.success("Score actualizado correctamente.");
       }
     }
+  };
+  const CodeWithLineNumbers = ({ code }: { code: string }) => {
+    // Dividimos el código en líneas
+    const lines = code.split("\n");
+  
+    return (
+      <ScrollView style={styles.codeBox}>
+        {lines.map((line, index) => (
+          <View style={styles.lineContainer} key={index}>
+            <Text >{index + 1} </Text> 
+            <Text style={styles.codeLine}>{line}</Text> 
+          </View>
+        ))}
+      </ScrollView>
+    );
   };
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -177,75 +197,91 @@ const QuizScreen = () => {
             source={require('../../assets/images/fondoBlanco.jpg')}
             style={styles.whiteBackgroundImage}
           />
-          {quiz && questions.length > 0 && (
-            <>
-              {/* Code Container */}
-              <View style={styles.codeContainer}>
-                <Text style={styles.codeHeader}>Pregunta {currentQuestionIndex + 1}:</Text>
-                {currentQuestion ? (
+          {loading ? (
+            <LoadingIcon/>
+          ) : 
+          (
+            <View>
+              {quiz && questions.length > 0 && (
+              <View>
+                {/* Code Container */}
+                <View style={styles.codeContainer}>
+                  <Text style={styles.codeHeader}>Pregunta {currentQuestionIndex + 1}:</Text>
+                  {currentQuestion ? (
+                    <View style={styles.codeBox}>
+                      <Text style={styles.code}>{currentQuestion.question}</Text>
+                    </View>
+                  ) : (
+                    <Text>No hay preguntas disponibles para este quiz.</Text>
+                  )}
+                  <Text style={styles.codeHeader}>Código a resolver:</Text>
                   <View style={styles.codeBox}>
-                    <Text style={styles.code}>{currentQuestion.question}</Text>
+                    <CodeWithLineNumbers code={quiz.wrongcode || ''} />
                   </View>
-                ) : (
-                  <Text>No hay preguntas disponibles para este quiz.</Text>
-                )}
-                <Text style={styles.codeHeader}>Código a resolver:</Text>
-                <View style={styles.codeBox}>
-                  {quiz.wrongcode.split('\n').map((line, index) => (
-                    <Text key={index} style={styles.code}>{line}</Text>
+                </View>
+                <View style={styles.codeContainer}>
+                  <Text style={styles.question}>Línea a resolver</Text>
+                  <Text>{currentQuestion.linestart || ''}</Text>
+                </View>
+                <View style={styles.codeContainer}>
+                  <Text style={styles.question}>Selecciona la respuesta</Text>
+                
+                
+                  {answers.map((answer, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={[
+                        styles.optionButton,
+                        selectedOption === answer.answer && styles.selectedOption,
+                        selectedOption !== null && !answer.iscorrect && selectedOption === answer.answer && styles.incorrectOption
+                      ]}
+                      onPress={() => handleOptionSelect(answer.answer)}
+                      disabled={!!selectedOption} // Disable the button if an option is already selected
+                    >
+                      <Text style={styles.optionText}>{answer.answer}</Text>
+                    </TouchableOpacity>
                   ))}
                 </View>
+
+                {/**MENSAJES DE ERROR**/}
+                {selectedOption && (
+                  <View style={styles.feedbackContainer}>
+                    <Text style={styles.feedbackLabel}>Retroalimentación:</Text>
+                    <Text style={[styles.feedback, answers.find(answer => answer.answer === selectedOption)?.iscorrect ? styles.correctFeedback : styles.incorrectFeedback]}>
+                      {feedback}
+                    </Text>
+                  </View>
+                )}
+                {selectedOption && answers.find(answer => answer.answer === selectedOption)?.iscorrect && (
+                  <View style={styles.correctContainer}>
+                    <Text style={styles.correctText}>¡CORRECTO!</Text>
+                  <TouchableOpacity style={styles.continueButtonC} onPress={handleContinue}>
+                    <Text style={styles.continueTextC}>CONTINUAR</Text>
+                  </TouchableOpacity>
+                  </View>
+                )}
+                {selectedOption && !answers.find(answer => answer.answer === selectedOption)?.iscorrect && (
+                  <View style={styles.incorrectContainer}>
+                    <Text style={styles.incorrectText}>Incorrecto</Text>
+                  <TouchableOpacity style={styles.continueButtonI} onPress={handleRetry}>
+                    <Text style={styles.continueTextI}>VOLVER A INTENTAR</Text>
+                  </TouchableOpacity>
+                  </View>
+                )}
               </View>
-              <Text style={styles.question}>Selecciona la respuesta</Text>
-              {answers.map((answer, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.optionButton,
-                    selectedOption === answer.answer && styles.selectedOption,
-                    selectedOption !== null && !answer.iscorrect && selectedOption === answer.answer && styles.incorrectOption
-                  ]}
-                  onPress={() => handleOptionSelect(answer.answer)}
-                  disabled={!!selectedOption} // Disable the button if an option is already selected
-                >
-                  <Text style={styles.optionText}>{answer.answer}</Text>
-                </TouchableOpacity>
-              ))}
-              {selectedOption && (
-                <View style={styles.feedbackContainer}>
-                  <Text style={styles.feedbackLabel}>Retroalimentación:</Text>
-                  <Text style={[styles.feedback, answers.find(answer => answer.answer === selectedOption)?.iscorrect ? styles.correctFeedback : styles.incorrectFeedback]}>
-                    {feedback}
-                  </Text>
+              )}
+              {!quiz && (
+                <View style={styles.noQuizContainer}>
+                  <Image
+                    source={require('../../assets/images/cancelar.png')}
+                    style={styles.errorIcon}
+                  />
+                  <Text style={styles.errorMessage}>No se encontró el quiz solicitado.</Text>
                 </View>
               )}
-              {selectedOption && answers.find(answer => answer.answer === selectedOption)?.iscorrect && (
-                <View style={styles.correctContainer}>
-                   <Text style={styles.correctText}>¡CORRECTO!</Text>
-                <TouchableOpacity style={styles.continueButtonC} onPress={handleContinue}>
-                  <Text style={styles.continueTextC}>CONTINUAR</Text>
-                </TouchableOpacity>
-                </View>
-              )}
-              {selectedOption && !answers.find(answer => answer.answer === selectedOption)?.iscorrect && (
-                <View style={styles.incorrectContainer}>
-                   <Text style={styles.incorrectText}>Incorrecto</Text>
-                <TouchableOpacity style={styles.continueButtonI} onPress={handleRetry}>
-                  <Text style={styles.continueTextI}>VOLVER A INTENTAR</Text>
-                </TouchableOpacity>
-                </View>
-              )}
-            </>
-          )}
-          {!quiz && (
-            <View style={styles.noQuizContainer}>
-              <Image
-                source={require('../../assets/images/cancelar.png')}
-                style={styles.errorIcon}
-              />
-              <Text style={styles.errorMessage}>No se encontró el quiz solicitado.</Text>
             </View>
           )}
+          
         </View>
       </ScrollView>
     </View>
@@ -336,12 +372,18 @@ const styles = StyleSheet.create({
   },
   codeBox: {
     backgroundColor: '#f9fff9',
-    padding: 15,
+    padding: 5,
     borderRadius: 10,
+  },
+  lineContainer: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  codeLine: {
+    fontSize: 14,
   },
   code: {
     fontSize: 16,
-    fontFamily: 'monospace',
     color: '#333',
   },
   outputContainer: {
@@ -439,7 +481,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#00622A', 
     marginVertical: 10,
-    paddingLeft: 27,
   },
   optionButton: {
     backgroundColor: '#F9FFF9',
@@ -447,7 +488,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 5,
     paddingLeft: 15,
-    marginHorizontal: 20,
+  
   },
   selectedOption: {
     backgroundColor: '#99C97C',

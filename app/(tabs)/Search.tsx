@@ -27,7 +27,9 @@ const getColor = (categoryid: number | null): string => {
 };
 
 const QuizItem: React.FC<{ quiz: Tables<"exercises">; onPress: () => void }> = ({ quiz, onPress }) => {
+
   const color = getColor(quiz.categoryid ?? null);
+
 
   return (
     <TouchableOpacity
@@ -51,6 +53,7 @@ const QuizItem: React.FC<{ quiz: Tables<"exercises">; onPress: () => void }> = (
 export default function About() {
   const [quizzes, setQuizzes] = useState<Tables<"exercises">[] | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,6 +69,9 @@ export default function About() {
         setQuizzes(quizzesData.exercises);
       } catch (error) {
         console.error('Error fetching quizzes:', error);
+      }finally
+      {
+        setLoading(false);
       }
     };
 
@@ -95,9 +101,7 @@ export default function About() {
             />
             <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
           </View>
-          <View style={styles.rayasContainer}>
-            <Image source={require('../../assets/images/rayas.png')} style={styles.rayas} />
-          </View>
+         
         </View>
       </View>
 
@@ -107,19 +111,30 @@ export default function About() {
             <Text style={styles.quizListTitle}>Ejercicios</Text>
           </View>
 
-          {quizzes?.map((quiz) => (
+          {quizzes?.length === 0 && !loading ? (
+              <Text style={styles.noAttemptsText}>No hay resultados</Text>
+            ) : (
+          quizzes?.map((quiz) => (
             <QuizItem 
               key={quiz.exerciseid} 
               quiz={quiz} 
               onPress={() => handleCreateQuiz(quiz.exerciseid)} 
             />
-          ))}
+          ))
+          )}
         </View>
       </ScrollView>
     </View>
   );
 }
 const styles = StyleSheet.create({
+  noAttemptsText: {
+    textAlign: 'center',
+    marginVertical: 20,
+    color: '#888',       
+    fontSize: 16,       
+    fontWeight: '500',   
+  },
   container: {
     flex: 1,
     backgroundColor: '#F7F7F7',

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  RefreshControl
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { ExerciseService } from "../../services/exercise";
@@ -17,6 +18,8 @@ import { Tables } from "database.types";
 export default function About() {
   const [quizzes, setQuizzes] = useState<Tables<"exercises">[]>([]);
   const [authorId, setAuthorId] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -28,6 +31,7 @@ export default function About() {
         console.error("Error al obtener el usuario:", error);
         Toast.error("Error al obtener el usuario.");
       }
+      setLoading(false);
     };
     fetchUser();
   }, []);
@@ -38,11 +42,17 @@ export default function About() {
       console.error("Error al obtener los quizzes:", error);
       Toast.error("Error al obtener los quizzes.");
     } else if (!exercises || exercises.length === 0) {
-      Toast.warn("No existen quizzes.");
+      //Toast.warn("No existen quizzes.");
     } else {
       setQuizzes(exercises);
-      Toast.success("Quizzes cargados.");
+      //Toast.success("Quizzes cargados.");
     }
+  };
+  // Función para manejar la recarga
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchQuizzes(authorId); // Recarga los quizzes
+    setRefreshing(false); // Termina el proceso de recarga
   };
 
   const handleCreateQuiz = (quizId: number) => {
@@ -64,29 +74,43 @@ export default function About() {
           </View>
         </View>
       </View>
-      <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}>
+      <ScrollView contentContainerStyle={styles.whiteBackgroundContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh} // Maneja la recarga
+            colors={["#4CAF50"]} // Puedes personalizar el color del indicador de carga
+          />
+        }
+      
+      >
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
             <Text style={styles.quizListTitle}>Quiz</Text>
           </View>
-          {quizzes.map((quiz) => (
-            <TouchableOpacity
-              key={quiz.exerciseid}
-              style={[styles.quizItem, { backgroundColor: "#fff" }]}
-              onPress={() => handleCreateQuiz(quiz.exerciseid)}
-            >
-              <View style={styles.quizItemIcon}>
-                <Icon name="bar-chart" size={30} color="#4CAF50" />
-              </View>
-              <View style={styles.quizItemDetails}>
-                <Text style={styles.quizItemTitle}>{quiz.instructions}</Text>
-                <Text style={styles.quizItemDescription}>
-                  Categoría ID: {quiz.categoryid}
-                </Text>
-              </View>
-              <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
-            </TouchableOpacity>
-          ))}
+          {quizzes?.length === 0 && !loading ? (
+              <Text style={styles.noAttemptsText}>No tienes ejercicios creados</Text>
+            ) : (
+            quizzes.map((quiz) => (
+              <TouchableOpacity
+                key={quiz.exerciseid}
+                style={[styles.quizItem, { backgroundColor: "#fff" }]}
+                onPress={() => handleCreateQuiz(quiz.exerciseid)}
+              >
+                <View style={styles.quizItemIcon}>
+                  <Icon name="bar-chart" size={30} color="#4CAF50" />
+                </View>
+                <View style={styles.quizItemDetails}>
+                  <Text style={styles.quizItemTitle}>{quiz.title || 'Título no disponible'}</Text>
+                  <Text style={styles.quizItemDescription}>
+                    {quiz.instructions || 'Sin instrucciones'}
+                  </Text>
+                </View>
+                <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
+              </TouchableOpacity>
+            ))
+          )
+          }
         </View>
       </ScrollView>
     </View>
@@ -94,6 +118,13 @@ export default function About() {
 }
 
 const styles = StyleSheet.create({
+  noAttemptsText: {
+    textAlign: 'center',
+    marginVertical: 20,
+    color: '#888',      
+    fontSize: 16,        
+    fontWeight: '500',  
+  },
   container: {
     flex: 1,
     backgroundColor: "#F7F7F7",
