@@ -115,7 +115,7 @@ const EscanearCodigo: React.FC = () => {
           style={styles.manualInput}
         />
         <Pressable style={styles.submitButton} onPress={handleManualCodeSubmit}>
-          <Text style={styles.submitButtonText}>Enviar Código</Text>
+          <Text style={styles.submitButtonText}>Enviar código</Text>
         </Pressable>
       </View>
     </View>

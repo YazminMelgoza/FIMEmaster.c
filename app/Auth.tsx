@@ -85,7 +85,7 @@ export default function Auth() {
             style={styles.backgroundImage}
           />
 
-          <Text style={styles.title}>Inicia Sesión</Text>
+          <Text style={styles.title}>Inicia sesión</Text>
 
           <Text style={styles.subtitle}>
             Ingresa tus datos para comenzar a utilizar la aplicación.
@@ -163,7 +163,7 @@ export default function Auth() {
             style={styles.loginButton}
             onPress={() => handleSubmit()}
           >
-            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+            <Text style={styles.loginButtonText}>Iniciar sesión</Text>
           </TouchableOpacity>
 
           <Text style={styles.registerLink}>

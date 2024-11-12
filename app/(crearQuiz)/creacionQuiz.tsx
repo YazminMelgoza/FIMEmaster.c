@@ -334,7 +334,7 @@ export default function CrearQuiz() {
                 style={styles.buttons}
                 onPress={() => handleFilePicker(setFieldValue, "solutioncode")}
               >
-                <Text style={styles.buttonText}>Cargar Ejercicio</Text>
+                <Text style={styles.buttonText}>Cargar ejercicio</Text>
               </TouchableOpacity>
               <Text style={styles.textTitleCode}>Solution Code:</Text>
               {errors.solutioncode && touched.solutioncode && (
@@ -350,7 +350,7 @@ export default function CrearQuiz() {
                 style={styles.buttons}
                 onPress={() => handleSubmit()}
               >
-                <Text style={styles.buttonText}>Crear Quiz</Text>
+                <Text style={styles.buttonText}>Crear quiz</Text>
               </TouchableOpacity>
             </View>
           </View>

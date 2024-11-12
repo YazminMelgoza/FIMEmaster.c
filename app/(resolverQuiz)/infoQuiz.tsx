@@ -86,12 +86,12 @@ const QuizScreen = () => {
         >
           <Image source={require("../../assets/images/flechaAtras.png")} />
         </TouchableOpacity>
-        <Text style={styles.title}>Resolver Quiz</Text>
+        <Text style={styles.title}>Resolver quiz</Text>
       </View>
 
       {/* Mostrar el ID del Quiz */}
       <View style={styles.quizIdContainer}>
-        <Text style={styles.quizIdText}>ID del Quiz: {id}</Text>
+        <Text style={styles.quizIdText}>ID del quiz: {id}</Text>
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -119,7 +119,7 @@ const QuizScreen = () => {
               </View>
               {/* Output Container */}
               <View style={styles.outputContainer}>
-                <Text style={styles.outputHeader}>Output Esperado:</Text>
+                <Text style={styles.outputHeader}>Output esperado:</Text>
                 <View style={styles.outputBox}>
                   <Text style={styles.output}>{quiz.solutioncode}</Text>
                 </View>

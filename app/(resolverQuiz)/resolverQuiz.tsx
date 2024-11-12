@@ -168,7 +168,7 @@ const QuizScreen = () => {
         >
           <Image source={require('../../assets/images/flechaAtras.png')} />
         </TouchableOpacity>
-        <Text style={styles.title}>Resolver Quiz</Text>
+        <Text style={styles.title}>Resolver quiz</Text>
       </View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} ref={scrollViewRef}>
         {/* White Background Container */}

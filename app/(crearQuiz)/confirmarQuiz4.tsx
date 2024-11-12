@@ -20,22 +20,22 @@ export default function confirmacioncreacion (){
       <ScrollView style={styles.quizListContainer}>
         <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
         <Image source={require('../../assets/images/user.png')} style={styles.profileImage} />
-        <Text className='text-black text-base font-semibold pt-2 '>perfil usuario</Text>
+        <Text className='text-black text-base font-semibold pt-2 '>Perfil de usuario</Text>
         </View>
         <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-green-800 text-xl font-bold pt-2 '>nombre de quiz</Text>
+        <Text className='text-green-800 text-xl font-bold pt-2 '>Nombre de quiz</Text>
         </View>
         <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-gray-500 text-lg font-semibold  '>descripcion de quiz a resolver...</Text>
+        <Text className='text-gray-500 text-lg font-semibold  '>Descripcion de quiz a resolver...</Text>
         </View>
         <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-green-800 text-xl font-bold pt-2 '>Categoria:</Text>
+        <Text className='text-green-800 text-xl font-bold pt-2 '>Categoría:</Text>
         </View>
         <View className='flex flex-row h-auto w-full px-1 gap-3 self-stretch align-middle '>
-        <Text className='text-gray-500 text-lg font-semibold  '>categoria de quiz a resolver...</Text>
+        <Text className='text-gray-500 text-lg font-semibold  '>  Categoría de quiz a resolver...</Text>
         </View>
         <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 pb-6 '>
-        <Text className='text-green-800 text-xl font-bold  '>Codigo a resolver</Text>
+        <Text className='text-green-800 text-xl font-bold  '>Código a resolver</Text>
         </View>
         <View className="flex flex-column px-1 h-52 gap-3 px-1 rounded-lg">
           <View className="flex flex-column px-1 h-auto  px-1 bg-green-50 rounded-xl">
@@ -56,7 +56,7 @@ return 0;
 
         </View>
         <View className='flex flex-row h-auto w-auto px-1 gap-3 self-stretch align-middle pt-2 pb-6 '>
-        <Text className='text-green-800 text-xl font-bold  '>Output Esperado:</Text>
+        <Text className='text-green-800 text-xl font-bold  '>Output esperado:</Text>
         </View>
         <View className="flex flex-column px-1 h-auto gap-3 px-1 rounded-lg">
           <View className="flex flex-column px-1 h-auto  px-1 bg-green-50 rounded-xl">
