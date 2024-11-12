@@ -25,11 +25,10 @@ import AvatarReadOnly from "components/AvatarReadOnly";
 //import CircularProgress from "../../components/ProgressElipse";
 import LoadingScreen from "../../components/loadingScreen";
 import { fonts } from "@rneui/themed/dist/config";
+import LoadingIcon from "../../components/loadingIcon";
 
 export default function Index() {
   
-
-
   const chartConfig = {
     backgroundGradientFrom: "#e6e6fa",
     backgroundGradientTo: "#e6e6fa",
@@ -277,10 +276,10 @@ export default function Index() {
     router.replace('/(creacionquiz)/qr/scan'); 
 
   };*/
-
+  /*
   if (!profile || loadingChart) {
     return <LoadingScreen />;
-  }
+  }*/
   return (
     <View style={styles.container}>
       
@@ -300,8 +299,14 @@ export default function Index() {
             </Link>
           </View>
         </View>
+        {(loading || loadingChart || !profile)? (
+                <LoadingIcon/>
+              ) : 
+              (
 
+              
         <View className="flex relative w-full bg-white h-auto flex-col  items-center">
+          <>
           <View className=" absolute  self-center h-20 -top-20 ">
             <AvatarReadOnly
               size={100}
@@ -365,7 +370,7 @@ export default function Index() {
 
                     </Text>
                     <Text className="text-[#3aa66a] text-xl font-medium font-['sans-serif'] leading-7">
-                      codigos{" "}
+                      códigos{" "}
                     </Text>
                     <Text className="text-[#0b082a] text-xl font-medium font-['sans-serif'] leading-7">
                       este mes!
@@ -433,7 +438,7 @@ export default function Index() {
             <View className=" w-fill h-auto pt-4">
             <View className="flex flex-row w-full justify-start pl-4 pb-2 items-start">
               <Text className="font-semibold text-xl ">Aciertos por categoría</Text>
-</View>
+            </View>
               <View className=" flex flex-col align-middle items-center border-2 rounded-3xl  border-green-300">
               
                 {/* Verificamos si los datos están vacíos */}
@@ -459,8 +464,9 @@ export default function Index() {
               </View>
             </View>
           </View>
+          </>
         </View>
-
+        )}
 
       </ScrollView>
     </View>
