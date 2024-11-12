@@ -53,7 +53,6 @@ export default function Index() {
     fromZero: true,
     fontfamily: "Rubik"
   };
-  const [selectedTab, setSelectedTab] = useState("home");
   const [loading, setLoading] = useState(true);
   const [loadingChart, setLoadingChart] = useState(true);
   const [profile, setProfile] = useState<Tables<"users"> | null>(null);
@@ -234,10 +233,10 @@ export default function Index() {
     labels: ["Programs"],
     data: [
       userCountAttempt !== null && QuizNumberMonth !== null
-        ? userCountAttempt / QuizNumberMonth
+        ? userCountAttempt / (QuizNumberMonth !== 0 ? QuizNumberMonth : 1)
         : 0,
     ], // Progreso (37/50 programas)
-  };
+};
 
 
   //Función para hacer el update
