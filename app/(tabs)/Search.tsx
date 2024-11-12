@@ -13,7 +13,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Tables } from 'database.types';
 import { ExerciseService } from 'services/exercise';
 
-// Función para obtener el color según el categoryid, maneja el caso de null
 const getColor = (categoryid: number | null): string => {
   switch (categoryid) {
     case 1:
@@ -27,10 +26,10 @@ const getColor = (categoryid: number | null): string => {
   }
 };
 
-// Componente para mostrar un ejercicio
 const QuizItem: React.FC<{ quiz: Tables<"exercises">; onPress: () => void }> = ({ quiz, onPress }) => {
-  const color = getColor(quiz.categoryid ?? null); // Maneja el caso en que categoryid es null
-  
+
+  const color = getColor(quiz.categoryid ?? null);
+
 
   return (
     <TouchableOpacity
@@ -56,11 +55,17 @@ export default function About() {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
-  // Llama a getExercisesByTitle cada vez que cambia el searchQuery
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const quizzesData = await ExerciseService.getExercisesByTitle(searchQuery);
+        const trimmedQuery = searchQuery.trim(); // Limpia solo los espacios innecesarios
+        const quizzesData = await ExerciseService.getExercisesByTitle(trimmedQuery);
+
+        // Si no hay resultados y `searchQuery` tiene espacios, limpia los espacios adicionales
+        if (quizzesData.exercises.length === 0 && searchQuery !== trimmedQuery) {
+          setSearchQuery(trimmedQuery);
+        }
+
         setQuizzes(quizzesData.exercises);
       } catch (error) {
         console.error('Error fetching quizzes:', error);
@@ -69,12 +74,13 @@ export default function About() {
         setLoading(false);
       }
     };
+
     fetchData();
-  }, [searchQuery]); // Se vuelve a ejecutar cuando cambia searchQuery
+  }, [searchQuery]);
 
   const handleCreateQuiz = (id: number) => {
     console.log('Crear test');
-    router.push(`iniciarQuiz?id=${id}`); // Navega a la pantalla de infoQuiz pasando el ID
+    router.push(`iniciarQuiz?id=${id}`);
   };
 
   return (
@@ -91,7 +97,7 @@ export default function About() {
               placeholder="Buscar"
               placeholderTextColor="#888"
               value={searchQuery}
-              onChangeText={setSearchQuery}  // Actualiza searchQuery cuando cambia el texto
+              onChangeText={setSearchQuery}  // Permite espacios en el input
             />
             <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
           </View>
@@ -121,7 +127,6 @@ export default function About() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   noAttemptsText: {
     textAlign: 'center',

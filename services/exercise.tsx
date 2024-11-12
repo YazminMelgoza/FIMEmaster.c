@@ -140,22 +140,27 @@ export class ExerciseService {
   }
 
   // Método para obtener exercises por title
-  public static async getExercisesByTitle(
-    searchQuery: string
-  ): Promise<{ exercises: Tables<"exercises">[]; error: PostgrestError | null }> {
-    const { data, error } = await supabase
-      .from('exercises') 
-      .select('exerciseid, instructions, categoryid, wrongcode, solutioncode, authorId, title, questionsnumber, createdat') 
-      .ilike('title', `%${searchQuery}%`)
-      .limit(10); 
+public static async getExercisesByTitle(
+  searchQuery: string
+): Promise<{ exercises: Tables<"exercises">[]; error: PostgrestError | null }> {
+  const trimmedQuery = searchQuery.trim(); // Elimina espacios adicionales
+  const filterQuery = trimmedQuery ? `%${trimmedQuery}%` : "%"; // Si está vacío, selecciona todos
+  
+  const { data, error } = await supabase
+    .from('exercises') 
+    .select('exerciseid, instructions, categoryid, wrongcode, solutioncode, authorId, title, questionsnumber, createdat') 
+    .ilike('title', filterQuery)
+    .limit(10); 
 
-    if (error) {
-      console.error("Error fetching exercises:", error);
-      return { exercises: [], error };
-    }
-
-    return { exercises: data as Tables<"exercises">[], error: null };
+  if (error) {
+    console.error("Error fetching exercises:", error);
+    return { exercises: [], error };
   }
+
+  return { exercises: data as Tables<"exercises">[], error: null };
+}
+  
+
   public static async getCurrentMonthQuizzesCount(): Promise<{
     count: number;
     error: PostgrestError | null;
