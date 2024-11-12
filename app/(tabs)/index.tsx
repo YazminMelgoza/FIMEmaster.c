@@ -29,7 +29,7 @@ export default function Index() {
     const year = date.getUTCFullYear();
     return `${day}/${month}/${year}`;
   };
-
+  const [loading, setLoading] = useState(true);
   const [attempts, setAttempts] = useState<any[]>([]);
   const [exerciseTitles, setExerciseTitles] = useState<{ [key: number]: string | null }>({});
   const [userId, setUserId] = useState<string>("");
@@ -63,6 +63,7 @@ export default function Index() {
         console.error("Error fetching user:", error);
         Toast.error("Usuario no encontrado.");
       }
+      setLoading(false);
     };
     fetchUser();
   }, []);
@@ -73,7 +74,7 @@ export default function Index() {
       console.error("Error fetching attempts:", error.message);
       Toast.error("Error cargando quiz recientes.");
     } else if (!data || data.length === 0) {
-      Toast.warn("No attempts found.");
+      //Toast.warn("No attempts found.");
     } else {
       setAttempts(data);
       //Toast.success("Attempts loaded.");
@@ -163,33 +164,45 @@ export default function Index() {
             </Link>
           </View>
 
-          {attempts.map((attempt) => (
-            <TouchableOpacity
-              key={attempt.attemptid}
-              style={[styles.quizItem, { backgroundColor: '#fff' }]}
-              onPress={() => handleCreateQuiz(attempt.exerciseid)}
-            >
-              <View style={styles.quizItemIcon}>
-                <Text style={styles.quizItemScoreLabel}>Puntaje</Text>
-                <Text style={styles.quizItemScore}>{attempt.score ?? 'N/A'}</Text>
-              </View>
-              <View style={styles.quizItemDetails}>
-                <Text style={styles.quizItemTitle}>
-                  {exerciseTitles[attempt.exerciseid] || `Intento ${attempt.attemptid}`}
-                </Text>
-                <Text style={styles.quizItemDescription}>
-                  Fecha: {formatDate(attempt.attemptedat)}
-                </Text>
-              </View>
-              <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
-            </TouchableOpacity>
-          ))}
+          {attempts.length === 0 && !loading ? (
+              <Text style={styles.noAttemptsText}>Aún no tienes intentos recientes</Text>
+            ) : (
+            attempts.map((attempt) => (
+              <TouchableOpacity
+                key={attempt.attemptid}
+                style={[styles.quizItem, { backgroundColor: '#fff' }]}
+                onPress={() => handleCreateQuiz(attempt.exerciseid)}
+              >
+                <View style={styles.quizItemIcon}>
+                  <Text style={styles.quizItemScoreLabel}>Puntaje</Text>
+                  <Text style={styles.quizItemScore}>{attempt.score ?? 'N/A'}</Text>
+                </View>
+                <View style={styles.quizItemDetails}>
+                  <Text style={styles.quizItemTitle}>
+                    {exerciseTitles[attempt.exerciseid] || `Intento ${attempt.attemptid}`}
+                  </Text>
+                  <Text style={styles.quizItemDescription}>
+                    Fecha: {formatDate(attempt.attemptedat)}
+                  </Text>
+                </View>
+                <Icon name="arrow-forward-ios" size={20} color="#4CAF50" />
+              </TouchableOpacity>
+            ))
+          )
+        }
         </View>
       </ScrollView>
     </View>
   );
 }
 const styles = StyleSheet.create({
+  noAttemptsText: {
+    textAlign: 'center',
+    marginVertical: 20,
+    color: '#888',       // Color gris para el texto
+    fontSize: 16,        // Tamaño de letra moderado
+    fontWeight: '500',   // Peso de fuente medio para mejor visibilidad
+  },
   container: {
     flex: 1,
     backgroundColor: '#F7F7F7',

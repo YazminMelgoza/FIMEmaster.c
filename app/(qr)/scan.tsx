@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Image, StyleSheet, Text, View, Pressable, TextInput, ToastAndroid } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
-import { Camera } from 'expo-camera';
+import React, { useState, useEffect, useRef } from 'react';
+import { Image, Text, View, Pressable, TextInput, ToastAndroid, StyleSheet } from 'react-native';
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { router } from 'expo-router';
 import { ExerciseService } from 'services/exercise';
 
@@ -9,14 +8,18 @@ const EscanearCodigo: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanned, setScanned] = useState(false);
   const [manualCode, setManualCode] = useState('');
-  const [isInputFocused, setIsInputFocused] = useState(false); // New state for input focus
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
+  // Manejo de permisos de la cámara
+  const [permission, requestPermission] = useCameraPermissions();
+  const [facing, setFacing] = useState<CameraType>('back');
+
+  // Esperar a que se otorguen los permisos
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
+    if (permission?.granted === false) {
+      requestPermission();
+    }
+  }, [permission]);
 
   const decodeBase64 = (data: string) => {
     try {
@@ -28,13 +31,14 @@ const EscanearCodigo: React.FC = () => {
   };
 
   const handleCreateQuiz = (quizId: number) => {
-    console.log("Creating quiz with ID:", quizId);
     router.replace(`iniciarQuiz?id=${quizId}`);
   };
 
   const handleBarCodeScanned = async ({ type, data }: { type: string; data: string }) => {
-    setScanned(true);
-    await processCode(data);
+    if (!scanned) {
+      setScanned(true);
+      await processCode(data);
+    }
   };
 
   const processCode = async (data: string) => {
@@ -43,7 +47,7 @@ const EscanearCodigo: React.FC = () => {
       const quizId = parseInt(decodedData, 10);
       await fetchExerciseById(quizId);
     } else {
-      ToastAndroid.show('Error decoding code.', ToastAndroid.LONG);
+      ToastAndroid.show('Error al decodificar el código.', ToastAndroid.LONG);
     }
   };
 
@@ -52,34 +56,41 @@ const EscanearCodigo: React.FC = () => {
       await processCode(manualCode);
       setManualCode('');
     } else {
-      ToastAndroid.show('Please enter a valid code.', ToastAndroid.SHORT);
+      ToastAndroid.show('Por favor, ingrese un código válido.', ToastAndroid.SHORT);
     }
   };
 
   const fetchExerciseById = async (quizId: number) => {
     const { exercise, error } = await ExerciseService.getExerciseById(quizId);
-
     if (error) {
-      console.error("Error fetching exercise by ID:", error);
-      ToastAndroid.show('Exercise not found.', ToastAndroid.LONG);
+      console.error("Error al obtener el ejercicio:", error);
+      ToastAndroid.show('Ejercicio no encontrado.', ToastAndroid.LONG);
     } else if (exercise) {
-      console.log("Exercise found:", exercise);
-      handleCreateQuiz(quizId); // Navigate to quiz if found
-      ToastAndroid.show(`Exercise found: ${exercise.title}`, ToastAndroid.LONG);
+      handleCreateQuiz(quizId);
+      ToastAndroid.show(`Ejercicio encontrado: ${exercise.title}`, ToastAndroid.LONG);
     } else {
-      ToastAndroid.show('No exercise found with this ID.', ToastAndroid.LONG);
+      ToastAndroid.show('No se encontró ningún ejercicio con este ID.', ToastAndroid.LONG);
     }
   };
 
-  if (hasPermission === null) {
-    return <Text>Requesting camera permission...</Text>;
+  if (!permission) {
+    // Solicitar permisos
+    return <Text>Solicitando permiso para la cámara...</Text>;
   }
-  if (!hasPermission) {
-    return <Text>Camera access not granted</Text>;
+  if (!permission.granted) {
+    // No se ha otorgado el permiso
+    return (
+      <View style={styles.container}>
+        <Text style={styles.message}>We need your permission to show the camera</Text>
+        <Pressable onPress={requestPermission}>
+          <Text>Grant Permission</Text>
+        </Pressable>
+      </View>
+    );
   }
 
   return (
-    <View style={styles.escanearCodigo}>
+    <View style={styles.container}>
       <Image
         style={styles.imageIcon}
         resizeMode="cover"
@@ -94,14 +105,12 @@ const EscanearCodigo: React.FC = () => {
         />
       </Pressable>
       <Text style={styles.fotografaElCdigo}>Fotografía el código QR</Text>
-
       <View style={styles.roundedRectangle}>
-        {!isInputFocused && (
-          <BarCodeScanner
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-            style={StyleSheet.absoluteFillObject}
-          />
-        )}
+        <CameraView
+          style={StyleSheet.absoluteFillObject}
+          facing={facing}
+          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+        />
       </View>
 
       <View style={styles.manualCodeContainer}>
@@ -110,8 +119,8 @@ const EscanearCodigo: React.FC = () => {
           placeholder="Ingrese el código del quiz aquí"
           value={manualCode}
           onChangeText={setManualCode}
-          onFocus={() => setIsInputFocused(true)} // Set focus state to true on focus
-          onBlur={() => setIsInputFocused(false)} // Set focus state to false on blur
+          onFocus={() => setIsInputFocused(true)}
+          onBlur={() => setIsInputFocused(false)}
           style={styles.manualInput}
         />
         <Pressable style={styles.submitButton} onPress={handleManualCodeSubmit}>
@@ -123,6 +132,23 @@ const EscanearCodigo: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  centrarCamara:
+  {
+    textAlign: 'center',
+
+  },
+  message: {
+    textAlign: 'center',
+    paddingBottom: 10,
+  },
+  camera: {
+    flex: 1,
+  },
   escanearCodigo: {
     flex: 1,
     backgroundColor: '#fff',
@@ -161,6 +187,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     position: 'absolute',
     top: 100,
+    alignSelf: 'center',
     fontWeight: 'bold',
     textAlign: 'center',
     width: '70%',
@@ -170,6 +197,7 @@ const styles = StyleSheet.create({
     height: '55%',
     position: 'absolute',
     top: '25%',
+    alignSelf: 'center', // Centrado horizontalmente
     borderRadius: 40,
     backgroundColor: '#f3fff3',
     justifyContent: 'center',

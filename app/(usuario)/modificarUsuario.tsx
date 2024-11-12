@@ -9,6 +9,7 @@ import { router, Link } from "expo-router";
 import { UserService } from "../../services/user";
 import { Toast } from "toastify-react-native";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import LoadingIcon from "../../components/loadingIcon";
 export default function Account() {
     const [loading, setLoading] = useState(true);
     const [userEmail, setUserEmail] = useState("");
@@ -67,11 +68,12 @@ export default function Account() {
         }));
     }
     //Función para update el estado del objeto user
+    /*
     if (loading) {
         return <View style={styles.container}>
             <Text>Loading...</Text>
         </View>;
-    }
+    }*/
 
     
     return (
@@ -86,72 +88,80 @@ export default function Account() {
             </TouchableOpacity>
 
             </View>
-            <View className="w-full h-auto flex relative justify-center align-bottom items-center ">
-                <Avatar
-                    size={100}
-                    url={user?.avatar_url || ""}
-                    onUpload={(url) => updateUserState({ avatar_url: url })}
-                />
-            </View>
-            <View className="bg-white rounded-t-3xl" style={styles.container}>
-
-
-                <Text style={styles.emailLabel}>Email</Text>
-                <Input
-                    value={userEmail}
-                    disabled
-                    containerStyle={styles.inputContainer}
-                    inputStyle={styles.input}
-                />
-
-                <Input
-                    label="First Name"
-                    value={user?.firstname || ""}
-                    onChangeText={(text) => updateUserState({ firstname: text })}
-                    containerStyle={styles.inputContainer}
-                    inputStyle={styles.input}
-                />
-
-                <Input
-                    label="Last Name"
-                    value={user?.lastname || ""}
-                    onChangeText={(text) => updateUserState({ lastname: text })}
-                    containerStyle={styles.inputContainer}
-                    inputStyle={styles.input}
-                />
-
-                <Input
-                    label="Middle Name"
-                    value={user?.middlename || ""}
-                    onChangeText={(text) => updateUserState({ middlename: text })}
-                    containerStyle={styles.inputContainer}
-                    inputStyle={styles.input}
-                />
-
-                <View className="w-full h-auto flex">
-
-                    <Button
-                        title={loading ? "Cargando..." : "Actualizar"}
-                        onPress={() => updateProfile(user!)}
-                        disabled={loading}
-                        buttonStyle={[styles.button, { backgroundColor: '#3aa66a' }]}
+            {loading ? (
+                <LoadingIcon/>
+              ) : 
+              (
+            <>
+            
+                <View className="w-full h-auto flex relative justify-center align-bottom items-center ">
+                    <Avatar
+                        size={100}
+                        url={user?.avatar_url || ""}
+                        onUpload={(url) => updateUserState({ avatar_url: url })}
                     />
                 </View>
-                <View className="w-full h-auto flex">
+                <View className="bg-white rounded-t-3xl" style={styles.container}>
 
-                    <Button
-                        title="Cerrar sesión"
-                        onPress={() =>
-                            supabase.auth
-                                .signOut()
-                                .then(() => router.navigate("/"))
-                                .catch(console.error)
-                        }
-                        buttonStyle={[styles.button, { backgroundColor: '#3aa66a' }]}
+
+                    <Text style={styles.emailLabel}>Correo electrónico</Text>
+                    <Input
+                        value={userEmail}
+                        disabled
+                        containerStyle={styles.inputContainer}
+                        inputStyle={styles.input}
                     />
-                </View>
 
-            </View>
+                    <Input
+                        label="Nombre"
+                        value={user?.firstname || ""}
+                        onChangeText={(text) => updateUserState({ firstname: text })}
+                        containerStyle={styles.inputContainer}
+                        inputStyle={styles.input}
+                    />
+
+                    <Input
+                        label="Apellido paterno"
+                        value={user?.lastname || ""}
+                        onChangeText={(text) => updateUserState({ lastname: text })}
+                        containerStyle={styles.inputContainer}
+                        inputStyle={styles.input}
+                    />
+
+                    <Input
+                        label="Apellido materno"
+                        value={user?.middlename || ""}
+                        onChangeText={(text) => updateUserState({ middlename: text })}
+                        containerStyle={styles.inputContainer}
+                        inputStyle={styles.input}
+                    />
+
+                    <View className="w-full h-auto flex">
+
+                        <Button
+                            title={loading ? "Cargando..." : "Actualizar"}
+                            onPress={() => updateProfile(user!)}
+                            disabled={loading}
+                            buttonStyle={[styles.button, { backgroundColor: '#3aa66a' }]}
+                        />
+                    </View>
+                    <View className="w-full h-auto flex">
+
+                        <Button
+                            title="Cerrar sesión"
+                            onPress={() =>
+                                supabase.auth
+                                    .signOut()
+                                    .then(() => router.navigate("/"))
+                                    .catch(console.error)
+                            }
+                            buttonStyle={[styles.button, { backgroundColor: '#3aa66a' }]}
+                        />
+                    </View>
+
+                </View>
+            </>
+            )}
         </View >
 
     );

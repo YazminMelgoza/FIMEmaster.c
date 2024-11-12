@@ -274,7 +274,6 @@ const styles = StyleSheet.create({
   },
   code: {
     fontSize: 16,
-    fontFamily: 'monospace',
     color: '#333',
   },
   outputContainer: {
