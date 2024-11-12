@@ -4,6 +4,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Camera } from 'expo-camera';
 import { router } from 'expo-router';
 import { ExerciseService } from 'services/exercise';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 const EscanearCodigo: React.FC = () => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -87,11 +88,7 @@ const EscanearCodigo: React.FC = () => {
       />
       <View style={styles.escanearCodigoChild} />
       <Pressable style={styles.vector} onPress={() => router.back()}>
-        <Image
-          style={styles.icon}
-          resizeMode="cover"
-          source={require('../../assets/images/vector-flecha.png')}
-        />
+        <AntDesign name="left" size={28} color="white" />
       </Pressable>
       <Text style={styles.fotografaElCdigo}>Fotografía el código QR</Text>
 

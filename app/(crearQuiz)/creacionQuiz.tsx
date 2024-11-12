@@ -26,6 +26,7 @@ import { generateQuestionsAndAnswers } from "helpers/generateQuestionsAndAnswers
 import {QuestionPayload, AnswerPayload} from "../types/questionPayload";
 import ConfirmarQuizScreen from './confirmarQuiz';
 import LoadingScreen from "../../components/loadingScreen";
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 
 export default function CrearQuiz() {
@@ -240,10 +241,7 @@ export default function CrearQuiz() {
                 <View style={styles.headerTextContainer}>
                   <View style={styles.backContainer}>
                     <TouchableOpacity onPress={() => router.back()}>
-                      <Image
-                        source={require("../../assets/images/back-icon.png")}
-                        style={styles.backImage}
-                      />
+                      <AntDesign name="left" size={27} color="white" />
                     </TouchableOpacity>
                   </View>
                   <Text style={styles.headerText}>Crea un nuevo quiz</Text>

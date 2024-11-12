@@ -158,7 +158,7 @@ export default function Index() {
             <Text style={styles.quizListTitle}>Quiz Recientes</Text>
             <Link asChild href="historialquiz">
               <TouchableOpacity style={styles.quizListSeeAll}>
-                <Text style={styles.quizListSeeAllText}>ver todos</Text>
+                <Text style={styles.quizListSeeAllText}>Ver todos</Text>
               </TouchableOpacity>
             </Link>
           </View>

@@ -5,6 +5,7 @@ import { Button, Input } from "@rneui/themed";
 import Avatar from "../../components/Avatar";
 import { Tables } from "database.types";
 import { router, Link } from "expo-router";
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 import { UserService } from "../../services/user";
 import { Toast } from "toastify-react-native";
@@ -82,7 +83,7 @@ export default function Account() {
             />
             <View className="w-full h-auto pl-8 pt-10">
             <TouchableOpacity onPress={() => router.back()}>
-                <FontAwesome name="chevron-left" size={35} color="white" onPress={()=> router.back()} />
+                <AntDesign name="left" size={24} color="white" />
             </TouchableOpacity>
 
             </View>
@@ -105,7 +106,7 @@ export default function Account() {
                 />
 
                 <Input
-                    label="First Name"
+                    label="Nombre(s)"
                     value={user?.firstname || ""}
                     onChangeText={(text) => updateUserState({ firstname: text })}
                     containerStyle={styles.inputContainer}
@@ -113,7 +114,7 @@ export default function Account() {
                 />
 
                 <Input
-                    label="Last Name"
+                    label="Apellido Paterno"
                     value={user?.lastname || ""}
                     onChangeText={(text) => updateUserState({ lastname: text })}
                     containerStyle={styles.inputContainer}
@@ -121,7 +122,7 @@ export default function Account() {
                 />
 
                 <Input
-                    label="Middle Name"
+                    label="Apellido Materno"
                     value={user?.middlename || ""}
                     onChangeText={(text) => updateUserState({ middlename: text })}
                     containerStyle={styles.inputContainer}

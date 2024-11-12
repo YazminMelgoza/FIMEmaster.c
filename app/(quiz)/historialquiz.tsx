@@ -4,6 +4,7 @@ import { NativeWindStyleSheet } from "nativewind";
 import { supabase } from "../../lib/supabase";
 import ToastManager, { Toast } from 'toastify-react-native';
 import { Tables } from 'database.types';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 import {
   View,
@@ -112,11 +113,7 @@ export default function Index() {
           <View style={styles.headerTextContainer}>
             <View style={styles.sunContainer}>
               <Pressable style={styles.vector} onPress={() => router.back()}>
-                <Image
-                  style={styles.icon}
-                  resizeMode="cover"
-                  source={require('../../assets/images/vector-flecha.png')}
-                />
+              <AntDesign name="left" size={26} color="white" />
               </Pressable>
               <Text style={styles.headerText}></Text>
             </View>

@@ -296,7 +296,7 @@ export default function Index() {
           <View className="h-32 flex flex-col items-end justify-center w-full">
 
             <Link asChild href={"modificarUsuario"}>
-              <FontAwesome name="gear" size={36} color="white" />
+              <AntDesign name="setting" size={32} color="white" />
             </Link>
           </View>
         </View>
