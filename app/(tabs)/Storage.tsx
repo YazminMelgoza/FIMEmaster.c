@@ -86,7 +86,7 @@ export default function About() {
       >
         <View style={styles.quizListContainer}>
           <View style={styles.quizListHeader}>
-            <Text style={styles.quizListTitle}>Quiz</Text>
+            <Text style={styles.quizListTitle}>Quizzes</Text>
           </View>
           {quizzes?.length === 0 && !loading ? (
               <Text style={styles.noAttemptsText}>No tienes ejercicios creados</Text>
