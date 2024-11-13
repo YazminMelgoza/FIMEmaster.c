@@ -18,7 +18,7 @@ const App: React.FC = () => {
 
       {/* Fondo blanco  */}
       <View style={styles.quizListContainer}>
-        <Text style={styles.loadingText}>Generando preguntas...</Text>
+        <Text style={styles.loadingText}>Generando las preguntas...</Text>
       </View>
     </View>
   );

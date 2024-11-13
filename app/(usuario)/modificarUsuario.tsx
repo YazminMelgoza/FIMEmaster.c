@@ -5,7 +5,7 @@ import { Button, Input } from "@rneui/themed";
 import Avatar from "../../components/Avatar";
 import { Tables } from "database.types";
 import { router, Link } from "expo-router";
-
+import AntDesign from '@expo/vector-icons/AntDesign';
 import { UserService } from "../../services/user";
 import { Toast } from "toastify-react-native";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
@@ -84,7 +84,7 @@ export default function Account() {
             />
             <View className="w-full h-auto pl-8 pt-10">
             <TouchableOpacity onPress={() => router.back()}>
-                <FontAwesome name="chevron-left" size={35} color="white" onPress={()=> router.back()} />
+            <AntDesign name="left" size={26} color="white" />
             </TouchableOpacity>
 
             </View>
