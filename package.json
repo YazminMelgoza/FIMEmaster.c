@@ -16,7 +16,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@supabase/supabase-js": "^2.46.1",
     "dependencies": "^0.0.1",
-    "expo": "~51.0.28",
+    "expo": "^52.0.7",
     "expo-barcode-scanner": "~13.0.1",
     "expo-camera": "~15.0.16",
     "expo-constants": "~16.0.2",
