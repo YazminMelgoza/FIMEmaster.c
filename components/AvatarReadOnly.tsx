@@ -1,7 +1,16 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert, Image, Button, TouchableOpacity, ActivityIndicator, Modal } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import {
+  StyleSheet,
+  View,
+  Alert,
+  Image,
+  Button,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 interface Props {
   size: number;
@@ -10,7 +19,12 @@ interface Props {
   showUploadButton?: boolean; // Nueva propiedad para controlar el botón de subida
 }
 
-export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadButton = true }: Props) {
+export default function AvatarReadOnly({
+  url,
+  size = 150,
+  onUpload,
+  showUploadButton = true,
+}: Props) {
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const avatarSize = { height: size, width: size };
@@ -22,7 +36,9 @@ export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadBu
 
   async function downloadImage(path: string) {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path);
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .download(path);
 
       if (error) {
         throw error;
@@ -35,7 +51,7 @@ export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadBu
       };
     } catch (error) {
       if (error instanceof Error) {
-        console.log('Error downloading image: ', error.message);
+        console.log("Error downloading image: ", error.message);
       }
     }
   }
@@ -53,24 +69,26 @@ export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadBu
       });
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.log('User cancelled image picker.');
+        console.log("User cancelled image picker.");
         return;
       }
 
       const image = result.assets[0];
 
       if (!image.uri) {
-        throw new Error('No image uri!');
+        throw new Error("No image uri!");
       }
 
-      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer());
+      const arraybuffer = await fetch(image.uri).then((res) =>
+        res.arrayBuffer()
+      );
 
-      const fileExt = image.uri.split('.').pop()?.toLowerCase() ?? 'jpeg';
+      const fileExt = image.uri.split(".").pop()?.toLowerCase() ?? "jpeg";
       const path = `${Date.now()}.${fileExt}`;
       const { data, error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from("avatars")
         .upload(path, arraybuffer, {
-          contentType: image.mimeType ?? 'image/jpeg',
+          contentType: image.mimeType ?? "image/jpeg",
         });
 
       if (uploadError) {
@@ -102,9 +120,7 @@ export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadBu
 
   return (
     <View>
-      <TouchableOpacity 
-      onPress={handleImagePress}
-      disabled={uploading}>
+      <TouchableOpacity onPress={handleImagePress} disabled={uploading}>
         {avatarUrl ? (
           <Image
             source={{ uri: avatarUrl }}
@@ -113,39 +129,34 @@ export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadBu
           />
         ) : (
           <Image
-            source={require('../assets/images/user.png')}
+            source={require("../assets/userplaceholder.jpg")}
             style={[avatarSize, styles.placeholderImage]}
             accessibilityLabel="Default Avatar"
           />
-
         )}
-        {uploading &&
-        <ActivityIndicator size="large" color="#0000ff" /> // Spinner de carga
-        
-
+        {
+          uploading && <ActivityIndicator size="large" color="#0000ff" /> // Spinner de carga
         }
       </TouchableOpacity>
       {/* Modal para mostrar la imagen en grande */}
       {avatarUrl && (
         <Modal
-        visible={showImageModal}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={closeModal}>
-        <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
-          <View style={styles.modalClose} >
-            <Image
-              source={{ uri: avatarUrl }} // Asegúrate de pasar undefined si avatarUrl es null
-              style={styles.modalImage}
-              accessibilityLabel="Imagen ampliada"
-            />
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
-      )
-      }
-      
+          visible={showImageModal}
+          animationType="fade"
+          transparent={true}
+          onRequestClose={closeModal}
+        >
+          <TouchableOpacity style={styles.modalBackground} onPress={closeModal}>
+            <View style={styles.modalClose}>
+              <Image
+                source={{ uri: avatarUrl }} // Asegúrate de pasar undefined si avatarUrl es null
+                style={styles.modalImage}
+                accessibilityLabel="Imagen ampliada"
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -153,38 +164,38 @@ export default function AvatarReadOnly({ url, size = 150, onUpload, showUploadBu
 const styles = StyleSheet.create({
   avatar: {
     borderRadius: 10,
-    overflow: 'hidden',
-    maxWidth: '100%',
+    overflow: "hidden",
+    maxWidth: "100%",
   },
   image: {
-    objectFit: 'cover',
+    objectFit: "cover",
     paddingTop: 0,
   },
   placeholderImage: {
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   noImage: {
-    backgroundColor: '#333',
+    backgroundColor: "#333",
     borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'rgb(200, 200, 200)',
+    borderStyle: "solid",
+    borderColor: "rgb(200, 200, 200)",
     borderRadius: 5,
   },
   modalBackground: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
   },
   modalClose: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 10,
   },
   modalImage: {
     width: 300, // Tamaño de la imagen ampliada
     height: 300, // Tamaño de la imagen ampliada
     borderRadius: 10,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
 });

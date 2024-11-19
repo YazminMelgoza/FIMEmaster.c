@@ -1,7 +1,15 @@
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
-import { StyleSheet, View, Alert, Image, Button, TouchableOpacity, ActivityIndicator } from 'react-native'
-import * as ImagePicker from 'expo-image-picker'
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import {
+  StyleSheet,
+  View,
+  Alert,
+  Image,
+  Button,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 interface Props {
   size: number;
@@ -10,7 +18,12 @@ interface Props {
   showUploadButton?: boolean; // Nueva propiedad para controlar el botón de subida
 }
 
-export default function Avatar({ url, size = 150, onUpload, showUploadButton = true }: Props) {
+export default function Avatar({
+  url,
+  size = 150,
+  onUpload,
+  showUploadButton = true,
+}: Props) {
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const avatarSize = { height: size, width: size };
@@ -21,7 +34,9 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
 
   async function downloadImage(path: string) {
     try {
-      const { data, error } = await supabase.storage.from('avatars').download(path);
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .download(path);
 
       if (error) {
         throw error;
@@ -34,7 +49,7 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
       };
     } catch (error) {
       if (error instanceof Error) {
-        console.log('Error downloading image: ', error.message);
+        console.log("Error downloading image: ", error.message);
       }
     }
   }
@@ -52,24 +67,26 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
       });
 
       if (result.canceled || !result.assets || result.assets.length === 0) {
-        console.log('User cancelled image picker.');
+        console.log("User cancelled image picker.");
         return;
       }
 
       const image = result.assets[0];
 
       if (!image.uri) {
-        throw new Error('No image uri!');
+        throw new Error("No image uri!");
       }
 
-      const arraybuffer = await fetch(image.uri).then((res) => res.arrayBuffer());
+      const arraybuffer = await fetch(image.uri).then((res) =>
+        res.arrayBuffer()
+      );
 
-      const fileExt = image.uri.split('.').pop()?.toLowerCase() ?? 'jpeg';
+      const fileExt = image.uri.split(".").pop()?.toLowerCase() ?? "jpeg";
       const path = `${Date.now()}.${fileExt}`;
       const { data, error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from("avatars")
         .upload(path, arraybuffer, {
-          contentType: image.mimeType ?? 'image/jpeg',
+          contentType: image.mimeType ?? "image/jpeg",
         });
 
       if (uploadError) {
@@ -90,9 +107,7 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
 
   return (
     <View>
-      <TouchableOpacity 
-      onPress={uploadAvatar}
-      disabled={uploading}>
+      <TouchableOpacity onPress={uploadAvatar} disabled={uploading}>
         {avatarUrl ? (
           <Image
             source={{ uri: avatarUrl }}
@@ -101,16 +116,13 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
           />
         ) : (
           <Image
-            source={require('../assets/images/user.png')}
+            source={require("../assets/userplaceholder.jpg")}
             style={[avatarSize, styles.placeholderImage]}
             accessibilityLabel="Default Avatar"
           />
-
         )}
-        {uploading &&
-        <ActivityIndicator size="large" color="#0000ff" /> // Spinner de carga
-        
-
+        {
+          uploading && <ActivityIndicator size="large" color="#0000ff" /> // Spinner de carga
         }
       </TouchableOpacity>
     </View>
@@ -120,21 +132,21 @@ export default function Avatar({ url, size = 150, onUpload, showUploadButton = t
 const styles = StyleSheet.create({
   avatar: {
     borderRadius: 10,
-    overflow: 'hidden',
-    maxWidth: '100%',
+    overflow: "hidden",
+    maxWidth: "100%",
   },
   image: {
-    objectFit: 'cover',
+    objectFit: "cover",
     paddingTop: 0,
   },
   placeholderImage: {
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   noImage: {
-    backgroundColor: '#333',
+    backgroundColor: "#333",
     borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'rgb(200, 200, 200)',
+    borderStyle: "solid",
+    borderColor: "rgb(200, 200, 200)",
     borderRadius: 5,
   },
 });

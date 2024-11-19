@@ -11,10 +11,10 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 import { ExerciseService } from "../../services/exercise";
 import { Tables } from "database.types";
 import ToastManager, { Toast } from "toastify-react-native"; // Importa ToastManager y Toast
-import {CircularProgress} from "../../components/ProgressElipse";
+import { CircularProgress } from "../../components/ProgressElipse";
 
 const QuizScreen = () => {
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { id } = useLocalSearchParams();
 
@@ -29,19 +29,19 @@ const QuizScreen = () => {
     }
   }, [id]);
   const fetchQuiz = async (quizId: number) => {
-    setLoading(true); 
+    setLoading(true);
     const { exercise, error } = await ExerciseService.getExerciseById(quizId);
     if (error) {
       Toast.error("Error al obtener el quiz.");
       console.error("Error al obtener el quiz:", error);
-    } else if (!exercise) { 
+    } else if (!exercise) {
       Toast.warn("El quiz no existe");
     } else {
       setQuiz(exercise);
       Toast.success("Quiz cargado");
       console.log(exercise);
     }
-    setLoading(false);  
+    setLoading(false);
   };
 
   const handleAnswerSelect = (lineNumber: number) => {
@@ -56,17 +56,14 @@ const QuizScreen = () => {
     const totalLines = 4;
     return Math.round((answeredCount / totalLines) * 100);
   };
-  if(loading)
-  {
-    return( 
-    <View style={styles.container}>
-      <View style={styles.noQuizContainer}>
-        <Text style={styles.errorMessage}>
-          Cargando...
-        </Text>
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.noQuizContainer}>
+          <Text style={styles.errorMessage}>Cargando...</Text>
+        </View>
       </View>
-
-    </View>);
+    );
   }
 
   return (

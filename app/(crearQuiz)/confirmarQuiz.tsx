@@ -1,73 +1,88 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, BackHandler  } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  BackHandler,
+} from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
 import { QuestionPayload } from "../types/questionPayload";
-import { Tables } from "database.types";;
-import QuizScreen from './resolverQuizPreview';
+import { Tables } from "database.types";
+import QuizScreen from "./resolverQuizPreview";
 import { ExerciseService } from "../../services/exercise";
-import ToastManager, { Toast } from 'toastify-react-native';
-
+import ToastManager, { Toast } from "toastify-react-native";
 
 type ConfirmarTestScreenProps = {
-  QuestionPayload: QuestionPayload[]; 
+  QuestionPayload: QuestionPayload[];
   infoEjercicio: Tables<"exercises">;
   authorName: string;
-  setLoadedQuiz: (loaded: boolean) => void; 
+  setLoadedQuiz: (loaded: boolean) => void;
 };
 
-export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,authorName, setLoadedQuiz }: ConfirmarTestScreenProps)  {
+export default function ConfirmarTestScreen({
+  QuestionPayload,
+  infoEjercicio,
+  authorName,
+  setLoadedQuiz,
+}: ConfirmarTestScreenProps) {
   const router = useRouter();
-  const [previewQuiz, setPreviewQuiz]  = useState(false);
+  const [previewQuiz, setPreviewQuiz] = useState(false);
   const [previewQuestion, setPreviewQuestion] = useState<QuestionPayload>();
   const [isCreating, setIsCreating] = useState(false);
   //Función para prevenir el ir para atrás
   useEffect(() => {
     const handleBackPress = () => {
-        setLoadedQuiz(false);
-        return true; 
+      setLoadedQuiz(false);
+      return true;
     };
-    const subscription = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      handleBackPress
+    );
     return () => {
-        subscription.remove();
+      subscription.remove();
     };
   }, [setLoadedQuiz]);
 
-  async function handleCreateExercise()
-  {
+  async function handleCreateExercise() {
     setIsCreating(true);
-    try
-    {
-      const { data, error } = await ExerciseService.createExercise(infoEjercicio,QuestionPayload);
+    try {
+      const { data, error } = await ExerciseService.createExercise(
+        infoEjercicio,
+        QuestionPayload
+      );
       // Manejo de errores
       if (error) {
         console.error("Error al crear el ejercicio:", error.message);
-        Toast.warn('Hubo un error al crear el ejercicio. Revisa la consola para más detalles.');
+        Toast.warn(
+          "Hubo un error al crear el ejercicio. Revisa la consola para más detalles."
+        );
         return;
       }
       // Si no hay errores, puedes procesar los datos
       console.log("Ejercicio creado exitosamente:", data);
       //Toast.success("Ejercicio creado exitosamente");
       router.replace("quizCreadoConExito");
-
-    }catch(err) 
-    {
+    } catch (err) {
       console.error("Error inesperado:", err);
-      Toast.warn("Ocurrió un error inesperado. Revisa la consola para más detalles.");
-    }finally {
+      Toast.warn(
+        "Ocurrió un error inesperado. Revisa la consola para más detalles."
+      );
+    } finally {
       // Cuando termine la acción, desactivar el estado de carga
       setIsCreating(false);
     }
+  }
 
-   
-  };
-
-  if(previewQuiz == true)
-  {
-    return(
+  if (previewQuiz == true) {
+    return (
       <QuizScreen
-      infoQuestion={previewQuestion}
-      codeToSolve={infoEjercicio.wrongcode}
-      setPreviewQuiz= {setPreviewQuiz}
+        infoQuestion={previewQuestion}
+        codeToSolve={infoEjercicio.wrongcode}
+        setPreviewQuiz={setPreviewQuiz}
       />
     );
   }
@@ -99,14 +114,13 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
           {/* Profile Section */}
           <View style={styles.profileContainer}>
             <Image
-              source={require("../../assets/images/usuario.png")}
+              source={require("../../assets/userplaceholder.jpg")}
               style={styles.profileImage}
             />
             <View style={styles.userInfo}>
               <Text style={styles.userName}>{authorName}</Text>
             </View>
           </View>
-
 
           {/* Quiz Info Section */}
           <View style={styles.infoContainer}>
@@ -116,16 +130,16 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
               {infoEjercicio.instructions}
             </Text>
             <Text style={styles.category}>Categoría:</Text>
-            <Text style={styles.categoryUpdate}>{infoEjercicio.categoryid}</Text>
+            <Text style={styles.categoryUpdate}>
+              {infoEjercicio.categoryid}
+            </Text>
           </View>
 
           {/* Code Section */}
           <View style={styles.codeContainer}>
             <Text style={styles.codeHeader}>Código a resolver:</Text>
             <View style={styles.codeBox}>
-              <Text style={styles.code}>
-                {infoEjercicio.wrongcode}
-              </Text>
+              <Text style={styles.code}>{infoEjercicio.wrongcode}</Text>
             </View>
           </View>
 
@@ -133,7 +147,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
           <View style={styles.outputContainer}>
             <Text style={styles.outputHeader}>Numero de preguntas:</Text>
             <View style={styles.outputBox}>
-              <Text style={styles.output}>{QuestionPayload.length }</Text>
+              <Text style={styles.output}>{QuestionPayload.length}</Text>
             </View>
           </View>
 
@@ -141,44 +155,48 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
           <View style={styles.answersContainer}>
             <Text style={styles.answersHeader}>Resuelve:</Text>
             {QuestionPayload.length > 0 ? (
-                QuestionPayload.map((question, index) => (
-                  <TouchableOpacity key={index} style={styles.answerOption}
-                    onPress={() => 
-                      {
-                        console.log("presionao: " + previewQuiz);
-                        setPreviewQuestion(question);
-                        setPreviewQuiz(true);
-                      }
-                    }
-                  >
-                    <View style={styles.answerBox}>
-                      <Image
-                        source={require("../../assets/images/fime-logo2.png")}
-                        style={styles.answerImage}
-                      />
-                      <Text style={styles.answerText}>Línea #{question.lineStart}</Text>
-                    </View>
-                  </TouchableOpacity>
-                ))
+              QuestionPayload.map((question, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.answerOption}
+                  onPress={() => {
+                    console.log("presionao: " + previewQuiz);
+                    setPreviewQuestion(question);
+                    setPreviewQuiz(true);
+                  }}
+                >
+                  <View style={styles.answerBox}>
+                    <Image
+                      source={require("../../assets/images/fime-logo2.png")}
+                      style={styles.answerImage}
+                    />
+                    <Text style={styles.answerText}>
+                      Línea #{question.lineStart}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))
             ) : (
-                <Text style={styles.answerText} >No hay preguntas disponibles.</Text>
+              <Text style={styles.answerText}>
+                No hay preguntas disponibles.
+              </Text>
             )}
-
           </View>
 
           {/* Buttons */}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.regresarButton}
-              onPress={() => setLoadedQuiz(false) }
+              onPress={() => setLoadedQuiz(false)}
               disabled={isCreating}
             >
               <Text style={styles.regresarButtonText}>Regresar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.finalizarButton}
-             onPress={handleCreateExercise}
-             disabled={isCreating}
-             >
+            <TouchableOpacity
+              style={styles.finalizarButton}
+              onPress={handleCreateExercise}
+              disabled={isCreating}
+            >
               {isCreating ? (
                 <Text style={styles.finalizarButtonText}>Creando...</Text>
               ) : (
@@ -190,7 +208,7 @@ export default function ConfirmarTestScreen({ QuestionPayload,infoEjercicio,auth
       </ScrollView>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -392,5 +410,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
-
